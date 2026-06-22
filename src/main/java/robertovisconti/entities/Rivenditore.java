@@ -1,6 +1,9 @@
 package robertovisconti.entities;
 
+import jakarta.persistence.Column;
+
 public class Rivenditore extends PuntoDiEmissione {
+    @Column(nullable = false)
     private boolean aperto;
 
     protected Rivenditore(){

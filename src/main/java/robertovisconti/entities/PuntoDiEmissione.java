@@ -10,7 +10,9 @@ import java.util.UUID;
 public class PuntoDiEmissione {
     @Id
     @GeneratedValue
+    @Column(name="punto_di_emissione_id")
     protected UUID id;
+    @Column(nullable = false)
     protected String nome;
 
     protected PuntoDiEmissione() {}

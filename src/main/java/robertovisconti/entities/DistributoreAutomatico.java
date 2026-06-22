@@ -1,8 +1,10 @@
 package robertovisconti.entities;
 
+import jakarta.persistence.Column;
 import robertovisconti.enums.StatoDistributoreAutomatico;
 
 public class DistributoreAutomatico extends PuntoDiEmissione{
+    @Column(nullable = false)
     private StatoDistributoreAutomatico stato;
 
     protected DistributoreAutomatico() {}
