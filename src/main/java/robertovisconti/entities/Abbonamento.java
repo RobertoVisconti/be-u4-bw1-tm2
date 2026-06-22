@@ -1,13 +1,13 @@
 package robertovisconti.entities;
 
 import jakarta.persistence.*;
-import org.hibernate.sql.results.jdbc.internal.ResultSetAccess;
+import robertovisconti.enums.TipoAbbonamento;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "abbonamento")
-public class Abbonamento extends TitoloViaggio{
+public class Abbonamento extends TitoloViaggio {
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_abbonamento")
     private TipoAbbonamento tipoAbbonamento;
@@ -19,21 +19,20 @@ public class Abbonamento extends TitoloViaggio{
     @JoinColumn(name = "id_tessera", nullable = false)
     private Tessera tessera;
 
-    protected Abbonamento(){}
-    public Abbonamento(TipoAbbonamento tipoAbbonamento, LocalDate dataEmissione, LocalDate dataScadenza){
+    protected Abbonamento() {
+    }
+
+    public Abbonamento(TipoAbbonamento tipoAbbonamento, LocalDate dataEmissione, LocalDate dataScadenza) {
         this.tipoAbbonamento = tipoAbbonamento;
         this.dataEmissione = LocalDate.now();
         switch (tipoAbbonamento) {
-            case SETTIMANALE ->
-                    this.dataScadenza = LocalDate.now().plusDays(7);
+            case SETTIMANALE -> this.dataScadenza = LocalDate.now().plusDays(7);
 
-            case MENSILE ->
-                    this.dataScadenza = LocalDate.now().plusMonths(1);
+            case MENSILE -> this.dataScadenza = LocalDate.now().plusMonths(1);
 
-            case ANNUALE ->
-                    this.dataScadenza = LocalDate.now().plusYears(1);
+            case ANNUALE -> this.dataScadenza = LocalDate.now().plusYears(1);
         }
-        }
+    }
 
     public TipoAbbonamento getTipoAbbonamento() {
         return tipoAbbonamento;
