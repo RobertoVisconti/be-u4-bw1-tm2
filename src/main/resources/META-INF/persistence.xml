@@ -13,6 +13,7 @@
         <class>robertovisconti.entities.TitoloViaggio</class>
         <class>robertovisconti.entities.Abbonamento</class>
         <class>robertovisconti.entities.Biglietto</class>
+        <class>robertovisconti.entities.Percorrenza</class>
         <properties>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/be-u4-bw1-tm2"/>
             <property name="jakarta.persistence.jdbc.user" value="postgres"/>
