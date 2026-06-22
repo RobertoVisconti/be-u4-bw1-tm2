@@ -1,7 +1,9 @@
 package robertovisconti.entities;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 
+@Entity
 public class Rivenditore extends PuntoDiEmissione {
     @Column(nullable = false)
     private boolean aperto;
