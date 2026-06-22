@@ -11,4 +11,19 @@ public class DistributoreAutomatico extends PuntoDiEmissione{
         super(nome);
         this.stato = stato;
     }
+
+    public void setStato(StatoDistributoreAutomatico stato) {
+        this.stato = stato;
+    }
+
+    @Override
+    public String toString() {
+        return "DistributoreAutomatico{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", stato=" + stato +
+                '}';
+    }
+
+
 }
