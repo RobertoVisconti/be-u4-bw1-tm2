@@ -5,7 +5,7 @@ import robertovisconti.enums.StatoDistributoreAutomatico;
 public class DistributoreAutomatico extends PuntoDiEmissione{
     private StatoDistributoreAutomatico stato;
 
-    public DistributoreAutomatico() {}
+    protected DistributoreAutomatico() {}
 
     public DistributoreAutomatico(String nome, StatoDistributoreAutomatico stato) {
         super(nome);

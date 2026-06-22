@@ -13,7 +13,7 @@ public class PuntoDiEmissione {
     protected UUID id;
     protected String nome;
 
-    public PuntoDiEmissione() {}
+    protected PuntoDiEmissione() {}
 
     public PuntoDiEmissione(String nome){
         this.nome = nome;

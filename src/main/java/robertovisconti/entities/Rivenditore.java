@@ -3,7 +3,7 @@ package robertovisconti.entities;
 public class Rivenditore extends PuntoDiEmissione {
     private boolean aperto;
 
-    public Rivenditore(){
+    protected Rivenditore(){
     }
 
     public Rivenditore(String nome, boolean aperto) {
