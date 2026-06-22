@@ -1,23 +1,23 @@
 package robertovisconti.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name="punti_di_emissione")
 public class PuntoDiEmissione {
     @Id
     @GeneratedValue
-    private UUID id;
-    private String nome;
+    protected UUID id;
+    protected String nome;
 
     public PuntoDiEmissione() {}
 
     public PuntoDiEmissione(String nome){
         this.nome = nome;
     }
+
+
 }
