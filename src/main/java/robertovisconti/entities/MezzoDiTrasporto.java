@@ -52,4 +52,14 @@ public class MezzoDiTrasporto {
     public StatoMezzo getStatoMezzo() {
         return statoMezzo;
     }
+
+    @Override
+    public String toString() {
+        return "MezzoDiTrasporto{" +
+                "id=" + id +
+                ", tipoMezzo=" + tipoMezzo +
+                ", capienza=" + capienza +
+                ", statoMezzo=" + statoMezzo +
+                '}';
+    }
 }
