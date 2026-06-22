@@ -3,6 +3,13 @@
              xmlns="http://xmlns.jcp.org/xml/ns/persistence"
              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
     <persistence-unit name="be-u4-bw1-tm2">
+        <class>robertovisconti.entities.Tessera</class>
+        <class>robertovisconti.entities.PuntoDiEmissione</class>
+        <class>robertovisconti.entities.DistributoreAutomatico</class>
+        <class>robertovisconti.entities.Rivenditore</class>
+        <class>robertovisconti.entities.Tratta</class>
+        <class>robertovisconti.entities.MezzoDiTrasporto</class>
+        <class>robertovisconti.entities.Manutenzione</class>
         <properties>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/be-u4-bw1-tm2"/>
             <property name="jakarta.persistence.jdbc.user" value="postgres"/>
