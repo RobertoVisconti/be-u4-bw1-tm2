@@ -2,16 +2,22 @@ package robertovisconti;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.Persistence;
 import net.datafaker.Faker;
+import robertovisconti.dao.MezzoDiTrasportoDAO;
 import robertovisconti.dao.TesseraDAO;
 import robertovisconti.dao.UtenteDAO;
+import robertovisconti.entities.MezzoDiTrasporto;
 import robertovisconti.entities.Tessera;
 import robertovisconti.entities.Utente;
 import robertovisconti.enums.Ruolo;
-import robertovisconti.exceptions.InputNonValidoException;
+import robertovisconti.enums.StatoMezzo;
+import robertovisconti.enums.TipoMezzo;
 import robertovisconti.exceptions.UtenteNonTrovatoException;
 
+import java.util.Objects;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -20,71 +26,122 @@ public class Application {
     public static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-
-        // apro l'EntityManager
         EntityManager em = entityManagerFactory.createEntityManager();
 
-        // DAO pronti per i metodi
         TesseraDAO tesseraDAO = new TesseraDAO(em);
         UtenteDAO utenteDAO = new UtenteDAO(em);
+        MezzoDiTrasportoDAO mezzoDiTrasportoDAO = new MezzoDiTrasportoDAO(em);
+
+
+//        utenteDAO.saveUtente(new Utente("Roberto", "Admin", "ciaosonounadmin@adming.it", Ruolo.ADMIN));
 
         boolean chiuso = true;
         while (chiuso) {
-            System.out.println("******* MENU PRINCIPALE *******");
-            System.out.println("1. Genera utenti");
-            System.out.println("2. Ricerca utenti");
-            System.out.println("0. Esci");
-            System.out.print(" Scegli un opzione: ");
+            System.out.println("\n******* TRASPORTO PUBBLICO *******");
+            System.out.println("Inserisci la tua email per accedere");
+            System.out.println("0. Chiudi Applicazione");
+            System.out.print("Scegli un'opzione o inserisci email: ");
+
+            String email = scanner.nextLine().trim();
+            if (Objects.equals(email, "0")) {
+                System.out.println("Applicazione in chiusura...");
+                break;
+            }
+
+            try {
+
+                Utente emailScanner = utenteDAO.findByEmail(email);
+
+                switch (emailScanner.getRuolo()) {
+                    case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO);
+                    case USER -> caseUser(tesseraDAO);
+                    default -> System.out.println("Ruolo non riconosciuto.");
+                }
+
+            } catch (NoResultException ex) {
+                System.out.println("Errore: Nessun utente associato a questa email.");
+            }
+        }
+
+        em.close();
+        entityManagerFactory.close();
+    }
+
+
+    // Case Amministratore
+    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+        boolean inMenu = true;
+        while (inMenu) {
+            System.out.println("\n******* MENU PRINCIPALE ADMIN *******");
+            System.out.println("1. Genera utenti / tessera / non tessera");
+            System.out.println("2. Creazione mezzi di trasporto");
+            System.out.println("3. Ricerca utenti");
+            System.out.println("0. Logout");
+            System.out.print("Scegli un'opzione: ");
 
             int scelta;
             try {
-                try {
-                    scelta = Integer.parseInt(scanner.nextLine());
-                } catch (NumberFormatException ex) {
-
-                    throw new InputNonValidoException("Devi inserire un numero valido per il menù.");
-                }
-            } catch (InputNonValidoException ex) {
-
-                System.out.println("Errore: " + ex.getMessage());
+                scelta = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException ex) {
+                System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
             }
 
             switch (scelta) {
                 case 1 -> creazioneUtenti(tesseraDAO, utenteDAO);
-                case 2 -> ricercaUtenti(utenteDAO);
+                case 2 -> creazioneMezzi(mezzoDiTrasportoDAO);
+                case 3 -> ricercaUtenti(utenteDAO);
                 case 0 -> {
-                    System.out.println("Applicazione chiusa");
-                    chiuso = false;
+                    System.out.println("Logout amministratore effettuato.");
+                    inMenu = false;
                 }
                 default -> System.out.println("Opzione non valida.");
             }
-
         }
+    }
 
+    //Case Utente
+    public static void caseUser(TesseraDAO tesseraDAO) {
+        boolean inMenu = true;
+        while (inMenu) {
+            System.out.println("\n******* MENU PRINCIPALE UTENTE *******");
+            System.out.println("1. Visualizza stato della tessera");
+            System.out.println("0. Logout");
+            System.out.print("Scegli un'opzione: ");
 
-//        em.close();
-//        entityManagerFactory.close();
+            int scelta;
+            try {
+                scelta = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException ex) {
+                System.out.println("Errore: Inserire un numero valido.");
+                scelta = -1;
+            }
+
+            switch (scelta) {
+                case 1 -> System.out.println("Funzionalità utente in sviluppo...");
+                case 0 -> {
+                    System.out.println("Logout utente effettuato.");
+                    inMenu = false;
+                }
+                default -> System.out.println("Opzione non valida.");
+            }
+        }
     }
 
     // Creazione Utenti
     public static void creazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO) {
-        // genera nomi e cognomi
         Faker faker = new Faker();
         for (int i = 0; i < 50; i++) {
 
-            Tessera tessera = new Tessera(UUID.randomUUID());
-            tesseraDAO.saveTessera(tessera);
-
-            // (1 su 10) ne creo uno amministratore
             Ruolo ruolo = (i % 10 == 0) ? Ruolo.ADMIN : Ruolo.USER;
+            String email = faker.internet().emailAddress();
 
-            // creo l'utente con nome e cognome finti generati da Faker
-            Utente utente = new Utente(faker.name().firstName(), faker.name().lastName(), ruolo);
-
-            utente.setIdTessera(tessera);
-
-            // salvo l'utente nel database
+            Utente utente = new Utente(faker.name().firstName(), faker.name().lastName(), email, ruolo);
+            if (i % 5 == 0) {
+                Tessera tessera = new Tessera(UUID.randomUUID());
+                tesseraDAO.saveTessera(tessera);
+                utente.setIdTessera(tessera);
+            }
             utenteDAO.saveUtente(utente);
         }
         System.out.println("Creazione utenti avvenuta con successo.");
@@ -100,8 +157,28 @@ public class Application {
             System.out.println(trovato);
         } catch (UtenteNonTrovatoException ex) {
             System.out.println("Errore: " + ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            System.out.println("Errore: Formato UUID non valido.");
         }
     }
 
+    // Creazione Mezzi di trasporti
+    public static void creazioneMezzi(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+        Faker faker = new Faker();
+        Random random = new Random();
 
+        TipoMezzo[] tipi = TipoMezzo.values();
+        StatoMezzo[] stati = StatoMezzo.values();
+
+        for (int i = 0; i < 20; i++) {
+            TipoMezzo tipo = tipi[random.nextInt(tipi.length)];
+            StatoMezzo stato = stati[random.nextInt(stati.length)];
+            int capienza = random.nextInt(30, 201);
+            String targa = faker.vehicle().licensePlate();
+
+            MezzoDiTrasporto mezzo = new MezzoDiTrasporto(tipo, capienza, stato, targa);
+            mezzoDiTrasportoDAO.save(mezzo);
+        }
+        System.out.println("Creazione 20 mezzi completata con successo.");
+    }
 }

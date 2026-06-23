@@ -23,9 +23,13 @@ public class Utente {
     @Column(name = "cognome", nullable = false)
     private String cognome;
 
+    // email utente
+    @Column(name = "e_mail", nullable = false, unique = true)
+    private String email;
+
     // id della tessera associata all'utente.
-    @OneToOne
-    @JoinColumn(name = "id_tessera", nullable = false, unique = true)
+    @OneToOne(optional = true)
+    @JoinColumn(name = "id_tessera", unique = true)
     private Tessera idTessera;
 
     // ruolo dell'utente (USER o ADMIN).
@@ -38,9 +42,10 @@ public class Utente {
     }
 
     // Costruttore che uso io per creare un utente con i suoi dati.
-    public Utente(String nome, String cognome, Ruolo ruolo) {
+    public Utente(String nome, String cognome, String email, Ruolo ruolo) {
         this.nome = nome;
         this.cognome = cognome;
+        this.email = email;
         this.ruolo = ruolo;
     }
 

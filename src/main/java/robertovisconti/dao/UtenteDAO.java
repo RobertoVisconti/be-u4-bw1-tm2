@@ -3,9 +3,12 @@ package robertovisconti.dao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.TypedQuery;
 import robertovisconti.entities.Utente;
+import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
 import robertovisconti.exceptions.UtenteNonTrovatoException;
 
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -33,6 +36,18 @@ public class UtenteDAO {
         return utente;
     }
 
+    public Utente findByEmail(String email) {
+        TypedQuery<Utente> query = em.createQuery("SELECT u FROM Utente u WHERE u.email = :email", Utente.class);
+        query.setParameter("email", email);
+        Optional<Utente> utenteOptional = query.getResultStream().findFirst();
+        if (utenteOptional.isPresent()) {
+            System.out.println(utenteOptional + " Utente loggato con successo.");
+            return utenteOptional.get();
+        } else {
+            throw new UtenteEmailNonTrovatoException(email);
+        }
+    }
+
     public void deleteUtente(UUID id) {
         Utente utente = findByID(id);
         EntityTransaction tx = em.getTransaction();
@@ -41,5 +56,6 @@ public class UtenteDAO {
         tx.commit();
         System.out.println(utente + " Rimosso con successo.");
     }
+
 
 }
