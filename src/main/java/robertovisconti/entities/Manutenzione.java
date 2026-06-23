@@ -62,6 +62,10 @@ public class Manutenzione {
         return motivo;
     }
 
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
+    }
+
     @Override
     public String toString() {
         return "Manutenzione{" +
