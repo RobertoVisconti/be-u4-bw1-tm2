@@ -23,7 +23,7 @@ public class PuntoDiEmissione {
     }
 
     public Biglietto vendiBiglietto(MezzoDiTrasporto mezzoDiTrasporto){
-        Biglietto biglietto = new Biglietto(LocalDateTime.now(), this, mezzoDiTrasporto, null);
+        Biglietto biglietto = new Biglietto(LocalDateTime.now(), this, mezzoDiTrasporto);
         System.out.println("Il biglietto " + biglietto + " è stato creato e venduto!");
         return biglietto;
     }

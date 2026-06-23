@@ -19,12 +19,10 @@ public class Biglietto extends TitoloViaggio {
     protected Biglietto() {
     }
 
-    public Biglietto(LocalDateTime dataEmissione, PuntoDiEmissione puntoDiEmissione, MezzoDiTrasporto mezzoDiTrasporto, LocalDateTime dataValidazione) {
+
+    public Biglietto(LocalDateTime dataEmissione, PuntoDiEmissione puntoDiEmissione, MezzoDiTrasporto mezzoDiTrasporto) {
         super(dataEmissione, puntoDiEmissione);
-    public Biglietto(UUID codiceUnivoco, PuntoDiEmissione puntoDiEmissione, LocalDate dataEmissione, MezzoDiTrasporto mezzoDiTrasporto, LocalDateTime dataValidazione) {
-        super(codiceUnivoco, puntoDiEmissione, dataEmissione);
         this.mezzoDiTrasporto = mezzoDiTrasporto;
-        this.dataValidazione = dataValidazione;
     }
 
     public MezzoDiTrasporto getMezzoDiTrasporto() {
