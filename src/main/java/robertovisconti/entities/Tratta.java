@@ -27,6 +27,30 @@ public class Tratta {
         this.tempoPercorrenzaStimato = tempoPercorrenzaStimato;
     }
 
+    public String getPuntoDiPartenza() {
+        return puntoDiPartenza;
+    }
+
+    public String getCapolinea() {
+        return capolinea;
+    }
+
+    public int getTempoPercorrenzaStimato() {
+        return tempoPercorrenzaStimato;
+    }
+
+    public void setPuntoDiPartenza(String puntoDiPartenza) {
+        this.puntoDiPartenza = puntoDiPartenza;
+    }
+
+    public void setCapolinea(String capolinea) {
+        this.capolinea = capolinea;
+    }
+
+    public void setTempoPercorrenzaStimato(int tempoPercorrenzaStimato) {
+        this.tempoPercorrenzaStimato = tempoPercorrenzaStimato;
+    }
+
     @Override
     public String toString() {
         return "Tratta{" +
