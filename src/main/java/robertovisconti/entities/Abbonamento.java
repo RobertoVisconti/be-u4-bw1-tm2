@@ -13,8 +13,6 @@ public class Abbonamento extends TitoloViaggio {
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_abbonamento")
     private TipoAbbonamento tipoAbbonamento;
-    @Column(name = "data_emissione")
-    private LocalDateTime dataEmissione;
     @Column(name = "data_scadenza")
     private LocalDateTime dataScadenza;
     @ManyToOne
@@ -24,8 +22,9 @@ public class Abbonamento extends TitoloViaggio {
     protected Abbonamento() {
     }
 
-    public Abbonamento(UUID codiceUnivoco, PuntoDiEmissione puntoDiEmissione, TipoAbbonamento tipoAbbonamento, LocalDateTime dataEmissione, LocalDateTime dataScadenza, Tessera tessera) {
+    public Abbonamento(LocalDateTime dataEmissione, PuntoDiEmissione puntoDiEmissione, UUID codiceUnivoco, LocalDateTime dataScadenza, TipoAbbonamento tipoAbbonamento) {
         super(dataEmissione, puntoDiEmissione, codiceUnivoco);
+        this.dataScadenza = dataScadenza;
         switch (tipoAbbonamento) {
             case SETTIMANALE -> this.dataScadenza = LocalDateTime.now().plusDays(7);
 
@@ -33,22 +32,13 @@ public class Abbonamento extends TitoloViaggio {
 
             case ANNUALE -> this.dataScadenza = LocalDateTime.now().plusYears(1);
         }
-        this.dataEmissione = dataEmissione;
-        this.dataScadenza = dataScadenza;
-        this.tessera = tessera;
     }
-
 
     public TipoAbbonamento getTipoAbbonamento() {
         return tipoAbbonamento;
     }
 
-    @Override
-    public LocalDateTime getDataEmissione() {
-        return dataEmissione;
-    }
-
-    public LocalDateTime getDataScadenza() {
+       public LocalDateTime getDataScadenza() {
         return dataScadenza;
     }
 
@@ -60,19 +50,15 @@ public class Abbonamento extends TitoloViaggio {
         this.tipoAbbonamento = tipoAbbonamento;
     }
 
-    public void setDataEmissione(LocalDateTime dataEmissione) {
-        this.dataEmissione = dataEmissione;
-    }
-
-    public void setDataScadenza(LocalDateTime dataScadenza) {
+   public void setDataScadenza(LocalDateTime dataScadenza) {
         this.dataScadenza = dataScadenza;
     }
 
     @Override
     public String toString() {
         return "Abbonamento{" +
-                "tipoAbbonamento=" + tipoAbbonamento +
-                ", dataEmissione=" + dataEmissione +
+                super.toString() + 
+                "tipoAbbonamento=" + tipoAbbonamento  +
                 ", dataScadenza=" + dataScadenza +
                 ", tessera=" + tessera +
                 '}';
