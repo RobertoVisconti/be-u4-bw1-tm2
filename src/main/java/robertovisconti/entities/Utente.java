@@ -6,8 +6,8 @@ import robertovisconti.enums.Ruolo;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user")
-public class User {
+@Table(name = "utente")
+public class Utente {
 
     // id dell'utente
     @Id
@@ -16,31 +16,31 @@ public class User {
     private UUID id;
 
     // nome dell'utente
-    @Column(name = "nome")
+    @Column(name = "nome", nullable = false)
     private String nome;
 
     // cognome dell'utente
-    @Column(name = "cognome")
+    @Column(name = "cognome", nullable = false)
     private String cognome;
 
     // id della tessera associata all'utente.
-    @Column(name = "id_tessera")
-    private UUID idTessera;
+    @OneToOne
+    @JoinColumn(name = "id_tessera", nullable = false, unique = true)
+    private Tessera idTessera;
 
     // ruolo dell'utente (USER o ADMIN).
     @Enumerated(EnumType.STRING)
-    @Column(name = "ruolo")
+    @Column(name = "ruolo", nullable = false)
     private Ruolo ruolo;
 
 
-    protected User() {
+    protected Utente() {
     }
 
     // Costruttore che uso io per creare un utente con i suoi dati.
-    public User(String nome, String cognome, UUID idTessera, Ruolo ruolo) {
+    public Utente(String nome, String cognome, Ruolo ruolo) {
         this.nome = nome;
         this.cognome = cognome;
-        this.idTessera = idTessera;
         this.ruolo = ruolo;
     }
 
@@ -56,7 +56,7 @@ public class User {
         return cognome;
     }
 
-    public UUID getIdTessera() {
+    public Tessera getIdTessera() {
         return idTessera;
     }
 

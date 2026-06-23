@@ -1,27 +1,26 @@
 package robertovisconti.entities;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "biglietto")
-public class Biglietto extends TitoloViaggio{
+public class Biglietto extends TitoloViaggio {
     @ManyToOne
     @JoinColumn(name = "id_mezzo")
     private MezzoDiTrasporto mezzoDiTrasporto;
 
-    @Column(name = "vidimato")
-    private boolean vidimato;
-
     @Column(name = "data_validazione")
-    private LocalDate dataValidazione;
+    private LocalDateTime dataValidazione;
 
-    protected Biglietto(){}
+    protected Biglietto() {
+    }
 
-    public Biglietto(LocalDate dataEmissione, PuntoDiEmissione puntoDiEmissione, MezzoDiTrasporto mezzoDiTrasporto, boolean vidimato, LocalDate dataValidazione) {
+    public Biglietto(LocalDate dataEmissione, PuntoDiEmissione puntoDiEmissione, MezzoDiTrasporto mezzoDiTrasporto, LocalDateTime dataValidazione) {
         super(dataEmissione, puntoDiEmissione);
         this.mezzoDiTrasporto = mezzoDiTrasporto;
-        this.vidimato = vidimato;
         this.dataValidazione = dataValidazione;
     }
 
@@ -29,19 +28,15 @@ public class Biglietto extends TitoloViaggio{
         return mezzoDiTrasporto;
     }
 
-    public boolean isVidimato() {
-        return vidimato;
-    }
 
-    public LocalDate getDataValidazione() {
+    public LocalDateTime getDataValidazione() {
         return dataValidazione;
     }
 
     @Override
     public String toString() {
-        return "Biglietto{" + super.toString() + 
+        return "Biglietto{" + super.toString() +
                 "mezzoDiTrasporto=" + mezzoDiTrasporto +
-                ", vidimato=" + vidimato +
                 ", dataValidazione=" + dataValidazione +
                 '}';
     }
