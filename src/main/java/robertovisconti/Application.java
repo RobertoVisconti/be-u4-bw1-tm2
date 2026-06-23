@@ -27,11 +27,30 @@ public class Application {
         TesseraDAO tesseraDAO = new TesseraDAO(em);
         UtenteDAO utenteDAO = new UtenteDAO(em);
 
+        boolean chiuso = false;
+        while (chiuso) {
+            System.out.println("******* MENU PRINCIPALE *******");
+            System.out.println("1. Genera utenti");
+            System.out.println("2. Ricerca utenti");
+            System.out.println("0. Esci");
+            System.out.print(" Scegli un opzione: ");
 
-        System.out.println("Generazione dei 50 utenti iniziali completata.");
+            int scelta = Integer.parseInt(scanner.nextLine());
 
-        em.close();
-        entityManagerFactory.close();
+            switch (scelta) {
+                case 1 -> creazioneUtenti(tesseraDAO, utenteDAO);
+                case 2 -> ricercaUtenti(utenteDAO);
+                case 0 -> {
+                    System.out.println("Applicazione chiusa");
+                    chiuso = true;
+                }
+                default -> System.out.println("Opzione non valida.");
+            }
+        }
+
+
+//        em.close();
+//        entityManagerFactory.close();
     }
 
     // Creazione Utenti
@@ -67,5 +86,6 @@ public class Application {
             System.out.println("Errore: " + ex.getMessage());
         }
     }
+
 
 }
