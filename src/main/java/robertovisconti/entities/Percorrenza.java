@@ -36,6 +36,9 @@ public class Percorrenza {
         this.dataFine = dataFine;
     }
 
+    public void setDataFine(LocalDateTime dataFine) {
+        this.dataFine = dataFine;
+    }
 
     public LocalDateTime getDataInizio() {
         return dataInizio;

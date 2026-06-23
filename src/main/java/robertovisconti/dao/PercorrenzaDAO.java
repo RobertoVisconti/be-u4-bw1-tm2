@@ -88,4 +88,12 @@ public class PercorrenzaDAO {
         long mediaSecondi = secondiTotali / percorrenze.size();
         return Duration.ofSeconds(mediaSecondi);
     }
+
+    public List<Percorrenza> percorrenzeSuTrattaPerMezzo(Tratta tratta, MezzoDiTrasporto mezzo) {
+        TypedQuery<Percorrenza> query = em.createQuery("SELECT p FROM Percorrenza p WHERE p.tratta = :tratta AND p.mezzo = :mezzo", Percorrenza.class);
+        query.setParameter("tratta", tratta);
+        query.setParameter("mezzo", mezzo);
+        return query.getResultList();
+    }
+    
 }
