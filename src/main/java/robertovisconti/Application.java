@@ -9,6 +9,7 @@ import robertovisconti.dao.UtenteDAO;
 import robertovisconti.entities.Tessera;
 import robertovisconti.entities.Utente;
 import robertovisconti.enums.Ruolo;
+import robertovisconti.exceptions.InputNonValidoException;
 import robertovisconti.exceptions.UtenteNonTrovatoException;
 
 import java.util.Scanner;
@@ -35,7 +36,19 @@ public class Application {
             System.out.println("0. Esci");
             System.out.print(" Scegli un opzione: ");
 
-            int scelta = Integer.parseInt(scanner.nextLine());
+            int scelta;
+            try {
+                try {
+                    scelta = Integer.parseInt(scanner.nextLine());
+                } catch (NumberFormatException ex) {
+
+                    throw new InputNonValidoException("Devi inserire un numero valido per il menù.");
+                }
+            } catch (InputNonValidoException ex) {
+
+                System.out.println("Errore: " + ex.getMessage());
+                scelta = -1;
+            }
 
             switch (scelta) {
                 case 1 -> creazioneUtenti(tesseraDAO, utenteDAO);
@@ -46,6 +59,7 @@ public class Application {
                 }
                 default -> System.out.println("Opzione non valida.");
             }
+
         }
 
 
