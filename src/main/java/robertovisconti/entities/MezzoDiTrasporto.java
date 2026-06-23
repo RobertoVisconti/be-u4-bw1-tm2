@@ -27,14 +27,18 @@ public class MezzoDiTrasporto {
     @Enumerated(EnumType.STRING)
     private StatoMezzo statoMezzo;
 
+    @Column(name = "targa", unique = true, nullable = false)
+    private String targa;
+
 
     protected MezzoDiTrasporto() {
     }
 
-    public MezzoDiTrasporto(TipoMezzo tipoMezzo, Integer capienza, StatoMezzo statoMezzo) {
+    public MezzoDiTrasporto(TipoMezzo tipoMezzo, Integer capienza, StatoMezzo statoMezzo, String targa) {
         this.tipoMezzo = tipoMezzo;
         this.capienza = capienza;
         this.statoMezzo = statoMezzo;
+        this.targa = targa;
     }
 
     public UUID getId() {
@@ -53,6 +57,18 @@ public class MezzoDiTrasporto {
         return statoMezzo;
     }
 
+    public void setTipoMezzo(TipoMezzo tipoMezzo) {
+        this.tipoMezzo = tipoMezzo;
+    }
+
+    public void setCapienza(int capienza) {
+        this.capienza = capienza;
+    }
+
+    public void setStatoMezzo(StatoMezzo statoMezzo) {
+        this.statoMezzo = statoMezzo;
+    }
+
     @Override
     public String toString() {
         return "MezzoDiTrasporto{" +
@@ -60,6 +76,7 @@ public class MezzoDiTrasporto {
                 ", tipoMezzo=" + tipoMezzo +
                 ", capienza=" + capienza +
                 ", statoMezzo=" + statoMezzo +
+                ", targa='" + targa + '\'' +
                 '}';
     }
 }
