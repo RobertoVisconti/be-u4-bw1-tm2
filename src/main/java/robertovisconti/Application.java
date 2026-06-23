@@ -9,6 +9,7 @@ import robertovisconti.dao.UtenteDAO;
 import robertovisconti.entities.Tessera;
 import robertovisconti.entities.Utente;
 import robertovisconti.enums.Ruolo;
+import robertovisconti.exceptions.UtenteNonTrovatoException;
 
 import java.util.Scanner;
 import java.util.UUID;
@@ -22,14 +23,22 @@ public class Application {
         // apro l'EntityManager
         EntityManager em = entityManagerFactory.createEntityManager();
 
-        // creo i DAO passandogli l'EntityManager, cosi' posso salvare tessere e utenti
+        // DAO pronti per i metodi
         TesseraDAO tesseraDAO = new TesseraDAO(em);
         UtenteDAO utenteDAO = new UtenteDAO(em);
 
+
+        System.out.println("Generazione dei 50 utenti iniziali completata.");
+
+        em.close();
+        entityManagerFactory.close();
+    }
+
+    // Creazione Utenti
+    public static void creazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO) {
         // genera nomi e cognomi
         Faker faker = new Faker();
         for (int i = 0; i < 50; i++) {
-
 
             Tessera tessera = new Tessera(UUID.randomUUID());
             tesseraDAO.saveTessera(tessera);
@@ -45,11 +54,18 @@ public class Application {
             // salvo l'utente nel database
             utenteDAO.saveUtente(utente);
         }
+        System.out.println("Creazione utenti avvenuta con successo.");
+    }
 
-        System.out.println("Generazione dei 50 utenti iniziali completata.");
-
-        em.close();
-        entityManagerFactory.close();
+    // Ricerca utente
+    public static void ricercaUtenti(UtenteDAO utenteDAO) {
+        try {
+            System.out.print("Inserisci l'UUID dell'utente da cercare: ");
+            String inserito = scanner.nextLine().trim();
+            UUID id = UUID.fromString(inserito);
+        } catch (UtenteNonTrovatoException ex) {
+            System.out.println("Errore: " + ex.getMessage());
+        }
     }
 
 }
