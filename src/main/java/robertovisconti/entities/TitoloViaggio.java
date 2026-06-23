@@ -3,6 +3,7 @@ package robertovisconti.entities;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -15,7 +16,7 @@ public abstract class TitoloViaggio {
     private UUID id;
 
     @Column(name = "data_emissione")
-    private LocalDate dataEmissione;
+    private LocalDateTime dataEmissione;
 
     @ManyToOne
     @JoinColumn(name = "punto_di_emissione_id", nullable = false)
@@ -26,7 +27,7 @@ public abstract class TitoloViaggio {
 
     protected TitoloViaggio(){}
     public TitoloViaggio(
-            LocalDate dataEmissione,
+            LocalDateTime dataEmissione,
             PuntoDiEmissione puntoDiEmissione
     ) {
         this.dataEmissione = dataEmissione;
@@ -37,7 +38,7 @@ public abstract class TitoloViaggio {
         return id;
     }
 
-    public LocalDate getDataEmissione() {
+    public LocalDateTime getDataEmissione() {
         return dataEmissione;
     }
 

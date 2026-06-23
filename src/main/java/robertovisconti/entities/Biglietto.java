@@ -18,7 +18,7 @@ public class Biglietto extends TitoloViaggio {
     protected Biglietto() {
     }
 
-    public Biglietto(LocalDate dataEmissione, PuntoDiEmissione puntoDiEmissione, MezzoDiTrasporto mezzoDiTrasporto, LocalDateTime dataValidazione) {
+    public Biglietto(LocalDateTime dataEmissione, PuntoDiEmissione puntoDiEmissione, MezzoDiTrasporto mezzoDiTrasporto, LocalDateTime dataValidazione) {
         super(dataEmissione, puntoDiEmissione);
         this.mezzoDiTrasporto = mezzoDiTrasporto;
         this.dataValidazione = dataValidazione;
