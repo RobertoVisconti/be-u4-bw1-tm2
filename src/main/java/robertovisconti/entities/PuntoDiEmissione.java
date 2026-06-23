@@ -1,6 +1,7 @@
 package robertovisconti.entities;
 
 import jakarta.persistence.*;
+import robertovisconti.enums.StatoDistributoreAutomatico;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,9 +24,13 @@ public class PuntoDiEmissione {
     }
 
     public Biglietto vendiBiglietto(MezzoDiTrasporto mezzoDiTrasporto){
-        Biglietto biglietto = new Biglietto(LocalDateTime.now(), this, mezzoDiTrasporto);
-        System.out.println("Il biglietto " + biglietto + " è stato creato e venduto!");
-        return biglietto;
+        if ((this instanceof DistributoreAutomatico && ((DistributoreAutomatico) this).getStato() == StatoDistributoreAutomatico.NON_ATTIVO) || !(this instanceof Rivenditore && ((Rivenditore) this).isAperto())) {
+            throw new RuntimeException("Punto di Emissione CHIUSO.");
+        } else {
+            Biglietto biglietto = new Biglietto(LocalDateTime.now(), this, mezzoDiTrasporto);
+            System.out.println("Il biglietto " + biglietto + " è stato creato e venduto!");
+            return biglietto;
+        }
     }
 
     public UUID getId() {

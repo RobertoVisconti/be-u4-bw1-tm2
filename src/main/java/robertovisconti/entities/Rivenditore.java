@@ -16,6 +16,10 @@ public class Rivenditore extends PuntoDiEmissione {
         this.aperto = aperto;
     }
 
+    public boolean isAperto() {
+        return aperto;
+    }
+
     public void setAperto(boolean aperto) {
         this.aperto = aperto;
     }

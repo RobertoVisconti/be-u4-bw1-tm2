@@ -21,6 +21,10 @@ public class DistributoreAutomatico extends PuntoDiEmissione{
         this.stato = stato;
     }
 
+    public StatoDistributoreAutomatico getStato() {
+        return stato;
+    }
+
     @Override
     public String toString() {
         return "DistributoreAutomatico{" +
