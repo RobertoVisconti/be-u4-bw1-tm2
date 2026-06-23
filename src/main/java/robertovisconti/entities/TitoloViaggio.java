@@ -31,7 +31,11 @@ public abstract class TitoloViaggio {
             PuntoDiEmissione puntoDiEmissione
     ) {
         this.dataEmissione = dataEmissione;
+
+    public TitoloViaggio(UUID codiceUnivoco, PuntoDiEmissione puntoDiEmissione, LocalDate dataEmissione) {
+        this.codiceUnivoco = codiceUnivoco;
         this.puntoDiEmissione = puntoDiEmissione;
+        this.dataEmissione = dataEmissione;
     }
 
     public UUID getId() {
