@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import robertovisconti.enums.TipoAbbonamento;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -13,9 +14,9 @@ public class Abbonamento extends TitoloViaggio {
     @Column(name = "tipo_abbonamento")
     private TipoAbbonamento tipoAbbonamento;
     @Column(name = "data_emissione")
-    private LocalDate dataEmissione;
+    private LocalDateTime dataEmissione;
     @Column(name = "data_scadenza")
-    private LocalDate dataScadenza;
+    private LocalDateTime dataScadenza;
     @ManyToOne
     @JoinColumn(name = "id_tessera", nullable = false)
     private Tessera tessera;
@@ -23,14 +24,14 @@ public class Abbonamento extends TitoloViaggio {
     protected Abbonamento() {
     }
 
-    public Abbonamento(UUID codiceUnivoco, PuntoDiEmissione puntoDiEmissione, TipoAbbonamento tipoAbbonamento, LocalDate dataEmissione, LocalDate dataScadenza, Tessera tessera) {
-        super(codiceUnivoco, puntoDiEmissione, dataEmissione);
+    public Abbonamento(UUID codiceUnivoco, PuntoDiEmissione puntoDiEmissione, TipoAbbonamento tipoAbbonamento, LocalDateTime dataEmissione, LocalDateTime dataScadenza, Tessera tessera) {
+        super(dataEmissione, puntoDiEmissione, codiceUnivoco);
         switch (tipoAbbonamento) {
-            case SETTIMANALE -> this.dataScadenza = LocalDate.now().plusDays(7);
+            case SETTIMANALE -> this.dataScadenza = LocalDateTime.now().plusDays(7);
 
-            case MENSILE -> this.dataScadenza = LocalDate.now().plusMonths(1);
+            case MENSILE -> this.dataScadenza = LocalDateTime.now().plusMonths(1);
 
-            case ANNUALE -> this.dataScadenza = LocalDate.now().plusYears(1);
+            case ANNUALE -> this.dataScadenza = LocalDateTime.now().plusYears(1);
         }
         this.dataEmissione = dataEmissione;
         this.dataScadenza = dataScadenza;
@@ -43,11 +44,11 @@ public class Abbonamento extends TitoloViaggio {
     }
 
     @Override
-    public LocalDate getDataEmissione() {
+    public LocalDateTime getDataEmissione() {
         return dataEmissione;
     }
 
-    public LocalDate getDataScadenza() {
+    public LocalDateTime getDataScadenza() {
         return dataScadenza;
     }
 
@@ -59,11 +60,11 @@ public class Abbonamento extends TitoloViaggio {
         this.tipoAbbonamento = tipoAbbonamento;
     }
 
-    public void setDataEmissione(LocalDate dataEmissione) {
+    public void setDataEmissione(LocalDateTime dataEmissione) {
         this.dataEmissione = dataEmissione;
     }
 
-    public void setDataScadenza(LocalDate dataScadenza) {
+    public void setDataScadenza(LocalDateTime dataScadenza) {
         this.dataScadenza = dataScadenza;
     }
 

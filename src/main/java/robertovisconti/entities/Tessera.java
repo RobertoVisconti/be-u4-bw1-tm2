@@ -42,8 +42,16 @@ public class Tessera {
         return dataEmissione;
     }
 
+    public void setDataEmissione(LocalDate dataEmissione) {
+        this.dataEmissione = dataEmissione;
+    }
+
     public LocalDate getDataScadenza() {
         return dataScadenza;
+    }
+
+    public void setDataScadenza(LocalDate dataScadenza) {
+        this.dataScadenza = dataScadenza;
     }
 
     public UUID getCodiceUnivoco() {

@@ -3,6 +3,7 @@ package robertovisconti.entities;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -15,7 +16,7 @@ public abstract class TitoloViaggio {
     private UUID id;
 
     @Column(name = "data_emissione")
-    private LocalDate dataEmissione;
+    private LocalDateTime dataEmissione;
 
     @ManyToOne
     @JoinColumn(name = "punto_di_emissione_id", nullable = false)
@@ -26,17 +27,17 @@ public abstract class TitoloViaggio {
 
     protected TitoloViaggio(){}
 
-    public TitoloViaggio(UUID codiceUnivoco, PuntoDiEmissione puntoDiEmissione, LocalDate dataEmissione) {
-        this.codiceUnivoco = codiceUnivoco;
-        this.puntoDiEmissione = puntoDiEmissione;
+    public TitoloViaggio(LocalDateTime dataEmissione, PuntoDiEmissione puntoDiEmissione, UUID codiceUnivoco) {
         this.dataEmissione = dataEmissione;
+        this.puntoDiEmissione = puntoDiEmissione;
+        this.codiceUnivoco = codiceUnivoco;
     }
 
     public UUID getId() {
         return id;
     }
 
-    public LocalDate getDataEmissione() {
+    public LocalDateTime getDataEmissione() {
         return dataEmissione;
     }
 
