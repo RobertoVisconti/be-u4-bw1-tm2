@@ -6,6 +6,7 @@ import jakarta.persistence.TypedQuery;
 import robertovisconti.entities.Tessera;
 import robertovisconti.exceptions.TesseraNonTrovataException;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,10 +32,28 @@ public class TesseraDAO {
         Optional<Tessera> tesseraOptional = query.getResultStream().findFirst();
         if (tesseraOptional.isPresent()) {
             System.out.println(tesseraOptional + " Tessera trovata con successo.");
+            return tesseraOptional.get();
         } else {
             throw new TesseraNonTrovataException(codiceUnivoco);
         }
-        return null;
+    }
+
+    public void updateTessera(UUID codiceUnivoco, LocalDate nuovaEmissione, LocalDate nuovaScadenza) {
+        EntityTransaction tx = em.getTransaction();
+        Tessera tessera = findByUnCode(codiceUnivoco);
+        tessera.setDataEmissione(nuovaEmissione);
+        tessera.setDataScadenza(nuovaScadenza);
+        tx.commit();
+        System.out.println(tessera + " Rinnovata con successo.");
+    }
+
+    public void deleteTessera(UUID codiceUnivoco) {
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
+        Tessera tessera = findByUnCode(codiceUnivoco);
+        em.remove(tessera);
+        tx.commit();
+        System.out.println(tessera + " Eliminata con successo.");
     }
 
 

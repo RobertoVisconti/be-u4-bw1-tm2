@@ -2,6 +2,7 @@ package robertovisconti.entities;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -21,5 +22,17 @@ public class PuntoDiEmissione {
         this.nome = nome;
     }
 
+    public Biglietto vendiBiglietto(MezzoDiTrasporto mezzoDiTrasporto){
+        Biglietto biglietto = new Biglietto(LocalDateTime.now(), this, mezzoDiTrasporto);
+        System.out.println("Il biglietto " + biglietto + " è stato creato e venduto!");
+        return biglietto;
+    }
 
+    public UUID getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
 }
