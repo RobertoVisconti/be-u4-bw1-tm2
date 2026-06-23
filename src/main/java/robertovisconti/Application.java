@@ -27,7 +27,7 @@ public class Application {
         TesseraDAO tesseraDAO = new TesseraDAO(em);
         UtenteDAO utenteDAO = new UtenteDAO(em);
 
-        boolean chiuso = false;
+        boolean chiuso = true;
         while (chiuso) {
             System.out.println("******* MENU PRINCIPALE *******");
             System.out.println("1. Genera utenti");
@@ -42,7 +42,7 @@ public class Application {
                 case 2 -> ricercaUtenti(utenteDAO);
                 case 0 -> {
                     System.out.println("Applicazione chiusa");
-                    chiuso = true;
+                    chiuso = false;
                 }
                 default -> System.out.println("Opzione non valida.");
             }
@@ -82,6 +82,8 @@ public class Application {
             System.out.print("Inserisci l'UUID dell'utente da cercare: ");
             String inserito = scanner.nextLine().trim();
             UUID id = UUID.fromString(inserito);
+            Utente trovato = utenteDAO.findByID(id);
+            System.out.println(trovato);
         } catch (UtenteNonTrovatoException ex) {
             System.out.println("Errore: " + ex.getMessage());
         }
