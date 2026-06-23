@@ -58,7 +58,7 @@ public class TitoloViaggioDAO {
     public void updateAbbonamento(
             UUID codiceUnivoco,
             TipoAbbonamento tipoAbbonamento,
-            LocalDate dataEmissione) {
+            LocalDateTime dataEmissione) {
 
         EntityTransaction transaction = entityManager.getTransaction();
 

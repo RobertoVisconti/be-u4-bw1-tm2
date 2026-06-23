@@ -60,6 +60,11 @@ public class Utente {
         return idTessera;
     }
 
+    // setter aggiunto per poter collegare la tessera all'utente dopo averlo creato
+    public void setIdTessera(Tessera idTessera) {
+        this.idTessera = idTessera;
+    }
+
     public Ruolo getRuolo() {
         return ruolo;
     }

@@ -21,7 +21,7 @@ public class Biglietto extends TitoloViaggio {
 
 
     public Biglietto(LocalDateTime dataEmissione, PuntoDiEmissione puntoDiEmissione, MezzoDiTrasporto mezzoDiTrasporto) {
-        super(dataEmissione, puntoDiEmissione);
+        super(dataEmissione, puntoDiEmissione, UUID.randomUUID());
         this.mezzoDiTrasporto = mezzoDiTrasporto;
     }
 
