@@ -49,6 +49,10 @@ public abstract class TitoloViaggio {
         return codiceUnivoco;
     }
 
+    public void setDataEmissione(LocalDateTime dataEmissione) {
+        this.dataEmissione = dataEmissione;
+    }
+
     @Override
     public String toString() {
         return "TitoloViaggio{" +
