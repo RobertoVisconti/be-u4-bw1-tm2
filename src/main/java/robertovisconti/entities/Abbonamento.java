@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import robertovisconti.enums.TipoAbbonamento;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "abbonamento")
@@ -22,9 +23,8 @@ public class Abbonamento extends TitoloViaggio {
     protected Abbonamento() {
     }
 
-    public Abbonamento(TipoAbbonamento tipoAbbonamento, LocalDate dataEmissione, LocalDate dataScadenza) {
-        this.tipoAbbonamento = tipoAbbonamento;
-        this.dataEmissione = LocalDate.now();
+    public Abbonamento(UUID codiceUnivoco, PuntoDiEmissione puntoDiEmissione, TipoAbbonamento tipoAbbonamento, LocalDate dataEmissione, LocalDate dataScadenza, Tessera tessera) {
+        super(codiceUnivoco, puntoDiEmissione);
         switch (tipoAbbonamento) {
             case SETTIMANALE -> this.dataScadenza = LocalDate.now().plusDays(7);
 
@@ -32,7 +32,11 @@ public class Abbonamento extends TitoloViaggio {
 
             case ANNUALE -> this.dataScadenza = LocalDate.now().plusYears(1);
         }
+        this.dataEmissione = dataEmissione;
+        this.dataScadenza = dataScadenza;
+        this.tessera = tessera;
     }
+
 
     public TipoAbbonamento getTipoAbbonamento() {
         return tipoAbbonamento;
@@ -49,6 +53,18 @@ public class Abbonamento extends TitoloViaggio {
 
     public Tessera getTessera() {
         return tessera;
+    }
+
+    public void setTipoAbbonamento(TipoAbbonamento tipoAbbonamento) {
+        this.tipoAbbonamento = tipoAbbonamento;
+    }
+
+    public void setDataEmissione(LocalDate dataEmissione) {
+        this.dataEmissione = dataEmissione;
+    }
+
+    public void setDataScadenza(LocalDate dataScadenza) {
+        this.dataScadenza = dataScadenza;
     }
 
     @Override

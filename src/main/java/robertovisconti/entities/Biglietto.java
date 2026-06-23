@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "biglietto")
@@ -18,8 +19,8 @@ public class Biglietto extends TitoloViaggio {
     protected Biglietto() {
     }
 
-    public Biglietto(LocalDate dataEmissione, PuntoDiEmissione puntoDiEmissione, MezzoDiTrasporto mezzoDiTrasporto, LocalDateTime dataValidazione) {
-        super(dataEmissione, puntoDiEmissione);
+    public Biglietto(UUID codiceUnivoco, PuntoDiEmissione puntoDiEmissione, LocalDate dataEmissione, MezzoDiTrasporto mezzoDiTrasporto, LocalDateTime dataValidazione) {
+        super(codiceUnivoco, puntoDiEmissione, dataEmissione);
         this.mezzoDiTrasporto = mezzoDiTrasporto;
         this.dataValidazione = dataValidazione;
     }
@@ -33,6 +34,10 @@ public class Biglietto extends TitoloViaggio {
         return dataValidazione;
     }
 
+    public void setDataValidazione(LocalDateTime dataValidazione) {
+        this.dataValidazione = dataValidazione;
+    }
+
     @Override
     public String toString() {
         return "Biglietto{" + super.toString() +
@@ -40,4 +45,6 @@ public class Biglietto extends TitoloViaggio {
                 ", dataValidazione=" + dataValidazione +
                 '}';
     }
+
+   
 }
