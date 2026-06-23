@@ -29,15 +29,13 @@ public class Percorrenza {
     protected Percorrenza() {
     }
 
-    public Percorrenza(Tratta tratta, MezzoDiTrasporto mezzo, LocalDateTime dataInizio) {
+    public Percorrenza(Tratta tratta, MezzoDiTrasporto mezzo, LocalDateTime dataInizio, LocalDateTime dataFine) {
         this.tratta = tratta;
         this.mezzo = mezzo;
         this.dataInizio = dataInizio;
-    }
-
-    public void setDataFine(LocalDateTime dataFine) {
         this.dataFine = dataFine;
     }
+
 
     public LocalDateTime getDataInizio() {
         return dataInizio;
