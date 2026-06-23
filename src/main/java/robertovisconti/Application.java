@@ -10,10 +10,12 @@ import robertovisconti.entities.Tessera;
 import robertovisconti.entities.Utente;
 import robertovisconti.enums.Ruolo;
 
+import java.util.Scanner;
 import java.util.UUID;
 
 public class Application {
     private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("be-u4-bw1-tm2");
+    public static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
 
