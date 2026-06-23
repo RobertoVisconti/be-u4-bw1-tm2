@@ -2,6 +2,7 @@ package robertovisconti.entities;
 
 import jakarta.persistence.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -46,6 +47,10 @@ public class Percorrenza {
 
     public LocalDateTime getDataFine() {
         return dataFine;
+    }
+
+    public Duration getTempoEffettivo() {
+        return Duration.between(dataInizio, dataFine);
     }
 
 
