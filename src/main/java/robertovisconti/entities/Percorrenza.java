@@ -39,6 +39,14 @@ public class Percorrenza {
         this.dataFine = dataFine;
     }
 
+    public LocalDateTime getDataInizio() {
+        return dataInizio;
+    }
+
+    public LocalDateTime getDataFine() {
+        return dataFine;
+    }
+
 
     @Override
     public String toString() {
