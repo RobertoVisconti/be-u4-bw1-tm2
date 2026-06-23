@@ -26,16 +26,11 @@ public abstract class TitoloViaggio {
     private UUID codiceUnivoco;
 
     protected TitoloViaggio(){}
-    public TitoloViaggio(
-            LocalDateTime dataEmissione,
-            PuntoDiEmissione puntoDiEmissione
-    ) {
-        this.dataEmissione = dataEmissione;
 
-    public TitoloViaggio(UUID codiceUnivoco, PuntoDiEmissione puntoDiEmissione, LocalDate dataEmissione) {
-        this.codiceUnivoco = codiceUnivoco;
-        this.puntoDiEmissione = puntoDiEmissione;
+    public TitoloViaggio(LocalDateTime dataEmissione, PuntoDiEmissione puntoDiEmissione, UUID codiceUnivoco) {
         this.dataEmissione = dataEmissione;
+        this.puntoDiEmissione = puntoDiEmissione;
+        this.codiceUnivoco = codiceUnivoco;
     }
 
     public UUID getId() {
