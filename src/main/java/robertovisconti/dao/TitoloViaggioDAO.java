@@ -43,6 +43,18 @@ public class TitoloViaggioDAO {
         return query.getSingleResult();
     }
 
+    public void delete(UUID codiceUnivoco) {
+         TitoloViaggio found = findByCodiceUnivoco(codiceUnivoco);
+
+         EntityTransaction transaction = entityManager.getTransaction();
+
+         transaction.begin();
+
+         entityManager.remove(found);
+
+         transaction.commit();
+    }
+
     public void updateAbbonamento(
             UUID codiceUnivoco,
             TipoAbbonamento tipoAbbonamento,
