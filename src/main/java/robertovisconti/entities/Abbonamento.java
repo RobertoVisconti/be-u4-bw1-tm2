@@ -3,7 +3,6 @@ package robertovisconti.entities;
 import jakarta.persistence.*;
 import robertovisconti.enums.TipoAbbonamento;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -38,27 +37,31 @@ public class Abbonamento extends TitoloViaggio {
         return tipoAbbonamento;
     }
 
-       public LocalDateTime getDataScadenza() {
+    public void setTipoAbbonamento(TipoAbbonamento tipoAbbonamento) {
+        this.tipoAbbonamento = tipoAbbonamento;
+    }
+
+    public LocalDateTime getDataScadenza() {
         return dataScadenza;
+    }
+
+    public void setDataScadenza(LocalDateTime dataScadenza) {
+        this.dataScadenza = dataScadenza;
     }
 
     public Tessera getTessera() {
         return tessera;
     }
 
-    public void setTipoAbbonamento(TipoAbbonamento tipoAbbonamento) {
-        this.tipoAbbonamento = tipoAbbonamento;
-    }
-
-   public void setDataScadenza(LocalDateTime dataScadenza) {
-        this.dataScadenza = dataScadenza;
+    public void setTessera(Tessera tessera) {
+        this.tessera = tessera;
     }
 
     @Override
     public String toString() {
         return "Abbonamento{" +
-                super.toString() + 
-                "tipoAbbonamento=" + tipoAbbonamento  +
+                super.toString() +
+                "tipoAbbonamento=" + tipoAbbonamento +
                 ", dataScadenza=" + dataScadenza +
                 ", tessera=" + tessera +
                 '}';

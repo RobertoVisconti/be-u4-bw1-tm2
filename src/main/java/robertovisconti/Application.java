@@ -6,10 +6,7 @@ import jakarta.persistence.Persistence;
 import net.datafaker.Faker;
 import robertovisconti.dao.*;
 import robertovisconti.entities.*;
-import robertovisconti.enums.Ruolo;
-import robertovisconti.enums.StatoDistributoreAutomatico;
-import robertovisconti.enums.StatoMezzo;
-import robertovisconti.enums.TipoMezzo;
+import robertovisconti.enums.*;
 import robertovisconti.exceptions.PuntoDiEmissioneNonTrovatoException;
 import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
 import robertovisconti.exceptions.UtenteNonTrovatoException;
@@ -57,7 +54,7 @@ public class Application {
                 switch (emailScanner.getRuolo()) {
                     case ADMIN ->
                             caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO);
-                    case USER -> caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO);
+                    case USER -> caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
 
@@ -118,7 +115,7 @@ public class Application {
     }
 
     //Case Utente
-    public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO) {
+    public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO) {
         boolean userMenu = true;
         while (userMenu) {
             System.out.println("\n MENU PRINCIPALE UTENTE");
@@ -139,7 +136,7 @@ public class Application {
                 case 1 -> {
                     PuntoDiEmissione punto = selezionaPunto(puntoDiEmissioneDAO);
                     if (punto != null) {
-                        casePunto(punto);
+                        casePunto(punto, titoloViaggioDAO, tesseraDAO);
                     }
                 }
                 case 2 -> caseViaggio(trattaDAO);
@@ -153,7 +150,7 @@ public class Application {
     }
 
     // Case Punto Vendita
-    public static void casePunto(PuntoDiEmissione punto) {
+    public static void casePunto(PuntoDiEmissione puntoVendita, TitoloViaggioDAO titoloViaggioDAO, TesseraDAO tesseraDAO) {
         boolean puntoMenu = true;
         while (puntoMenu) {
             System.out.println("\n MENU PUNTO VENDITA");
@@ -173,8 +170,8 @@ public class Application {
             }
 
             switch (scelta) {
-                case 1 -> System.out.println("1. Compra biglietto");
-                case 2 -> System.out.println("2. Compra abbonamento");
+                case 1 -> compraBiglietto(titoloViaggioDAO, puntoVendita);
+                case 2 -> compraAbbonamento(titoloViaggioDAO, tesseraDAO, puntoVendita);
                 case 3 -> System.out.println("3. Rinnova tessera");
                 case 4 -> System.out.println("4. Rinnova Abbonamento");
                 case 0 -> {
@@ -215,6 +212,97 @@ public class Application {
             }
         }
     }
+
+    // Metodo Compra biglietto
+    public static void compraBiglietto(TitoloViaggioDAO titoloViaggioDAO, PuntoDiEmissione puntoVendita) {
+        Biglietto nuovoBiglietto = new Biglietto();
+        nuovoBiglietto.setDataEmissione(LocalDateTime.now());
+        nuovoBiglietto.setPuntoDiEmissione(puntoVendita);
+        nuovoBiglietto.setCodiceUnivoco(UUID.randomUUID());
+        try {
+            titoloViaggioDAO.save(nuovoBiglietto);
+            System.out.println("Biglietto acquistato al punto: " + puntoVendita.getNome());
+        } catch (Exception ex) {
+            System.out.println("Errore durante la vendita del biglietto: " + ex.getMessage());
+        }
+    }
+
+    // Metodo Compra Abbonamento
+    public static void compraAbbonamento(TitoloViaggioDAO titoloViaggioDAO, TesseraDAO tesseraDAO, PuntoDiEmissione puntoVendita) {
+        System.out.println("\n--- ACQUISTO ABBONAMENTO ---");
+        System.out.println("Per acquistare un abbonamento è necessaria una tessera attiva.");
+        System.out.println("Vuoi procedere alla creazione di una nuova tessera?");
+        System.out.println("1. Sì, crea tessera e abbonamento");
+        System.out.println("2. No, annulla operazione");
+        System.out.print("Scegli un'opzione: ");
+        int risposta;
+        try {
+            risposta = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            risposta = -1;
+        }
+
+        if (risposta != 1) {
+            System.out.println("Operazione annullata. Ritorno al menu.");
+            return;
+        }
+
+        // Creazione Tessera
+        System.out.println("\nGenerazione della tessera in corso...");
+        Tessera nuovaTessera = new Tessera(UUID.randomUUID());
+        try {
+            tesseraDAO.saveTessera(nuovaTessera);
+        } catch (Exception e) {
+            System.out.println("Errore durante la creazione della tessera: " + e.getMessage());
+            return;
+        }
+
+        // Selezione tipo di Abbonamento
+        System.out.println("\nSeleziona il tipo di abbonamento:");
+        System.out.println("1. Settimanale");
+        System.out.println("2. Mensile");
+        System.out.println("3. Annuale");
+        System.out.print("Scegli un'opzione: ");
+
+        int tipoScelto;
+        try {
+            tipoScelto = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            tipoScelto = -1;
+        }
+
+        TipoAbbonamento tipoAbbonamento;
+        switch (tipoScelto) {
+            case 1 -> tipoAbbonamento = TipoAbbonamento.SETTIMANALE;
+            case 2 -> tipoAbbonamento = TipoAbbonamento.MENSILE;
+            case 3 -> tipoAbbonamento = TipoAbbonamento.ANNUALE;
+            default -> {
+                System.out.println("Opzione non valida. Operazione annullata (Tessera creata comunque).");
+                return;
+            }
+        }
+
+        // Salvataggio / Associazione Tessera e Abbonamento
+        Abbonamento nuovoAbbonamento = new Abbonamento(
+                LocalDateTime.now(),
+                puntoVendita,
+                UUID.randomUUID(),
+                LocalDateTime.now(),
+                tipoAbbonamento);
+        nuovoAbbonamento.setTessera(nuovaTessera);
+        try {
+            titoloViaggioDAO.save(nuovoAbbonamento);
+            System.out.println("Abbonamento " + tipoAbbonamento + " acquistato con successo!");
+        } catch (Exception e) {
+            System.out.println("Errore durante il salvataggio dell'abbonamento: " + e.getMessage());
+        }
+    }
+
+    // Metodo Rinnovo Tessera
+    public static void rinnovotessera(TesseraDAO tesseraDAO){
+
+    }
+
 
     // Creazione Utenti
     public static void creazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO) {

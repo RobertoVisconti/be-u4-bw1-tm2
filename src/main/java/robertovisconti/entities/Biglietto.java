@@ -2,7 +2,6 @@ package robertovisconti.entities;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,7 +15,7 @@ public class Biglietto extends TitoloViaggio {
     @Column(name = "data_validazione")
     private LocalDateTime dataValidazione;
 
-    protected Biglietto() {
+    public Biglietto() {
     }
 
 

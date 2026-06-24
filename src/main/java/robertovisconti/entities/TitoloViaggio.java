@@ -2,7 +2,6 @@ package robertovisconti.entities;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -25,7 +24,8 @@ public abstract class TitoloViaggio {
     @Column(name = "codice_univoco", unique = true, nullable = false)
     private UUID codiceUnivoco;
 
-    protected TitoloViaggio(){}
+    protected TitoloViaggio() {
+    }
 
     public TitoloViaggio(LocalDateTime dataEmissione, PuntoDiEmissione puntoDiEmissione, UUID codiceUnivoco) {
         this.dataEmissione = dataEmissione;
@@ -41,16 +41,24 @@ public abstract class TitoloViaggio {
         return dataEmissione;
     }
 
+    public void setDataEmissione(LocalDateTime dataEmissione) {
+        this.dataEmissione = dataEmissione;
+    }
+
     public PuntoDiEmissione getPuntoDiEmissione() {
         return puntoDiEmissione;
+    }
+
+    public void setPuntoDiEmissione(PuntoDiEmissione puntoDiEmissione) {
+        this.puntoDiEmissione = puntoDiEmissione;
     }
 
     public UUID getCodiceUnivoco() {
         return codiceUnivoco;
     }
 
-    public void setDataEmissione(LocalDateTime dataEmissione) {
-        this.dataEmissione = dataEmissione;
+    public void setCodiceUnivoco(UUID codiceUnivoco) {
+        this.codiceUnivoco = codiceUnivoco;
     }
 
     @Override

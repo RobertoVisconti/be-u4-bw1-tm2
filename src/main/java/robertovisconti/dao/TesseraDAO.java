@@ -40,6 +40,7 @@ public class TesseraDAO {
 
     public void updateTessera(UUID codiceUnivoco, LocalDate nuovaEmissione, LocalDate nuovaScadenza) {
         EntityTransaction tx = em.getTransaction();
+        tx.begin();
         Tessera tessera = findByUnCode(codiceUnivoco);
         tessera.setDataEmissione(nuovaEmissione);
         tessera.setDataScadenza(nuovaScadenza);
