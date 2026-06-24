@@ -72,23 +72,5 @@ public class ManutenzioneDAO {
         return query.getResultList();
     }
 
-    public static void storicoManutenzione(ManutenzioneDAO dao) {
-        System.out.println("\nInserisci la targa:");
-        String targa = scanner.nextLine();
-
-        List<Manutenzione> lista = dao.storicoManutenzioni(targa);
-
-        if (lista.isEmpty()) {
-            System.out.println("Nessuna manutenzione trovata.");
-            return;
-        }
-
-        for(Manutenzione m : lista) {
-            System.out.println("\nStorico Manutenzioni:");
-            System.out.println("Inizio: " + m.getDataInizio());
-            System.out.println("Fine: " + m.getDataFine());
-            System.out.println("Motivo: " + m.getMotivo());
-        }
-    }
 
 }

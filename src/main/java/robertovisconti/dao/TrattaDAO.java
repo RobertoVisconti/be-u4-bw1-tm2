@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import robertovisconti.entities.Tratta;
 
+import java.util.List;
 import java.util.UUID;
 
 public class TrattaDAO {
@@ -22,6 +23,18 @@ public class TrattaDAO {
         transaction.commit();
 
         System.out.println(newTratta + "creata con successo!");
+    }
+
+    // TASK 3a - creo una tratta e la salvo subito
+    public Tratta creaTratta(String puntoDiPartenza, String capolinea, int tempoPercorrenzaStimato) {
+        Tratta tratta = new Tratta(puntoDiPartenza, capolinea, tempoPercorrenzaStimato);
+        save(tratta);
+        return tratta;
+    }
+
+    // restituisco tutte le tratte presenti nel database
+    public List<Tratta> findAll() {
+        return entityManager.createQuery("SELECT t FROM Tratta t", Tratta.class).getResultList();
     }
 
     public Tratta findById(UUID id) {

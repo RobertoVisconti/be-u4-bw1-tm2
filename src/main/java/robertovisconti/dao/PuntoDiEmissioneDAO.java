@@ -3,6 +3,7 @@ package robertovisconti.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import robertovisconti.entities.DistributoreAutomatico;
 import robertovisconti.entities.PuntoDiEmissione;
 import robertovisconti.entities.Rivenditore;
@@ -100,5 +101,15 @@ public class PuntoDiEmissioneDAO {
             System.out.println(nome + " - " + id);
         }
 
+    }
+
+    public List<PuntoDiEmissione> findAllPuntiDiEmissione() {
+
+        TypedQuery<PuntoDiEmissione> query = em.createQuery(
+                "SELECT p FROM PuntoDiEmissione p",
+                PuntoDiEmissione.class
+        );
+
+        return query.getResultList();
     }
 }

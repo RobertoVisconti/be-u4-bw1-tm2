@@ -7,6 +7,7 @@ import robertovisconti.entities.MezzoDiTrasporto;
 import robertovisconti.enums.StatoMezzo;
 import robertovisconti.enums.TipoMezzo;
 
+import java.util.List;
 import java.util.UUID;
 
 public class MezzoDiTrasportoDAO {
@@ -24,6 +25,11 @@ public class MezzoDiTrasportoDAO {
         transaction.commit();
 
         System.out.println(newMezzo + "creato con successo!");
+    }
+
+    // restituisco tutti i mezzi presenti nel database
+    public List<MezzoDiTrasporto> findAll() {
+        return entityManager.createQuery("SELECT m FROM MezzoDiTrasporto m", MezzoDiTrasporto.class).getResultList();
     }
 
     public MezzoDiTrasporto findByTarga(String targa) {

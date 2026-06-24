@@ -8,22 +8,41 @@ import java.util.UUID;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name="punti_di_emissione")
+@Table(name = "punti_di_emissione")
 public class PuntoDiEmissione {
     @Id
     @GeneratedValue
-    @Column(name="punto_di_emissione_id")
+    @Column(name = "punto_di_emissione_id")
     protected UUID id;
+
     @Column(nullable = false)
     protected String nome;
 
-    protected PuntoDiEmissione() {}
+    @Column(nullable = false)
+    private String indirizzo;
 
-    public PuntoDiEmissione(String nome){
-        this.nome = nome;
+    @Column(nullable = false)
+    private String citta;
+
+    @Column(nullable = false)
+    private String cap;
+
+    @Column(nullable = false, unique = true)
+    private String piva;
+
+    protected PuntoDiEmissione() {
     }
 
-    public Biglietto vendiBiglietto(MezzoDiTrasporto mezzoDiTrasporto){
+    public PuntoDiEmissione(String nome, String indirizzo, String citta, String cap, String piva) {
+        this.nome = nome;
+        this.indirizzo = indirizzo;
+        this.citta = citta;
+        this.cap = cap;
+        this.piva = piva;
+    }
+
+
+    public Biglietto vendiBiglietto(MezzoDiTrasporto mezzoDiTrasporto) {
         if ((this instanceof DistributoreAutomatico && ((DistributoreAutomatico) this).getStato() == StatoDistributoreAutomatico.NON_ATTIVO) || !(this instanceof Rivenditore && ((Rivenditore) this).isAperto())) {
             throw new RuntimeException("Punto di Emissione CHIUSO.");
         } else {
@@ -37,7 +56,30 @@ public class PuntoDiEmissione {
         return id;
     }
 
+    public String getIndirizzo() {
+        return indirizzo;
+    }
+
+    public String getCitta() {
+        return citta;
+    }
+
+    public String getCap() {
+        return cap;
+    }
+
     public String getNome() {
         return nome;
+    }
+
+    @Override
+    public String toString() {
+        return "PuntoDiEmissione{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", indirizzo='" + indirizzo + '\'' +
+                ", citta='" + citta + '\'' +
+                ", cap='" + cap + '\'' +
+                '}';
     }
 }
