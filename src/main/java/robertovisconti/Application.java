@@ -2,25 +2,21 @@ package robertovisconti;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.Persistence;
 import net.datafaker.Faker;
 import robertovisconti.dao.MezzoDiTrasportoDAO;
+import robertovisconti.dao.PuntoDiEmissioneDAO;
 import robertovisconti.dao.TesseraDAO;
 import robertovisconti.dao.UtenteDAO;
-import robertovisconti.entities.MezzoDiTrasporto;
-import robertovisconti.entities.Tessera;
-import robertovisconti.entities.Utente;
+import robertovisconti.entities.*;
 import robertovisconti.enums.Ruolo;
+import robertovisconti.enums.StatoDistributoreAutomatico;
 import robertovisconti.enums.StatoMezzo;
 import robertovisconti.enums.TipoMezzo;
 import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
 import robertovisconti.exceptions.UtenteNonTrovatoException;
 
-import java.util.Objects;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 public class Application {
     private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("be-u4-bw1-tm2");
@@ -32,6 +28,7 @@ public class Application {
         TesseraDAO tesseraDAO = new TesseraDAO(em);
         UtenteDAO utenteDAO = new UtenteDAO(em);
         MezzoDiTrasportoDAO mezzoDiTrasportoDAO = new MezzoDiTrasportoDAO(em);
+        PuntoDiEmissioneDAO puntoDiEmissioneDAO = new PuntoDiEmissioneDAO(em);
 
 
         utenteDAO.saveUtente(new Utente("Roberto", "Admin", "ciaosonounadmin@adming.it", Ruolo.ADMIN));
@@ -54,7 +51,7 @@ public class Application {
                 Utente emailScanner = utenteDAO.findByEmail(email);
 
                 switch (emailScanner.getRuolo()) {
-                    case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO);
+                    case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO);
                     case USER -> caseUser(tesseraDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
@@ -70,7 +67,7 @@ public class Application {
 
 
     // Case Amministratore
-    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
         boolean adminMenu = true;
         while (adminMenu) {
             System.out.println("\n******* MENU PRINCIPALE ADMIN *******");
@@ -91,7 +88,8 @@ public class Application {
             switch (scelta) {
                 case 1 -> creazioneUtenti(tesseraDAO, utenteDAO);
                 case 2 -> creazioneMezzi(mezzoDiTrasportoDAO);
-                case 3 -> ricercaUtenti(utenteDAO);
+                case 3 -> creazionePunti(puntoDiEmissioneDAO);
+                case 4 -> ricercaUtenti(utenteDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
                     adminMenu = false;
@@ -181,5 +179,37 @@ public class Application {
             mezzoDiTrasportoDAO.save(mezzo);
         }
         System.out.println("Creazione 20 mezzi completata con successo.");
+    }
+
+    // Creazione Punti Vendita
+    public static void creazionePunti(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
+        Faker faker = new Faker(new Locale("it", "IT"));
+        Random random = new Random();
+
+        StatoDistributoreAutomatico[] statoDistributore = StatoDistributoreAutomatico.values();
+
+        for (int i = 0; i < 20; i++) {
+
+            String indirizzo = faker.address().streetAddress();
+            String citta = faker.address().city();
+            String cap = faker.address().zipCode();
+            String piva = faker.number().digits(11);
+
+            if (random.nextBoolean()) {
+                String nome = "Distributore Automatico H24 - " + faker.address().streetAddress();
+                StatoDistributoreAutomatico stato = statoDistributore[random.nextInt(statoDistributore.length)];
+                DistributoreAutomatico distributore = new DistributoreAutomatico(nome, indirizzo, citta, cap, piva, stato);
+
+                puntoDiEmissioneDAO.savePuntoDiEmissione(distributore);
+            } else {
+                String[] prefissi = {"Ticket Point ", "Biglietteria ", "Ricevitoria ", "Tabaccheria "};
+                String nome = prefissi[random.nextInt(prefissi.length)] + faker.name().lastName();
+                boolean isAperto = random.nextBoolean();
+                Rivenditore rivenditore = new Rivenditore(nome, indirizzo, citta, cap, piva, isAperto);
+                puntoDiEmissioneDAO.savePuntoDiEmissione(rivenditore);
+            }
+
+        }
+        System.out.println("Creazione punti di emissione avvenuta con successo.");
     }
 }
