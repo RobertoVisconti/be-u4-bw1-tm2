@@ -34,7 +34,7 @@ public class Application {
         TitoloViaggioDAO titoloViaggioDAO = new TitoloViaggioDAO(em);
         PercorrenzaDAO percorrenzaDAO = new PercorrenzaDAO(em);
         GenericDAO genericDAO = new GenericDAO(em);
-        ManutenzioneDAO manutenzioneDAO = new ManutenzioneDAO(em,mezzoDiTrasportoDAO);
+        ManutenzioneDAO manutenzioneDAO = new ManutenzioneDAO(em, mezzoDiTrasportoDAO);
 
         creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
         creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
@@ -63,7 +63,7 @@ public class Application {
 
                 switch (emailScanner.getRuolo()) {
                     case ADMIN ->
-                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO);
+                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO, manutenzioneDAO);
                     case USER ->
                             caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO, mezzoDiTrasportoDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
