@@ -31,6 +31,7 @@ public class Application {
         MezzoDiTrasportoDAO mezzoDiTrasportoDAO = new MezzoDiTrasportoDAO(em);
         PuntoDiEmissioneDAO puntoDiEmissioneDAO = new PuntoDiEmissioneDAO(em);
         TrattaDAO trattaDAO = new TrattaDAO(em);
+        TitoloViaggioDAO titoloViaggioDAO = new TitoloViaggioDAO(em);
         PercorrenzaDAO percorrenzaDAO = new PercorrenzaDAO(em);
 
 
@@ -55,7 +56,7 @@ public class Application {
 
                 switch (emailScanner.getRuolo()) {
                     case ADMIN ->
-                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO);
+                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO);
                     case USER -> caseUser(tesseraDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
@@ -71,7 +72,7 @@ public class Application {
 
 
     // Case Amministratore
-    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO) {
+    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO, TitoloViaggioDAO titoloViaggioDAO) {
         boolean adminMenu = true;
         while (adminMenu) {
             System.out.println("\n MENU PRINCIPALE ADMIN ");
@@ -84,6 +85,7 @@ public class Application {
             System.out.println("7. Assegna tratta a un mezzo");
             System.out.println("8. Calcola tempo medio percorrenza");
             System.out.println("9. Storico percorrenze mezzo/tratta");
+            System.out.println("10. Menù storici titoli di viaggio");
             System.out.println("0. Logout");
             System.out.print("Scegli un'opzione: ");
 
@@ -105,6 +107,7 @@ public class Application {
                 case 7 -> assegnaTrattaMezzo(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 8 -> calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 9 -> storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
+                case 10 -> menuCountTitoliViaggio(titoloViaggioDAO, puntoDiEmissioneDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
                     adminMenu = false;
@@ -508,7 +511,7 @@ public class Application {
 
     public static void menuCountTitoliViaggio(TitoloViaggioDAO titoloViaggioDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
         while (true) {
-            System.out.println("******* SELEZIONA UN'OPZIONE *******");
+            System.out.println("\n******* SELEZIONA UN'OPZIONE *******\n");
             System.out.println("1. Conta biglietti emessi in un lasso di tempo.");
             System.out.println("2. Conta biglietti emessi in un lasso di tempo su un punto di emissione.");
             System.out.println("3. Conta abbonamenti emessi in un lasso di tempo.");
@@ -613,6 +616,10 @@ public class Application {
                         System.out.println("Data non valida: " + ex.getMessage());
                     }
 
+                    if (puntoDiEmissione == null) {
+                        System.out.println("Errore in immissione dati, controllare i dati inseriti e riprovare.\n");
+                        continue;
+                    };
                     System.out.println("\nBiglietti emessi tra " + dataInizio + " e " + dataFine + " presso " + puntoDiEmissione.getNome() + ": " + titoloViaggioDAO.countBigliettiBetween(dataInizio, dataFine, puntoDiEmissione));
                 }
 
