@@ -71,7 +71,7 @@ public class Application {
     public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO) {
         boolean adminMenu = true;
         while (adminMenu) {
-            System.out.println("\n******* MENU PRINCIPALE ADMIN *******");
+            System.out.println("\n MENU PRINCIPALE ADMIN ");
             System.out.println("1. Genera utenti / tessera / non tessera");
             System.out.println("2. Creazione mezzi di trasporto");
             System.out.println("3. Creazione punti di emissione");
@@ -113,7 +113,7 @@ public class Application {
     public static void caseUser(TesseraDAO tesseraDAO) {
         boolean userMenu = true;
         while (userMenu) {
-            System.out.println("\n******* MENU PRINCIPALE UTENTE *******");
+            System.out.println("\n MENU PRINCIPALE UTENTE");
             System.out.println("1. Visualizza stato della tessera");
             System.out.println("0. Logout");
             System.out.print("Scegli un'opzione: ");
