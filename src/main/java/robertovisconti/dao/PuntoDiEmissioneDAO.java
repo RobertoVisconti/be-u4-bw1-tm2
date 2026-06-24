@@ -9,6 +9,7 @@ import robertovisconti.entities.Rivenditore;
 import robertovisconti.enums.StatoDistributoreAutomatico;
 import robertovisconti.exceptions.PuntoDiEmissioneNonTrovatoException;
 
+import java.util.List;
 import java.util.UUID;
 
 public class PuntoDiEmissioneDAO {
@@ -87,5 +88,17 @@ public class PuntoDiEmissioneDAO {
         transaction.commit();
 
         System.out.println("Il punto emissione " + found.getNome() + " è stato cancellato dal DB.");
+    }
+
+    public void printAllNamesAndUuids() {
+
+        Query query = em.createQuery("SELECT p.nome, p.id FROM PuntoDiEmissione p");
+        List<Object[]> result = query.getResultList();
+        for (Object[] row : result) {
+            String nome = (String) row[0];
+            UUID id = (UUID) row[1];
+            System.out.println(nome + " - " + id);
+        }
+
     }
 }
