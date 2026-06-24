@@ -18,22 +18,22 @@ public class Abbonamento extends TitoloViaggio {
     @JoinColumn(name = "id_tessera", nullable = false)
     private Tessera tessera;
 
-    protected Abbonamento() {
+    public Abbonamento() {
     }
 
-    public Abbonamento(LocalDateTime dataEmissione, PuntoDiEmissione puntoDiEmissione, UUID codiceUnivoco, LocalDateTime dataScadenza, TipoAbbonamento tipoAbbonamento) {
+    public Abbonamento(LocalDateTime dataEmissione, PuntoDiEmissione puntoDiEmissione, UUID codiceUnivoco, TipoAbbonamento tipoAbbonamento, Tessera tessera) {
         super(dataEmissione, puntoDiEmissione, codiceUnivoco);
-        this.dataScadenza = dataScadenza;
 
         this.tipoAbbonamento = tipoAbbonamento;
 
         switch (tipoAbbonamento) {
-            case SETTIMANALE -> this.dataScadenza = LocalDateTime.now().plusDays(7);
+            case SETTIMANALE -> this.dataScadenza = dataEmissione.plusDays(7);
 
-            case MENSILE -> this.dataScadenza = LocalDateTime.now().plusMonths(1);
+            case MENSILE -> this.dataScadenza = dataEmissione.plusMonths(1);
 
-            case ANNUALE -> this.dataScadenza = LocalDateTime.now().plusYears(1);
+            case ANNUALE -> this.dataScadenza = dataEmissione.plusYears(1);
         }
+        this.tessera = tessera;
     }
 
     public TipoAbbonamento getTipoAbbonamento() {
