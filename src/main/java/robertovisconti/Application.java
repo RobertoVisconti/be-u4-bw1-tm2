@@ -56,7 +56,7 @@ public class Application {
 
                 switch (emailScanner.getRuolo()) {
                     case ADMIN ->
-                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO);
+                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO);
                     case USER -> caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
@@ -72,7 +72,7 @@ public class Application {
 
 
     // Case Amministratore
-    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO) {
+    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO, TitoloViaggioDAO titoloViaggioDAO) {
         boolean adminMenu = true;
         while (adminMenu) {
             System.out.println("\n MENU PRINCIPALE ADMIN ");
@@ -547,7 +547,7 @@ public class Application {
     }
 
 
-//    MENU' per cercare titoli di viaggio per periodo o per periodo e punto vendita.
+//    // MENU' per cercare titoli di viaggio per periodo o per periodo e punto vendita.
 
     public static void menuCountTitoliViaggio(TitoloViaggioDAO titoloViaggioDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
         while (true) {
@@ -560,8 +560,7 @@ public class Application {
             int input = -1;
             try {
                 input = Integer.parseInt(scanner.nextLine().trim());
-            }
-            catch (NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 System.out.println("Formato errato, inserisci un numbero");
                 continue;
             }
@@ -659,7 +658,8 @@ public class Application {
                     if (puntoDiEmissione == null) {
                         System.out.println("Errore in immissione dati, controllare i dati inseriti e riprovare.\n");
                         continue;
-                    };
+                    }
+                    ;
                     System.out.println("\nBiglietti emessi tra " + dataInizio + " e " + dataFine + " presso " + puntoDiEmissione.getNome() + ": " + titoloViaggioDAO.countBigliettiBetween(dataInizio, dataFine, puntoDiEmissione));
                 }
 
