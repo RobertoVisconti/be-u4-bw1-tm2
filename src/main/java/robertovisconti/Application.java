@@ -115,7 +115,8 @@ public class Application {
         boolean userMenu = true;
         while (userMenu) {
             System.out.println("\n MENU PRINCIPALE UTENTE");
-            System.out.println("1. Visualizza stato della tessera");
+            System.out.println("1. Scegli punto vendita");
+            System.out.println("2. Scegli viaggio");
             System.out.println("0. Logout");
             System.out.print("Scegli un'opzione: ");
 
@@ -134,6 +135,36 @@ public class Application {
                     userMenu = false;
                 }
                 default -> System.out.println("Opzione non valida.");
+            }
+        }
+    }
+
+    // Case Punto Vendita
+    public static void casePunto() {
+        boolean puntoMenu = true;
+        while (puntoMenu) {
+            System.out.println("\n MENU PUNTO VENDITA");
+            System.out.println("1. Compra biglietto");
+            System.out.println("2. Compra abbonamento");
+            System.out.println("3. Rinnova tessera");
+            System.out.println("4. Rinnova Abbonamento");
+            System.out.println("0. Torna al menu principale");
+            System.out.print("Scegli un'opzione: ");
+
+            int scelta;
+            try {
+                scelta = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException ex) {
+                System.out.println("Errore: Inserire un numero valido.");
+                scelta = -1;
+            }
+
+            switch (scelta) {
+                case 1 -> System.out.println("1. Compra biglietto");
+                case 2 -> System.out.println("2. Compra abbonamento");
+                case 3 -> System.out.println("3. Rinnova tessera");
+                case 4 -> System.out.println("4. Rinnova Abbonamento");
+                case 0 -> System.out.println("0. Torna al menu principale");
             }
         }
     }
@@ -348,8 +379,37 @@ public class Application {
         }
     }
 
-    //Storico Manutenzione
+    // Mostra l'elenco dei punti vendita
+    public static PuntoDiEmissione selezionaPunto(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
+        List<PuntoDiEmissione> punti = puntoDiEmissioneDAO.findAllPuntiDiEmissione();
 
+        if (punti.isEmpty()) {
+            System.out.println("Nessuna tratta presente: creane prima con l'opzione 5.");
+            return null;
+        }
+
+        System.out.println("\nScegli un punto vendita:");
+        for (int i = 0; i < punti.size(); i++) {
+            PuntoDiEmissione p = punti.get(i);
+            System.out.println((i + 1) + ". " + p.getNome() + " -> " + p.getIndirizzo()
+                    + " " + p.getCitta());
+        }
+        System.out.print("Numero della tratta: ");
+
+        try {
+            int scelta = Integer.parseInt(scanner.nextLine().trim());
+            if (scelta < 1 || scelta > punti.size()) {
+                System.out.println("Numero non valido.");
+                return null;
+            }
+            return punti.get(scelta - 1);
+        } catch (NumberFormatException ex) {
+            System.out.println("Devi inserire un numero.");
+            return null;
+        }
+    }
+
+    //Storico Manutenzione
     public static void storicoManutenzione(ManutenzioneDAO dao) {
         System.out.println("\nInserisci la targa:");
         String targa = scanner.nextLine();

@@ -3,12 +3,14 @@ package robertovisconti.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import robertovisconti.entities.DistributoreAutomatico;
 import robertovisconti.entities.PuntoDiEmissione;
 import robertovisconti.entities.Rivenditore;
 import robertovisconti.enums.StatoDistributoreAutomatico;
 import robertovisconti.exceptions.PuntoDiEmissioneNonTrovatoException;
 
+import java.util.List;
 import java.util.UUID;
 
 public class PuntoDiEmissioneDAO {
@@ -87,5 +89,15 @@ public class PuntoDiEmissioneDAO {
         transaction.commit();
 
         System.out.println("Il punto emissione " + found.getNome() + " è stato cancellato dal DB.");
+    }
+
+    public List<PuntoDiEmissione> findAllPuntiDiEmissione() {
+
+        TypedQuery<PuntoDiEmissione> query = em.createQuery(
+                "SELECT p FROM PuntoDiEmissione p",
+                PuntoDiEmissione.class
+        );
+
+        return query.getResultList();
     }
 }
