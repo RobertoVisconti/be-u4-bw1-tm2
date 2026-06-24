@@ -231,4 +231,21 @@ public class Application {
         }
     }
 
+    //Verifica abbonamento
+
+    public static void verificaAbbonamento(TitoloViaggioDAO titoloDAO) {
+
+        System.out.println("Inserisci il codice della tessera:");
+
+        UUID codice = UUID.fromString(scanner.nextLine());
+
+        boolean valido = titoloDAO.isAbbonamentoValido(codice);
+
+        if (valido) {
+            System.out.println("Abbonamento valido.");
+        } else {
+            System.out.println("Abbonamento scaduto o inesistente.");
+        }
+    }
+
 }
