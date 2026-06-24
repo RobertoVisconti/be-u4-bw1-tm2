@@ -185,7 +185,15 @@ public class Application {
         for (int i = 0; i < 20; i++) {
             TipoMezzo tipo = tipi[random.nextInt(tipi.length)];
             StatoMezzo stato = stati[random.nextInt(stati.length)];
-            int capienza = random.nextInt(30, 201);
+
+            // la capienza dipende dal tipo di mezzo: un bus porta meno persone di un tram
+            int capienza;
+            if (tipo == TipoMezzo.BUS) {
+                capienza = random.nextInt(50, 121);   // bus: tra 50 e 120 posti
+            } else {
+                capienza = random.nextInt(120, 251);  // tram: tra 120 e 250 posti
+            }
+
             String targa = faker.vehicle().licensePlate();
 
             MezzoDiTrasporto mezzo = new MezzoDiTrasporto(tipo, capienza, stato, targa);
