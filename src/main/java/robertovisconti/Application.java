@@ -230,6 +230,8 @@ public class Application {
         }
     }
 
+
+
     // Metodo Compra Abbonamento
     public static void compraAbbonamento(TitoloViaggioDAO titoloViaggioDAO, TesseraDAO tesseraDAO, PuntoDiEmissione puntoVendita) {
         System.out.println("\n--- ACQUISTO ABBONAMENTO ---");
@@ -303,78 +305,126 @@ public class Application {
 
     // Metodo Rinnovo Tessera
     public static void rinnovotessera(TesseraDAO tesseraDAO) {
+
         System.out.println("\n--- RINNOVO TESSERA ---");
         System.out.print("Inserisci il Codice Univoco della tessera: ");
 
-        String inputCodice = scanner.nextLine().trim();
         UUID codiceUnivoco;
 
         try {
-            codiceUnivoco = UUID.fromString(inputCodice);
+            codiceUnivoco = UUID.fromString(scanner.nextLine().trim());
         } catch (IllegalArgumentException e) {
-            System.out.println("Errore: Il formato del codice UUID inserito non è valido.");
+            System.out.println("UUID non valido.");
             return;
         }
+
+        System.out.println("\nPer quanto tempo vuoi rinnovare?");
+        System.out.println("1. 1 anno");
+        System.out.println("2. 2 anni");
+        System.out.println("3. 3 anni");
+        System.out.print("Scelta: ");
+
+        int scelta;
+
         try {
-            LocalDate nuovaEmissione = LocalDate.now();
-            LocalDate nuovaScadenza = nuovaEmissione.plusYears(1);
-            tesseraDAO.updateTessera(codiceUnivoco, nuovaEmissione, nuovaScadenza);
-            System.out.println("Tessera aggiornata correttamente nel sistema!");
-        } catch (TesseraNonTrovataException ex) {
-            // Cattura l'eccezione personalizzata lanciata dal tuo findByUnCode
-            System.out.println("Operazione fallita: " + ex.getMessage());
+            scelta = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Input non valido.");
+            return;
+        }
+
+        int anni;
+
+        switch (scelta) {
+            case 1 -> anni = 1;
+            case 2 -> anni = 2;
+            case 3 -> anni = 3;
+            default -> {
+                System.out.println("Scelta non valida.");
+                return;
+            }
+        }
+
+        try {
+
+            Tessera tessera = tesseraDAO.findByUnCode(codiceUnivoco);
+
+            LocalDate vecchiaScadenza = tessera.getDataScadenza();
+
+            LocalDate nuovaScadenza;
+
+            if (vecchiaScadenza.isAfter(LocalDate.now())) {
+                nuovaScadenza = vecchiaScadenza.plusYears(anni);
+            } else {
+                nuovaScadenza = LocalDate.now().plusYears(anni);
+            }
+
+            tesseraDAO.updateTessera(
+                    codiceUnivoco,
+                    tessera.getDataEmissione(),
+                    nuovaScadenza
+            );
+
+            System.out.println("Tessera rinnovata!");
+            System.out.println("Nuova scadenza: " + nuovaScadenza);
+
         } catch (Exception e) {
-            System.out.println("Errore imprevisto durante il rinnovo: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
     // Metodo Rinnovo Abbonamento
     public static void rinnovoAbbonamento(TitoloViaggioDAO titoloViaggioDAO) {
+
         System.out.println("\n--- RINNOVO ABBONAMENTO ---");
         System.out.print("Inserisci il Codice Univoco dell'abbonamento: ");
 
-        String inputCodice = scanner.nextLine().trim();
         UUID codiceUnivoco;
+
         try {
-            codiceUnivoco = UUID.fromString(inputCodice);
+            codiceUnivoco = UUID.fromString(scanner.nextLine().trim());
         } catch (IllegalArgumentException e) {
-            System.out.println("Errore: Il formato del codice UUID inserito non è valido.");
+            System.out.println("UUID non valido.");
             return;
         }
 
-        // Seleziono nuovo tipo abbonamento
         System.out.println("\nSeleziona il tipo di rinnovo:");
         System.out.println("1. Settimanale");
         System.out.println("2. Mensile");
         System.out.println("3. Annuale");
-        System.out.print("Scegli un'opzione: ");
+        System.out.print("Scelta: ");
 
-        int tipoScelto;
+        int scelta;
+
         try {
-            tipoScelto = Integer.parseInt(scanner.nextLine().trim());
+            scelta = Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
-            tipoScelto = -1;
+            System.out.println("Input non valido.");
+            return;
         }
 
         TipoAbbonamento tipoAbbonamento;
-        switch (tipoScelto) {
+
+        switch (scelta) {
             case 1 -> tipoAbbonamento = TipoAbbonamento.SETTIMANALE;
             case 2 -> tipoAbbonamento = TipoAbbonamento.MENSILE;
             case 3 -> tipoAbbonamento = TipoAbbonamento.ANNUALE;
             default -> {
-                System.out.println("Opzione non valida. Rinnovo annullato.");
+                System.out.println("Scelta non valida.");
                 return;
             }
         }
 
-        // Aggiornamento
         try {
-            LocalDateTime nuovaEmissione = LocalDateTime.now();
-            titoloViaggioDAO.updateAbbonamento(codiceUnivoco, tipoAbbonamento, nuovaEmissione);
-        } catch (NoResultException ex) {
-            System.out.println("Errore: Nessun abbonamento trovato con il codice fornito.");
-        } catch (Exception ex) {
-            System.out.println("Errore imprevisto durante il rinnovo: " + ex.getMessage());
+
+            titoloViaggioDAO.updateAbbonamento(codiceUnivoco, tipoAbbonamento, LocalDateTime.now());
+
+            System.out.println("Abbonamento rinnovato con successo!");
+
+        } catch (Exception e) {
+
+            System.out.println(e.getMessage());
+
         }
     }
 
