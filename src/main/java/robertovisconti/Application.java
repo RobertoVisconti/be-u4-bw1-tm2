@@ -282,7 +282,7 @@ public class Application {
 
             } catch (TesseraNonTrovataException e) {
 
-                System.out.println("Tessera non trovata.");
+                System.out.println(e.getMessage());
                 return;
             }
 
