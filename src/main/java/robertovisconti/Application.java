@@ -36,7 +36,7 @@ public class Application {
 
         boolean optionMenu = true;
         while (optionMenu) {
-            System.out.println("\n******* TRASPORTO PUBBLICO *******");
+            System.out.println("\nTRASPORTO PUBBLICO");
             System.out.println("Inserisci la tua email per accedere");
             System.out.println("0. Chiudi Applicazione");
             System.out.print("Scegli un'opzione o inserisci email: ");
