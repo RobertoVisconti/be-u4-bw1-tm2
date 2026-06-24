@@ -8,11 +8,11 @@ public class Rivenditore extends PuntoDiEmissione {
     @Column(nullable = false)
     private boolean aperto;
 
-    protected Rivenditore(){
+    protected Rivenditore() {
     }
 
-    public Rivenditore(String nome, boolean aperto) {
-        super(nome);
+    public Rivenditore(String nome, String indirizzo, String citta, String cap, String piva, boolean aperto) {
+        super(nome, indirizzo, citta, cap, piva);
         this.aperto = aperto;
     }
 
