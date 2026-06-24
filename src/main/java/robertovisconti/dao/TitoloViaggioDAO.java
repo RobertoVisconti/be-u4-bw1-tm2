@@ -75,18 +75,27 @@ public class TitoloViaggioDAO {
 
             abbonamento.setTipoAbbonamento(tipoAbbonamento);
 
-            abbonamento.setDataEmissione(dataEmissione);
+            LocalDateTime baseDate;
+
+            if (abbonamento.getDataScadenza().isAfter(LocalDateTime.now())) {
+                baseDate = abbonamento.getDataScadenza();
+            } else {
+                baseDate = LocalDateTime.now();
+            }
 
             switch (tipoAbbonamento) {
+
                 case SETTIMANALE ->
-                        abbonamento.setDataScadenza(dataEmissione.plusDays(7));
+                        abbonamento.setDataScadenza(baseDate.plusWeeks(1));
 
                 case MENSILE ->
-                        abbonamento.setDataScadenza(dataEmissione.plusMonths(1));
+                        abbonamento.setDataScadenza(baseDate.plusMonths(1));
 
                 case ANNUALE ->
-                        abbonamento.setDataScadenza(dataEmissione.plusYears(1));
+                        abbonamento.setDataScadenza(baseDate.plusYears(1));
             }
+
+            abbonamento.setDataEmissione(dataEmissione);
         }
 
         transaction.commit();

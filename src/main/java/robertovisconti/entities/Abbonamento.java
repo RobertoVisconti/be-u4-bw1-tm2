@@ -24,6 +24,9 @@ public class Abbonamento extends TitoloViaggio {
     public Abbonamento(LocalDateTime dataEmissione, PuntoDiEmissione puntoDiEmissione, UUID codiceUnivoco, LocalDateTime dataScadenza, TipoAbbonamento tipoAbbonamento) {
         super(dataEmissione, puntoDiEmissione, codiceUnivoco);
         this.dataScadenza = dataScadenza;
+
+        this.tipoAbbonamento = tipoAbbonamento;
+
         switch (tipoAbbonamento) {
             case SETTIMANALE -> this.dataScadenza = LocalDateTime.now().plusDays(7);
 
