@@ -36,8 +36,8 @@ public class Application {
 
         utenteDAO.saveUtente(new Utente("Roberto", "Admin", "ciaosonounadmin@adming.it", Ruolo.ADMIN));
 
-        boolean chiuso = true;
-        while (chiuso) {
+        boolean optionMenu = true;
+        while (optionMenu) {
             System.out.println("\n******* TRASPORTO PUBBLICO *******");
             System.out.println("Inserisci la tua email per accedere");
             System.out.println("0. Chiudi Applicazione");
@@ -71,8 +71,8 @@ public class Application {
 
     // Case Amministratore
     public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
-        boolean inMenu = true;
-        while (inMenu) {
+        boolean adminMenu = true;
+        while (adminMenu) {
             System.out.println("\n******* MENU PRINCIPALE ADMIN *******");
             System.out.println("1. Genera utenti / tessera / non tessera");
             System.out.println("2. Creazione mezzi di trasporto");
@@ -94,7 +94,7 @@ public class Application {
                 case 3 -> ricercaUtenti(utenteDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
-                    inMenu = false;
+                    adminMenu = false;
                 }
                 default -> System.out.println("Opzione non valida.");
             }
@@ -103,8 +103,8 @@ public class Application {
 
     //Case Utente
     public static void caseUser(TesseraDAO tesseraDAO) {
-        boolean inMenu = true;
-        while (inMenu) {
+        boolean userMenu = true;
+        while (userMenu) {
             System.out.println("\n******* MENU PRINCIPALE UTENTE *******");
             System.out.println("1. Visualizza stato della tessera");
             System.out.println("0. Logout");
@@ -122,7 +122,7 @@ public class Application {
                 case 1 -> System.out.println("Funzionalità utente in sviluppo...");
                 case 0 -> {
                     System.out.println("Logout utente effettuato.");
-                    inMenu = false;
+                    userMenu = false;
                 }
                 default -> System.out.println("Opzione non valida.");
             }
