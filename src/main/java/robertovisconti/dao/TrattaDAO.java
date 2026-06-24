@@ -24,6 +24,13 @@ public class TrattaDAO {
         System.out.println(newTratta + "creata con successo!");
     }
 
+    // TASK 3a - creo una tratta e la salvo subito
+    public Tratta creaTratta(String puntoDiPartenza, String capolinea, int tempoPercorrenzaStimato) {
+        Tratta tratta = new Tratta(puntoDiPartenza, capolinea, tempoPercorrenzaStimato);
+        save(tratta);
+        return tratta;
+    }
+
     public Tratta findById(UUID id) {
 
         Tratta found = entityManager.find(Tratta.class, id);
