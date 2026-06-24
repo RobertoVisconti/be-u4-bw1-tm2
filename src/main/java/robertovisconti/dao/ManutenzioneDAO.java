@@ -83,9 +83,9 @@ public class ManutenzioneDAO {
             return;
         }
 
-        for(Manutenzione m : lista) {
             System.out.println("\nStorico Manutenzioni:");
-            System.out.println("Inizio: " + m.getDataInizio());
+        for(Manutenzione m : lista) {
+            System.out.println("\nInizio: " + m.getDataInizio());
             System.out.println("Fine: " + m.getDataFine());
             System.out.println("Motivo: " + m.getMotivo());
         }
