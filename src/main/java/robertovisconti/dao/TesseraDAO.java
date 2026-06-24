@@ -26,6 +26,13 @@ public class TesseraDAO {
         System.out.println(tessera + " Associata con successo.");
     }
 
+    // creo una nuova tessera (con codice univoco generato automaticamente) e la salvo subito
+    public Tessera creaTessera() {
+        Tessera tessera = new Tessera(UUID.randomUUID());
+        saveTessera(tessera);
+        return tessera;
+    }
+
     public Tessera findByUnCode(UUID codiceUnivoco) {
         TypedQuery<Tessera> query = em.createQuery("SELECT e FROM Tessera e WHERE e.codiceUnivoco = :codiceUnivoco", Tessera.class);
         query.setParameter("codiceUnivoco", codiceUnivoco);

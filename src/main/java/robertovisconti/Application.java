@@ -35,7 +35,7 @@ public class Application {
         PercorrenzaDAO percorrenzaDAO = new PercorrenzaDAO(em);
 
 
-//        utenteDAO.saveUtente(new Utente("Roberto", "Admin", "ciaosonounadmin@adming.it", Ruolo.ADMIN));
+
 
         boolean optionMenu = true;
         while (optionMenu) {
@@ -254,9 +254,9 @@ public class Application {
 
         // Creazione Tessera
         System.out.println("\nGenerazione della tessera in corso...");
-        Tessera nuovaTessera = new Tessera(UUID.randomUUID());
+        Tessera nuovaTessera;
         try {
-            tesseraDAO.saveTessera(nuovaTessera);
+            nuovaTessera = tesseraDAO.creaTessera();
         } catch (Exception e) {
             System.out.println("Errore durante la creazione della tessera: " + e.getMessage());
             return;
@@ -439,8 +439,7 @@ public class Application {
 
             Utente utente = new Utente(faker.name().firstName(), faker.name().lastName(), email, ruolo);
             if (i % 5 == 0) {
-                Tessera tessera = new Tessera(UUID.randomUUID());
-                tesseraDAO.saveTessera(tessera);
+                Tessera tessera = tesseraDAO.creaTessera();
                 utente.setIdTessera(tessera);
             }
             utenteDAO.saveUtente(utente);
@@ -474,7 +473,15 @@ public class Application {
         for (int i = 0; i < 20; i++) {
             TipoMezzo tipo = tipi[random.nextInt(tipi.length)];
             StatoMezzo stato = stati[random.nextInt(stati.length)];
-            int capienza = random.nextInt(30, 201);
+
+            // la capienza dipende dal tipo di mezzo
+            int capienza;
+            if (tipo == TipoMezzo.BUS) {
+                capienza = random.nextInt(50, 121);   // bus: tra 50 e 120 posti
+            } else {
+                capienza = random.nextInt(120, 251);  // tram: tra 120 e 250 posti
+            }
+
             String targa = faker.vehicle().licensePlate();
 
             MezzoDiTrasporto mezzo = new MezzoDiTrasporto(tipo, capienza, stato, targa);
@@ -737,7 +744,7 @@ public class Application {
         }
     }
 
-    // VIdima biglietto
+    // Vidima biglietto
 
     public static void vidimaBiglietto(TitoloViaggioDAO titoloDAO) {
 
@@ -764,7 +771,7 @@ public class Application {
 
     public static void menuCountTitoliViaggio(TitoloViaggioDAO titoloViaggioDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
         while (true) {
-            System.out.println("\n******* SELEZIONA UN'OPZIONE *******\n");
+            System.out.println("\n SELEZIONA UN'OPZIONE \n");
             System.out.println("1. Conta biglietti emessi in un lasso di tempo.");
             System.out.println("2. Conta biglietti emessi in un lasso di tempo su un punto di emissione.");
             System.out.println("3. Conta abbonamenti emessi in un lasso di tempo.");
