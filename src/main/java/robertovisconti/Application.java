@@ -351,4 +351,24 @@ public class Application {
             System.out.println("Abbonamento scaduto o inesistente.");
         }
     }
+
+    public static void vidimaBiglietto(TitoloViaggioDAO titoloDAO) {
+
+        try {
+
+            System.out.println("Inserisci il codice univoco del biglietto:");
+
+            UUID codice = UUID.fromString(scanner.nextLine());
+
+            titoloDAO.vidimaBiglietto(codice);
+
+        } catch (IllegalArgumentException e) {
+
+            System.out.println("UUID non valido.");
+
+        } catch (RuntimeException e) {
+
+            System.out.println(e.getMessage());
+        }
+    }
 }

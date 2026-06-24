@@ -155,4 +155,33 @@ public class TitoloViaggioDAO {
         query.setParameter("puntoDiEmissione", puntoDiEmissione);
         return query.getResultList().size();
     }
+
+    public void vidimaBiglietto(UUID codiceUnivoco) {
+
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        transaction.begin();
+
+        TitoloViaggio titolo = findByCodiceUnivoco(codiceUnivoco);
+
+        if (titolo instanceof Biglietto biglietto) {
+
+            if (biglietto.getDataValidazione() == null) {
+
+                biglietto.setDataValidazione(LocalDateTime.now());
+
+                System.out.println("Biglietto vidimato con successo!");
+
+            } else {
+
+                System.out.println("Biglietto già vidimato il: " + biglietto.getDataValidazione());
+            }
+
+        } else {
+
+            System.out.println("Il codice inserito non appartiene ad un biglietto.");
+        }
+
+        transaction.commit();
+    }
 }
