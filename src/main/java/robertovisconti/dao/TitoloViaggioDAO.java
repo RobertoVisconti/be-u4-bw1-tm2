@@ -5,11 +5,13 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 import robertovisconti.entities.Abbonamento;
 import robertovisconti.entities.Biglietto;
+import robertovisconti.entities.PuntoDiEmissione;
 import robertovisconti.entities.TitoloViaggio;
 import robertovisconti.enums.TipoAbbonamento;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -104,5 +106,53 @@ public class TitoloViaggioDAO {
         transaction.commit();
 
         System.out.println("Biglietto aggiornato!");
+    }
+
+    public boolean isAbbonamentoValido(UUID codiceTessera) {
+
+        TypedQuery<Abbonamento> query = entityManager.createQuery(
+                "SELECT a FROM Abbonamento a WHERE a.tessera.codiceUnivoco = :codice ORDER BY a.dataScadenza DESC",
+                Abbonamento.class
+        );
+
+        query.setParameter("codice", codiceTessera);
+
+        try {
+            Abbonamento a = query.getSingleResult();
+
+            return a.getDataScadenza().isAfter(LocalDateTime.now());
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public int countBigliettiBetween(LocalDateTime inizio, LocalDateTime fine) {
+        TypedQuery<Biglietto> query = entityManager.createQuery("SELECT b FROM Biglietto b WHERE b.dataEmissione BETWEEN :inizio AND :fine", Biglietto.class);
+        query.setParameter("inizio", inizio);
+        query.setParameter("fine", fine);
+        return query.getResultList().size();
+    }
+    public int countBigliettiBetween(LocalDateTime inizio, LocalDateTime fine, PuntoDiEmissione puntoDiEmissione) {
+        TypedQuery<Biglietto> query = entityManager.createQuery("SELECT b FROM Biglietto b WHERE b.dataEmissione BETWEEN :inizio AND :fine AND b.puntoDiEmissione = :puntoDiEmissione", Biglietto.class);
+        query.setParameter("inizio", inizio);
+        query.setParameter("fine", fine);
+        query.setParameter("puntoDiEmissione", puntoDiEmissione);
+        return query.getResultList().size();
+    }
+
+    public int countAbbonamentiBetween(LocalDateTime inizio, LocalDateTime fine) {
+        TypedQuery<Abbonamento> query = entityManager.createQuery("SELECT a FROM Abbonamento a WHERE a.dataEmissione BETWEEN :inizio AND :fine", Abbonamento.class);
+        query.setParameter("inizio", inizio);
+        query.setParameter("fine", fine);
+        return query.getResultList().size();
+    }
+
+    public int countAbbonamentiBetween(LocalDateTime inizio, LocalDateTime fine, PuntoDiEmissione puntoDiEmissione) {
+        TypedQuery<Abbonamento> query = entityManager.createQuery("SELECT a FROM Abbonamento a WHERE a.dataEmissione BETWEEN :inizio AND :fine AND a.puntoDiEmissione = :puntoDiEmissione", Abbonamento.class);
+        query.setParameter("inizio", inizio);
+        query.setParameter("fine", fine);
+        query.setParameter("puntoDiEmissione", puntoDiEmissione);
+        return query.getResultList().size();
     }
 }
