@@ -304,7 +304,7 @@ public class Application {
     // Metodo Rinnovo Tessera
     public static void rinnovotessera(TesseraDAO tesseraDAO) {
         System.out.println("\n--- RINNOVO TESSERA ---");
-        System.out.print("Inserisci il Codice Univoco (UUID) della tessera: ");
+        System.out.print("Inserisci il Codice Univoco della tessera: ");
 
         String inputCodice = scanner.nextLine().trim();
         UUID codiceUnivoco;
@@ -331,7 +331,7 @@ public class Application {
     // Metodo Rinnovo Abbonamento
     public static void rinnovoAbbonamento(TitoloViaggioDAO titoloViaggioDAO) {
         System.out.println("\n--- RINNOVO ABBONAMENTO ---");
-        System.out.print("Inserisci il Codice Univoco (UUID) dell'abbonamento: ");
+        System.out.print("Inserisci il Codice Univoco dell'abbonamento: ");
 
         String inputCodice = scanner.nextLine().trim();
         UUID codiceUnivoco;
