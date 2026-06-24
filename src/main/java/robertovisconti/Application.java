@@ -5,8 +5,10 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import net.datafaker.Faker;
 import robertovisconti.dao.MezzoDiTrasportoDAO;
+import robertovisconti.dao.PercorrenzaDAO;
 import robertovisconti.dao.PuntoDiEmissioneDAO;
 import robertovisconti.dao.TesseraDAO;
+import robertovisconti.dao.TrattaDAO;
 import robertovisconti.dao.UtenteDAO;
 import robertovisconti.entities.*;
 import robertovisconti.enums.Ruolo;
@@ -16,6 +18,8 @@ import robertovisconti.enums.TipoMezzo;
 import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
 import robertovisconti.exceptions.UtenteNonTrovatoException;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class Application {
@@ -29,6 +33,8 @@ public class Application {
         UtenteDAO utenteDAO = new UtenteDAO(em);
         MezzoDiTrasportoDAO mezzoDiTrasportoDAO = new MezzoDiTrasportoDAO(em);
         PuntoDiEmissioneDAO puntoDiEmissioneDAO = new PuntoDiEmissioneDAO(em);
+        TrattaDAO trattaDAO = new TrattaDAO(em);
+        PercorrenzaDAO percorrenzaDAO = new PercorrenzaDAO(em);
 
 
         utenteDAO.saveUtente(new Utente("Roberto", "Admin", "ciaosonounadmin@adming.it", Ruolo.ADMIN));
@@ -51,7 +57,7 @@ public class Application {
                 Utente emailScanner = utenteDAO.findByEmail(email);
 
                 switch (emailScanner.getRuolo()) {
-                    case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO);
+                    case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO);
                     case USER -> caseUser(tesseraDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
@@ -67,13 +73,18 @@ public class Application {
 
 
     // Case Amministratore
-    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
+    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO) {
         boolean adminMenu = true;
         while (adminMenu) {
             System.out.println("\n******* MENU PRINCIPALE ADMIN *******");
             System.out.println("1. Genera utenti / tessera / non tessera");
             System.out.println("2. Creazione mezzi di trasporto");
-            System.out.println("3. Ricerca utenti");
+            System.out.println("3. Creazione punti di emissione");
+            System.out.println("4. Ricerca utenti");
+            System.out.println("5. Creazione tratte");
+            System.out.println("6. Genera percorrenze");
+            System.out.println("7. Assegna tratta a un mezzo");
+            System.out.println("8. Calcola tempo medio percorrenza");
             System.out.println("0. Logout");
             System.out.print("Scegli un'opzione: ");
 
@@ -90,6 +101,10 @@ public class Application {
                 case 2 -> creazioneMezzi(mezzoDiTrasportoDAO);
                 case 3 -> creazionePunti(puntoDiEmissioneDAO);
                 case 4 -> ricercaUtenti(utenteDAO);
+                case 5 -> creazioneTratte(trattaDAO);
+                case 6 -> generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
+                case 7 -> assegnaTrattaMezzo(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
+                case 8 -> calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
                     adminMenu = false;
@@ -211,5 +226,96 @@ public class Application {
 
         }
         System.out.println("Creazione punti di emissione avvenuta con successo.");
+    }
+
+
+    // Creazione tratte in blocco
+    public static void creazioneTratte(TrattaDAO trattaDAO) {
+        Faker faker = new Faker(new Locale("it", "IT"));
+        Random random = new Random();
+
+        for (int i = 0; i < 15; i++) {
+            String partenza = faker.address().city();
+            String capolinea = faker.address().city();
+            int tempoStimato = random.nextInt(10, 91); // minuti stimati, tra 10 e 90
+
+            trattaDAO.creaTratta(partenza, capolinea, tempoStimato);
+        }
+        System.out.println("Creazione 15 tratte completata.");
+    }
+
+    // Genera percorrenze in blocco collegando tratte e mezzi gia' esistenti
+    public static void generaPercorrenze(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
+        List<Tratta> tratte = trattaDAO.findAll();
+        List<MezzoDiTrasporto> mezzi = mezzoDiTrasportoDAO.findAll();
+
+        if (tratte.isEmpty() || mezzi.isEmpty()) {
+            System.out.println("Servono prima delle tratte e dei mezzi.");
+            return;
+        }
+
+        Random random = new Random();
+        for (int i = 0; i < 30; i++) {
+            Tratta tratta = tratte.get(random.nextInt(tratte.size()));
+            MezzoDiTrasporto mezzo = mezzi.get(random.nextInt(mezzi.size()));
+
+            // data di inizio casuale negli ultimi 30 giorni
+            LocalDateTime inizio = LocalDateTime.now().minusDays(random.nextInt(0, 30)).minusHours(random.nextInt(0, 24));
+            // la fine = inizio + tempo stimato della tratta, con qualche minuto di variazione
+            LocalDateTime fine = inizio.plusMinutes(tratta.getTempoPercorrenzaStimato() + random.nextInt(-5, 11));
+
+            percorrenzaDAO.creaPercorrenza(tratta, mezzo, inizio, fine);
+        }
+        System.out.println("Creazione 30 percorrenze completata.");
+    }
+
+    // Assegna una tratta a un mezzo: l'admin sceglie mezzo e tratta
+    public static void assegnaTrattaMezzo(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
+        try {
+            System.out.print("Targa del mezzo: ");
+            String targa = scanner.nextLine().trim();
+            MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
+
+            System.out.print("UUID della tratta: ");
+            UUID idTratta = UUID.fromString(scanner.nextLine().trim());
+            Tratta tratta = trattaDAO.findById(idTratta);
+
+
+            LocalDateTime inizio = LocalDateTime.now();
+            LocalDateTime fine = inizio.plusMinutes(tratta.getTempoPercorrenzaStimato());
+
+            Percorrenza percorrenza = percorrenzaDAO.assegnaTrattaAMezzo(tratta, mezzo, inizio, fine);
+            System.out.println("Tratta assegnata al mezzo: " + percorrenza);
+        } catch (IllegalArgumentException ex) {
+            System.out.println("Errore: Formato UUID non valido.");
+        } catch (RuntimeException ex) {
+            System.out.println("Errore: " + ex.getMessage());
+        }
+    }
+
+    // Calcola il tempo medio di percorrenza di una tratta da parte di un mezzo
+    public static void calcolaTempoMedio(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
+        try {
+            System.out.print("Targa del mezzo: ");
+            String targa = scanner.nextLine().trim();
+            MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
+
+            System.out.print("UUID della tratta: ");
+            UUID idTratta = UUID.fromString(scanner.nextLine().trim());
+            Tratta tratta = trattaDAO.findById(idTratta);
+
+            Duration media = percorrenzaDAO.tempoMedioPercorrenza(tratta, mezzo);
+            if (media.isZero()) {
+                System.out.println("Nessuna percorrenza conclusa trovata per questo mezzo su questa tratta.");
+            } else {
+                long minuti = media.toMinutes();
+                long secondi = media.minusMinutes(minuti).getSeconds();
+                System.out.println("Tempo medio di percorrenza: " + minuti + " min " + secondi + " sec.");
+            }
+        } catch (IllegalArgumentException ex) {
+            System.out.println("Errore: Formato UUID non valido.");
+        } catch (RuntimeException ex) {
+            System.out.println("Errore: " + ex.getMessage());
+        }
     }
 }
