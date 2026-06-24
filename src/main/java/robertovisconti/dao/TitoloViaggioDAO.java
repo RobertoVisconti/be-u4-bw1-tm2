@@ -9,6 +9,7 @@ import robertovisconti.entities.PuntoDiEmissione;
 import robertovisconti.entities.TitoloViaggio;
 import robertovisconti.enums.TipoAbbonamento;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -154,5 +155,67 @@ public class TitoloViaggioDAO {
         query.setParameter("fine", fine);
         query.setParameter("puntoDiEmissione", puntoDiEmissione);
         return query.getResultList().size();
+    }
+
+    public static void menuCountTitoliViaggio(TitoloViaggioDAO titoloViaggioDAO) {
+         while (true) {
+             System.out.println("******* SELEZIONA UN'OPZIONE *******");
+             System.out.println("1. Conta biglietti emessi in un lasso di tempo.");
+             System.out.println("2. Conta biglietti emessi in un lasso di tempo su un punto di emissione.");
+             System.out.println("3. Conta abbonamenti emessi in un lasso di tempo.");
+             System.out.println("4. Conta abbonamenti emessi in un lasso di tempo su un punto di emissione.");
+             int input = -1;
+             try {
+                 input = Integer.parseInt(scanner.nextLine().trim());
+             }
+             catch (NumberFormatException ex) {
+                 System.out.println("Formato errato, inserisci un numbero");
+                 continue;
+             }
+
+             switch (input) {
+                 case 1 -> {
+                     LocalDateTime dataInizio = null;
+                     LocalDateTime dataFine = null;
+                     System.out.println("Data di inizio:");
+                     System.out.println("Inserisci il giorno:");
+                     int giornoInizio = Integer.parseInt(scanner.nextLine().trim());
+                     System.out.println("Inserisci il mese:");
+                     int meseInizio = Integer.parseInt(scanner.nextLine().trim());
+                     System.out.println("Inserisci l'anno:");
+                     int annoInizio = Integer.parseInt(scanner.nextLine().trim());
+                     System.out.println("Inserisci l'ora:");
+                     int oraInizio = Integer.parseInt(scanner.nextLine().trim());
+                     System.out.println("Inserisci il minuto");
+                     int minutoInizio = Integer.parseInt(scanner.nextLine().trim());
+
+                     try {
+                         dataInizio = LocalDateTime.of(annoInizio, meseInizio, giornoInizio, oraInizio, minutoInizio);
+                     } catch (DateTimeException ex) {
+                         System.out.println("Data non valida: " + ex.getMessage());
+                     }
+
+                     System.out.println("Data di fine:");
+                     System.out.println("Inserisci il giorno:");
+                     int giornoFine = Integer.parseInt(scanner.nextLine().trim());
+                     System.out.println("Inserisci il mese:");
+                     int meseFine = Integer.parseInt(scanner.nextLine().trim());
+                     System.out.println("Inserisci l'anno:");
+                     int annoFine = Integer.parseInt(scanner.nextLine().trim());
+                     System.out.println("Inserisci l'ora:");
+                     int oraFine = Integer.parseInt(scanner.nextLine().trim());
+                     System.out.println("Inserisci il minuto");
+                     int minutoFine = Integer.parseInt(scanner.nextLine().trim());
+
+                     try {
+                         dataFine = LocalDateTime.of(annoFine, meseFine, giornoFine, oraFine, minutoFine);
+                     } catch (DateTimeException ex) {
+                         System.out.println("Data non valida: " + ex.getMessage());
+                     }
+
+                     System.out.println("\nBiglietti emessi tra " + dataInizio + " e " + dataFine + ": " + titoloViaggioDAO.countBigliettiBetween(dataInizio, dataFine));
+                 }
+             }
+         }
     }
 }
