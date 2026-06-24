@@ -2,7 +2,6 @@ package robertovisconti;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.Persistence;
 import net.datafaker.Faker;
 import robertovisconti.dao.MezzoDiTrasportoDAO;
@@ -52,7 +51,7 @@ public class Application {
                 Utente emailScanner = utenteDAO.findByEmail(email);
 
                 switch (emailScanner.getRuolo()) {
-                    case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO);
+                    case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO);
                     case USER -> caseUser(tesseraDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
