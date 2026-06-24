@@ -32,6 +32,7 @@ public class Application {
         TitoloViaggioDAO titoloViaggioDAO = new TitoloViaggioDAO(em);
         PercorrenzaDAO percorrenzaDAO = new PercorrenzaDAO(em);
         GenericDAO genericDAO = new GenericDAO(em);
+        ManutenzioneDAO manutenzioneDAO = new ManutenzioneDAO(em,mezzoDiTrasportoDAO);
 
         creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
         creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
@@ -62,7 +63,7 @@ public class Application {
 
                 switch (emailScanner.getRuolo()) {
                     case ADMIN ->
-                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO);
+                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO, manutenzioneDAO);
                     case USER -> caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
@@ -78,7 +79,7 @@ public class Application {
 
 
     // Case Amministratore
-    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO, TitoloViaggioDAO titoloViaggioDAO, GenericDAO genericDAO) {
+    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO, TitoloViaggioDAO titoloViaggioDAO, GenericDAO genericDAO, ManutenzioneDAO manutenzioneDAO) {
         boolean adminMenu = true;
         while (adminMenu) {
             System.out.println("\n MENU PRINCIPALE ADMIN ");
@@ -92,6 +93,8 @@ public class Application {
             System.out.println("8. Calcola tempo medio percorrenza");
             System.out.println("9. Storico percorrenze mezzo/tratta");
             System.out.println("10. Menù storici titoli di viaggio");
+            System.out.println("11. Storico manutenzioni");
+            System.out.println("12. Verifica abbonamento");
             System.out.println("0. Logout");
             System.out.print("Scegli un'opzione: ");
 
@@ -114,6 +117,8 @@ public class Application {
                 case 8 -> calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 9 -> storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 10 -> menuCountTitoliViaggio(titoloViaggioDAO, puntoDiEmissioneDAO);
+                case 11 -> storicoManutenzione(manutenzioneDAO);
+                case 12 -> verificaAbbonamento(titoloViaggioDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
                     adminMenu = false;
