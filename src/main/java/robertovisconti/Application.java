@@ -1,9 +1,6 @@
 package robertovisconti;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.Persistence;
+import jakarta.persistence.*;
 import net.datafaker.Faker;
 import robertovisconti.dao.*;
 import robertovisconti.entities.*;
@@ -26,6 +23,7 @@ public class Application {
     public static void main(String[] args) {
         EntityManager em = entityManagerFactory.createEntityManager();
 
+
         TesseraDAO tesseraDAO = new TesseraDAO(em);
         UtenteDAO utenteDAO = new UtenteDAO(em);
         MezzoDiTrasportoDAO mezzoDiTrasportoDAO = new MezzoDiTrasportoDAO(em);
@@ -33,6 +31,13 @@ public class Application {
         TrattaDAO trattaDAO = new TrattaDAO(em);
         TitoloViaggioDAO titoloViaggioDAO = new TitoloViaggioDAO(em);
         PercorrenzaDAO percorrenzaDAO = new PercorrenzaDAO(em);
+        GenericDAO genericDAO = new GenericDAO(em);
+
+        creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
+        creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
+        creazionePunti(puntoDiEmissioneDAO, genericDAO);
+        creazioneTratte(trattaDAO, genericDAO);
+        generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
 
 
 //        utenteDAO.saveUtente(new Utente("Roberto", "Admin", "ciaosonounadmin@adming.it", Ruolo.ADMIN));
@@ -56,7 +61,7 @@ public class Application {
 
                 switch (emailScanner.getRuolo()) {
                     case ADMIN ->
-                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO);
+                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO);
                     case USER -> caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
@@ -72,7 +77,7 @@ public class Application {
 
 
     // Case Amministratore
-    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO, TitoloViaggioDAO titoloViaggioDAO) {
+    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO, TitoloViaggioDAO titoloViaggioDAO, GenericDAO genericDAO) {
         boolean adminMenu = true;
         while (adminMenu) {
             System.out.println("\n MENU PRINCIPALE ADMIN ");
@@ -98,12 +103,12 @@ public class Application {
             }
 
             switch (scelta) {
-                case 1 -> creazioneUtenti(tesseraDAO, utenteDAO);
-                case 2 -> creazioneMezzi(mezzoDiTrasportoDAO);
-                case 3 -> creazionePunti(puntoDiEmissioneDAO);
+                case 1 -> creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
+                case 2 -> creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
+                case 3 -> creazionePunti(puntoDiEmissioneDAO, genericDAO);
                 case 4 -> ricercaUtenti(utenteDAO);
-                case 5 -> creazioneTratte(trattaDAO);
-                case 6 -> generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
+                case 5 -> creazioneTratte(trattaDAO, genericDAO);
+                case 6 -> generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
                 case 7 -> assegnaTrattaMezzo(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 8 -> calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 9 -> storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
@@ -380,7 +385,10 @@ public class Application {
 
 
     // Creazione Utenti
-    public static void creazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO) {
+    public static void creazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, GenericDAO genericDAO) {
+        if (!genericDAO.isTableEmpty(Utente.class)) {
+            return;
+        }
         Faker faker = new Faker();
         for (int i = 0; i < 50; i++) {
 
@@ -414,7 +422,10 @@ public class Application {
     }
 
     // Creazione Mezzi di trasporti
-    public static void creazioneMezzi(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+    public static void creazioneMezzi(MezzoDiTrasportoDAO mezzoDiTrasportoDAO, GenericDAO genericDAO) {
+        if (!genericDAO.isTableEmpty(MezzoDiTrasporto.class)) {
+            return;
+        }
         Faker faker = new Faker();
         Random random = new Random();
 
@@ -434,7 +445,10 @@ public class Application {
     }
 
     // Creazione Punti Vendita
-    public static void creazionePunti(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
+    public static void creazionePunti(PuntoDiEmissioneDAO puntoDiEmissioneDAO, GenericDAO genericDAO) {
+        if (!genericDAO.isTableEmpty(PuntoDiEmissione.class)) {
+            return;
+        }
         Faker faker = new Faker(new Locale("it", "IT"));
         Random random = new Random();
 
@@ -467,7 +481,10 @@ public class Application {
 
 
     // Creazione tratte in blocco
-    public static void creazioneTratte(TrattaDAO trattaDAO) {
+    public static void creazioneTratte(TrattaDAO trattaDAO, GenericDAO genericDAO) {
+        if (!genericDAO.isTableEmpty(Tratta.class)) {
+            return;
+        }
         Faker faker = new Faker(new Locale("it", "IT"));
         Random random = new Random();
 
@@ -482,7 +499,10 @@ public class Application {
     }
 
     // Genera percorrenze in blocco collegando tratte e mezzi gia' esistenti
-    public static void generaPercorrenze(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
+    public static void generaPercorrenze(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO, GenericDAO genericDAO) {
+        if (!genericDAO.isTableEmpty(Percorrenza.class)) {
+            return;
+        }
         List<Tratta> tratte = trattaDAO.findAll();
         List<MezzoDiTrasporto> mezzi = mezzoDiTrasportoDAO.findAll();
 
@@ -708,6 +728,7 @@ public class Application {
             System.out.println(e.getMessage());
         }
     }
+
 
 
 //    // MENU' per cercare titoli di viaggio per periodo o per periodo e punto vendita.
