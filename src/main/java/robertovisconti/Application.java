@@ -72,7 +72,7 @@ public class Application {
     public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO) {
         boolean adminMenu = true;
         while (adminMenu) {
-            System.out.println("\n******* MENU PRINCIPALE ADMIN *******");
+            System.out.println("\n MENU PRINCIPALE ADMIN ");
             System.out.println("1. Genera utenti / tessera / non tessera");
             System.out.println("2. Creazione mezzi di trasporto");
             System.out.println("3. Creazione punti di emissione");
@@ -114,7 +114,7 @@ public class Application {
     public static void caseUser(TesseraDAO tesseraDAO) {
         boolean userMenu = true;
         while (userMenu) {
-            System.out.println("\n******* MENU PRINCIPALE UTENTE *******");
+            System.out.println("\n MENU PRINCIPALE UTENTE");
             System.out.println("1. Visualizza stato della tessera");
             System.out.println("0. Logout");
             System.out.print("Scegli un'opzione: ");
@@ -272,10 +272,11 @@ public class Application {
             String targa = scanner.nextLine().trim();
             MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
 
-            System.out.print("UUID della tratta: ");
-            UUID idTratta = UUID.fromString(scanner.nextLine().trim());
-            Tratta tratta = trattaDAO.findById(idTratta);
-
+            // scelgo la tratta da un elenco numerato
+            Tratta tratta = selezionaTratta(trattaDAO);
+            if (tratta == null) {
+                return;
+            }
 
             LocalDateTime inizio = LocalDateTime.now();
             LocalDateTime fine = inizio.plusMinutes(tratta.getTempoPercorrenzaStimato());
@@ -296,9 +297,11 @@ public class Application {
             String targa = scanner.nextLine().trim();
             MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
 
-            System.out.print("UUID della tratta: ");
-            UUID idTratta = UUID.fromString(scanner.nextLine().trim());
-            Tratta tratta = trattaDAO.findById(idTratta);
+            // scelgo la tratta da un elenco numerato
+            Tratta tratta = selezionaTratta(trattaDAO);
+            if (tratta == null) {
+                return;
+            }
 
             Duration media = percorrenzaDAO.tempoMedioPercorrenza(tratta, mezzo);
             if (media.isZero()) {
@@ -312,6 +315,36 @@ public class Application {
             System.out.println("Errore: Formato UUID non valido.");
         } catch (RuntimeException ex) {
             System.out.println("Errore: " + ex.getMessage());
+        }
+    }
+
+    // Mostra l'elenco numerato delle tratte e restituisce quella scelta (null se non valida)
+    public static Tratta selezionaTratta(TrattaDAO trattaDAO) {
+        List<Tratta> tratte = trattaDAO.findAll();
+
+        if (tratte.isEmpty()) {
+            System.out.println("Nessuna tratta presente: creane prima con l'opzione 5.");
+            return null;
+        }
+
+        System.out.println("\nScegli una tratta:");
+        for (int i = 0; i < tratte.size(); i++) {
+            Tratta t = tratte.get(i);
+            System.out.println((i + 1) + ". " + t.getPuntoDiPartenza() + " -> " + t.getCapolinea()
+                    + " (stimato " + t.getTempoPercorrenzaStimato() + " min)");
+        }
+        System.out.print("Numero della tratta: ");
+
+        try {
+            int scelta = Integer.parseInt(scanner.nextLine().trim());
+            if (scelta < 1 || scelta > tratte.size()) {
+                System.out.println("Numero non valido.");
+                return null;
+            }
+            return tratte.get(scelta - 1);
+        } catch (NumberFormatException ex) {
+            System.out.println("Devi inserire un numero.");
+            return null;
         }
     }
 
@@ -350,6 +383,28 @@ public class Application {
             System.out.println("Abbonamento valido.");
         } else {
             System.out.println("Abbonamento scaduto o inesistente.");
+        }
+    }
+
+    // VIdima biglietto
+
+    public static void vidimaBiglietto(TitoloViaggioDAO titoloDAO) {
+
+        try {
+
+            System.out.println("Inserisci il codice univoco del biglietto:");
+
+            UUID codice = UUID.fromString(scanner.nextLine());
+
+            titoloDAO.vidimaBiglietto(codice);
+
+        } catch (IllegalArgumentException e) {
+
+            System.out.println("UUID non valido.");
+
+        } catch (RuntimeException e) {
+
+            System.out.println(e.getMessage());
         }
     }
 }
