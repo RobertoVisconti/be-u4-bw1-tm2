@@ -3,6 +3,7 @@ package robertovisconti.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
+import robertovisconti.Application;
 import robertovisconti.entities.Manutenzione;
 import robertovisconti.exceptions.ManutenzioneNonTrovata;
 
@@ -74,7 +75,7 @@ public class ManutenzioneDAO {
 
     public static void storicoManutenzione(ManutenzioneDAO dao) {
         System.out.println("\nInserisci la targa:");
-        String targa = scanner.nextLine();
+        String targa = Application.scanner.nextLine();
 
         List<Manutenzione> lista = dao.storicoManutenzioni(targa);
 
