@@ -93,7 +93,7 @@ public class Application {
                 case 3 -> ricercaUtenti(utenteDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
-                    inMenu = false;
+                    adminMenu = false;
                 }
                 default -> System.out.println("Opzione non valida.");
             }
@@ -121,7 +121,7 @@ public class Application {
                 case 1 -> System.out.println("Funzionalità utente in sviluppo...");
                 case 0 -> {
                     System.out.println("Logout utente effettuato.");
-                    inMenu = false;
+                    userMenu = false;
                 }
                 default -> System.out.println("Opzione non valida.");
             }
