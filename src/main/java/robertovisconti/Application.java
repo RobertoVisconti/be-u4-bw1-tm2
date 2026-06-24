@@ -56,8 +56,8 @@ public class Application {
 
                 switch (emailScanner.getRuolo()) {
                     case ADMIN ->
-                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO);
-                    case USER -> caseUser(tesseraDAO);
+                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO);
+                    case USER -> caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
 
@@ -72,7 +72,7 @@ public class Application {
 
 
     // Case Amministratore
-    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO, TitoloViaggioDAO titoloViaggioDAO) {
+    public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO) {
         boolean adminMenu = true;
         while (adminMenu) {
             System.out.println("\n MENU PRINCIPALE ADMIN ");
@@ -118,7 +118,7 @@ public class Application {
     }
 
     //Case Utente
-    public static void caseUser(TesseraDAO tesseraDAO) {
+    public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO) {
         boolean userMenu = true;
         while (userMenu) {
             System.out.println("\n MENU PRINCIPALE UTENTE");
@@ -136,7 +136,13 @@ public class Application {
             }
 
             switch (scelta) {
-                case 1 -> System.out.println("Funzionalità utente in sviluppo...");
+                case 1 -> {
+                    PuntoDiEmissione punto = selezionaPunto(puntoDiEmissioneDAO);
+                    if (punto != null) {
+                        casePunto(punto);
+                    }
+                }
+                case 2 -> caseViaggio(trattaDAO);
                 case 0 -> {
                     System.out.println("Logout utente effettuato.");
                     userMenu = false;
@@ -147,7 +153,7 @@ public class Application {
     }
 
     // Case Punto Vendita
-    public static void casePunto() {
+    public static void casePunto(PuntoDiEmissione punto) {
         boolean puntoMenu = true;
         while (puntoMenu) {
             System.out.println("\n MENU PUNTO VENDITA");
@@ -171,7 +177,41 @@ public class Application {
                 case 2 -> System.out.println("2. Compra abbonamento");
                 case 3 -> System.out.println("3. Rinnova tessera");
                 case 4 -> System.out.println("4. Rinnova Abbonamento");
-                case 0 -> System.out.println("0. Torna al menu principale");
+                case 0 -> {
+                    System.out.println("Torno al menu principale utente");
+                    puntoMenu = false;
+                }
+                default -> System.out.println("Opzione non valida.");
+            }
+
+        }
+    }
+
+    // Case Viaggio
+    public static void caseViaggio(TrattaDAO trattaDAO) {
+        boolean viaggioMenu = true;
+
+        while (viaggioMenu) { // Il ciclo inizia qui
+            System.out.println("\n MENU VIAGGI");
+            System.out.println("1. Scegli Viaggio");
+            System.out.println("0. Torna al menu principale");
+            System.out.print("Scegli un'opzione: ");
+
+            int scelta;
+            try {
+                scelta = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException ex) {
+                System.out.println("Errore: Inserire un numero valido.");
+                scelta = -1;
+            }
+
+            switch (scelta) {
+                case 1 -> selezionaTratta(trattaDAO);
+                case 0 -> {
+                    System.out.println("Torno al menu principale utente");
+                    viaggioMenu = false;
+                }
+                default -> System.out.println("Opzione non valida.");
             }
         }
     }
