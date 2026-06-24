@@ -280,7 +280,7 @@ public class Application {
                 System.out.println("Formato UUID non valido.");
                 return;
 
-            } catch (Exception e) {
+            } catch (TesseraNonTrovataException e) {
 
                 System.out.println("Tessera non trovata.");
                 return;
