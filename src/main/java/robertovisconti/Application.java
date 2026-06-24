@@ -1,6 +1,8 @@
 package robertovisconti;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import net.datafaker.Faker;
 import robertovisconti.dao.*;
 import robertovisconti.entities.*;
@@ -39,8 +41,6 @@ public class Application {
         creazioneTratte(trattaDAO, genericDAO);
         generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
         creazioneBiglietti(titoloViaggioDAO, genericDAO, puntoDiEmissioneDAO, mezzoDiTrasportoDAO);
-
-
 
 
         boolean optionMenu = true;
@@ -197,7 +197,7 @@ public class Application {
     public static void caseViaggio(TrattaDAO trattaDAO) {
         boolean viaggioMenu = true;
 
-        while (viaggioMenu) { // Il ciclo inizia qui
+        while (viaggioMenu) {
             System.out.println("\n MENU VIAGGI");
             System.out.println("1. Scegli Viaggio");
             System.out.println("0. Torna al menu principale");
@@ -235,7 +235,6 @@ public class Application {
             System.out.println("Errore durante la vendita del biglietto: " + ex.getMessage());
         }
     }
-
 
 
     // Metodo Compra Abbonamento
@@ -349,7 +348,7 @@ public class Application {
             case 3 -> {
 
                 tipoAbbonamento = TipoAbbonamento.ANNUALE;
-               
+
 
             }
 
@@ -362,8 +361,7 @@ public class Application {
 
         try {
 
-            Abbonamento nuovoAbbonamento = new Abbonamento(LocalDateTime.now(),puntoVendita,UUID.randomUUID(),tipoAbbonamento,tessera);
-
+            Abbonamento nuovoAbbonamento = new Abbonamento(LocalDateTime.now(), puntoVendita, UUID.randomUUID(), tipoAbbonamento, tessera);
 
 
             titoloViaggioDAO.save(nuovoAbbonamento);
@@ -377,6 +375,7 @@ public class Application {
             System.out.println("Errore durante il salvataggio: " + e.getMessage());
         }
     }
+
     // Metodo Rinnovo Tessera
     public static void rinnovotessera(TesseraDAO tesseraDAO) {
 
@@ -872,7 +871,6 @@ public class Application {
             System.out.println(e.getMessage());
         }
     }
-
 
 
 //    // MENU' per cercare titoli di viaggio per periodo o per periodo e punto vendita.
