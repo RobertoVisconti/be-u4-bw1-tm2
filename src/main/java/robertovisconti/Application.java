@@ -350,12 +350,12 @@ public class Application {
         }
     }
 
-    // Mostra l'elenco numerato delle tratte e restituisce quella scelta (null se non valida)
+    // Mostra l'elenco numerato delle tratte e restituisce quella scelta
     public static Tratta selezionaTratta(TrattaDAO trattaDAO) {
         List<Tratta> tratte = trattaDAO.findAll();
 
         if (tratte.isEmpty()) {
-            System.out.println("Nessuna tratta presente: creane prima con l'opzione 5.");
+            System.out.println("Nessuna tratta presente.");
             return null;
         }
 
