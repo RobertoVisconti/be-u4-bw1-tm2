@@ -36,12 +36,12 @@ public class Application {
         GenericDAO genericDAO = new GenericDAO(em);
         ManutenzioneDAO manutenzioneDAO = new ManutenzioneDAO(em, mezzoDiTrasportoDAO);
 
-        creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
-        creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
-        creazionePunti(puntoDiEmissioneDAO, genericDAO);
-        creazioneTratte(trattaDAO, genericDAO);
-        generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
-        creazioneBiglietti(titoloViaggioDAO, genericDAO, puntoDiEmissioneDAO, mezzoDiTrasportoDAO);
+        Service.creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
+        Service.creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
+        Service.creazionePunti(puntoDiEmissioneDAO, genericDAO);
+        Service.creazioneTratte(trattaDAO, genericDAO);
+        Service.generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
+        Service.creazioneBiglietti(titoloViaggioDAO, genericDAO, puntoDiEmissioneDAO, mezzoDiTrasportoDAO);
 
 
         boolean optionMenu = true;
@@ -108,12 +108,12 @@ public class Application {
             }
 
             switch (scelta) {
-                case 1 -> creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
-                case 2 -> creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
-                case 3 -> creazionePunti(puntoDiEmissioneDAO, genericDAO);
+                case 1 -> Service.creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
+                case 2 -> Service.creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
+                case 3 -> Service.creazionePunti(puntoDiEmissioneDAO, genericDAO);
                 case 4 -> ricercaUtenti(utenteDAO);
-                case 5 -> creazioneTratte(trattaDAO, genericDAO);
-                case 6 -> generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
+                case 5 -> Service.creazioneTratte(trattaDAO, genericDAO);
+                case 6 -> Service.generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
                 case 7 -> assegnaTrattaMezzo(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 8 -> calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 9 -> storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
@@ -522,28 +522,6 @@ public class Application {
         }
     }
 
-
-    // Creazione Utenti
-    public static void creazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, GenericDAO genericDAO) {
-        if (!genericDAO.isTableEmpty(Utente.class)) {
-            return;
-        }
-        Faker faker = new Faker();
-        for (int i = 0; i < 50; i++) {
-
-            Ruolo ruolo = (i % 10 == 0) ? Ruolo.ADMIN : Ruolo.USER;
-            String email = faker.internet().emailAddress();
-
-            Utente utente = new Utente(faker.name().firstName(), faker.name().lastName(), email, ruolo);
-            if (i % 5 == 0) {
-                Tessera tessera = tesseraDAO.creaTessera();
-                utente.setIdTessera(tessera);
-            }
-            utenteDAO.saveUtente(utente);
-        }
-        System.out.println("Creazione utenti avvenuta con successo.");
-    }
-
     // Ricerca utente
     public static void ricercaUtenti(UtenteDAO utenteDAO) {
         try {
@@ -557,137 +535,6 @@ public class Application {
         } catch (IllegalArgumentException ex) {
             System.out.println("Errore: Formato UUID non valido.");
         }
-    }
-
-    // Creazione Mezzi di trasporti
-    public static void creazioneMezzi(MezzoDiTrasportoDAO mezzoDiTrasportoDAO, GenericDAO genericDAO) {
-        if (!genericDAO.isTableEmpty(MezzoDiTrasporto.class)) {
-            return;
-        }
-        Faker faker = new Faker();
-        Random random = new Random();
-
-        TipoMezzo[] tipi = TipoMezzo.values();
-        StatoMezzo[] stati = StatoMezzo.values();
-
-        for (int i = 0; i < 20; i++) {
-            TipoMezzo tipo = tipi[random.nextInt(tipi.length)];
-            StatoMezzo stato = stati[random.nextInt(stati.length)];
-
-            // la capienza dipende dal tipo di mezzo
-            int capienza;
-            if (tipo == TipoMezzo.BUS) {
-                capienza = random.nextInt(50, 121);   // bus: tra 50 e 120 posti
-            } else {
-                capienza = random.nextInt(120, 251);  // tram: tra 120 e 250 posti
-            }
-
-            String targa = faker.vehicle().licensePlate();
-
-            MezzoDiTrasporto mezzo = new MezzoDiTrasporto(tipo, capienza, stato, targa);
-            mezzoDiTrasportoDAO.save(mezzo);
-        }
-        System.out.println("Creazione 20 mezzi completata con successo.");
-    }
-
-    // Creazione Punti Vendita
-    public static void creazionePunti(PuntoDiEmissioneDAO puntoDiEmissioneDAO, GenericDAO genericDAO) {
-        if (!genericDAO.isTableEmpty(PuntoDiEmissione.class)) {
-            return;
-        }
-        Faker faker = new Faker(new Locale("it", "IT"));
-        Random random = new Random();
-
-        StatoDistributoreAutomatico[] statoDistributore = StatoDistributoreAutomatico.values();
-
-        for (int i = 0; i < 20; i++) {
-
-            String indirizzo = faker.address().streetAddress();
-            String citta = faker.address().city();
-            String cap = faker.address().zipCode();
-            String piva = faker.number().digits(11);
-
-            if (random.nextBoolean()) {
-                String nome = "Distributore Automatico H24 - " + faker.address().streetAddress();
-                StatoDistributoreAutomatico stato = statoDistributore[random.nextInt(statoDistributore.length)];
-                DistributoreAutomatico distributore = new DistributoreAutomatico(nome, indirizzo, citta, cap, piva, stato);
-
-                puntoDiEmissioneDAO.savePuntoDiEmissione(distributore);
-            } else {
-                String[] prefissi = {"Ticket Point ", "Biglietteria ", "Ricevitoria ", "Tabaccheria "};
-                String nome = prefissi[random.nextInt(prefissi.length)] + faker.name().lastName();
-                boolean isAperto = random.nextBoolean();
-                Rivenditore rivenditore = new Rivenditore(nome, indirizzo, citta, cap, piva, isAperto);
-                puntoDiEmissioneDAO.savePuntoDiEmissione(rivenditore);
-            }
-
-        }
-        System.out.println("Creazione punti di emissione avvenuta con successo.");
-    }
-
-
-    // Creazione tratte in blocco
-    public static void creazioneTratte(TrattaDAO trattaDAO, GenericDAO genericDAO) {
-        if (!genericDAO.isTableEmpty(Tratta.class)) {
-            return;
-        }
-        Faker faker = new Faker(new Locale("it", "IT"));
-        Random random = new Random();
-
-        for (int i = 0; i < 15; i++) {
-            String partenza = faker.address().city();
-            String capolinea = faker.address().city();
-            int tempoStimato = random.nextInt(10, 91); // minuti stimati, tra 10 e 90
-
-            trattaDAO.creaTratta(partenza, capolinea, tempoStimato);
-        }
-        System.out.println("Creazione 15 tratte completata.");
-    }
-
-    // Creazione biglietti in blocco
-    public static void creazioneBiglietti(TitoloViaggioDAO titoloViaggioDAO, GenericDAO genericDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
-        if (!genericDAO.isTableEmpty(TitoloViaggio.class)) {
-            return;
-        }
-        List<PuntoDiEmissione> tuttiIPunti = puntoDiEmissioneDAO.findAllPuntiDiEmissione();
-        List<MezzoDiTrasporto> tuttiIMezzi = mezzoDiTrasportoDAO.findAll();
-        Random random = new Random();
-
-        for (int i = 0; i < 25; i++) {
-            PuntoDiEmissione puntoRandom = tuttiIPunti.get(random.nextInt(0, tuttiIPunti.size()));
-            MezzoDiTrasporto mezzoRandom = tuttiIMezzi.get(random.nextInt(0, tuttiIPunti.size()));
-            Biglietto biglietto = new Biglietto(LocalDateTime.now(), puntoRandom, mezzoRandom);
-            titoloViaggioDAO.save(biglietto);
-        }
-        System.out.println("Creazione 25 biglietti completata.");
-    }
-
-    // Genera percorrenze in blocco collegando tratte e mezzi gia' esistenti
-    public static void generaPercorrenze(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO, GenericDAO genericDAO) {
-        if (!genericDAO.isTableEmpty(Percorrenza.class)) {
-            return;
-        }
-        List<Tratta> tratte = trattaDAO.findAll();
-        List<MezzoDiTrasporto> mezzi = mezzoDiTrasportoDAO.findAll();
-
-        if (tratte.isEmpty() || mezzi.isEmpty()) {
-            System.out.println("Servono prima delle tratte e dei mezzi.");
-            return;
-        }
-
-        Random random = new Random();
-        for (int i = 0; i < 30; i++) {
-            Tratta tratta = tratte.get(random.nextInt(tratte.size()));
-            MezzoDiTrasporto mezzo = mezzi.get(random.nextInt(mezzi.size()));
-
-            // data di inizio casuale negli ultimi 30 giorni
-            LocalDateTime inizio = LocalDateTime.now().minusDays(random.nextInt(0, 30)).minusHours(random.nextInt(0, 24));
-            // la fine = inizio + tempo stimato della tratta, con qualche minuto di variazione
-            LocalDateTime fine = inizio.plusMinutes(tratta.getTempoPercorrenzaStimato() + random.nextInt(-5, 11));
-
-            percorrenzaDAO.creaPercorrenza(tratta, mezzo, inizio, fine);
-        }
-        System.out.println("Creazione 30 percorrenze completata.");
     }
 
     // Assegna una tratta a un mezzo: l'admin sceglie mezzo e tratta
@@ -951,6 +798,11 @@ public class Application {
                             System.out.println("Data non valida: " + ex.getMessage());
                         }
 
+                        if (dataInizio != null && dataFine != null && dataInizio.isAfter(dataFine)) {
+                            System.out.println("\nLa data di inizio non può essere successiva alla data di fine.\n");
+                            continue;
+                        }
+
                         System.out.println("\nBiglietti emessi tra " + dataInizio + " e " + dataFine + ": " + titoloViaggioDAO.countBigliettiBetween(dataInizio, dataFine));
                     }
 
@@ -1003,6 +855,10 @@ public class Application {
                         } catch (DateTimeException ex) {
                             System.out.println("Data non valida: " + ex.getMessage());
                         }
+                        if (dataInizio != null && dataFine != null && dataInizio.isAfter(dataFine)) {
+                            System.out.println("\nLa data di inizio non può essere successiva alla data di fine.\n");
+                            continue;
+                        }
 
                         if (puntoDiEmissione == null) {
                             System.out.println("Errore in immissione dati, controllare i dati inseriti e riprovare.\n");
@@ -1049,6 +905,11 @@ public class Application {
                             dataFine = LocalDateTime.of(annoFine, meseFine, giornoFine, oraFine, minutoFine);
                         } catch (DateTimeException ex) {
                             System.out.println("Data non valida: " + ex.getMessage());
+                        }
+
+                        if (dataInizio != null && dataFine != null && dataInizio.isAfter(dataFine)) {
+                            System.out.println("\nLa data di inizio non può essere successiva alla data di fine.\n");
+                            continue;
                         }
 
                         System.out.println("\nAbbonamenti emessi tra " + dataInizio + " e " + dataFine + ": " + titoloViaggioDAO.countAbbonamentiBetween(dataInizio, dataFine));
@@ -1102,6 +963,11 @@ public class Application {
                             dataFine = LocalDateTime.of(annoFine, meseFine, giornoFine, oraFine, minutoFine);
                         } catch (DateTimeException ex) {
                             System.out.println("Data non valida: " + ex.getMessage());
+                        }
+
+                        if (dataInizio != null && dataFine != null && dataInizio.isAfter(dataFine)) {
+                            System.out.println("\nLa data di inizio non può essere successiva alla data di fine.\n");
+                            continue;
                         }
 
                         System.out.println("\nAbbonamenti emessi tra " + dataInizio + " e " + dataFine + " presso " + puntoDiEmissione.getNome() + ": " + titoloViaggioDAO.countAbbonamentiBetween(dataInizio, dataFine, puntoDiEmissione));
