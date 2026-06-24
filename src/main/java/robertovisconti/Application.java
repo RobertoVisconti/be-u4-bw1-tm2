@@ -63,7 +63,8 @@ public class Application {
                 switch (emailScanner.getRuolo()) {
                     case ADMIN ->
                             caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO);
-                    case USER -> caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO);
+                    case USER ->
+                            caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO, mezzoDiTrasportoDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
 
@@ -124,7 +125,7 @@ public class Application {
     }
 
     //Case Utente
-    public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO) {
+    public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
         boolean userMenu = true;
         while (userMenu) {
             System.out.println("\n MENU PRINCIPALE UTENTE");
@@ -148,7 +149,8 @@ public class Application {
                         casePunto(punto, titoloViaggioDAO, tesseraDAO);
                     }
                 }
-                case 2 -> caseViaggio(trattaDAO);
+
+                case 2 -> caseViaggio(trattaDAO, titoloViaggioDAO);
                 case 0 -> {
                     System.out.println("Logout utente effettuato.");
                     userMenu = false;
@@ -194,12 +196,18 @@ public class Application {
     }
 
     // Case Viaggio
-    public static void caseViaggio(TrattaDAO trattaDAO) {
+    public static void caseViaggio(TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO) {
         boolean viaggioMenu = true;
+        Tratta trattaSelezionata = null;
 
         while (viaggioMenu) {
             System.out.println("\n MENU VIAGGI");
             System.out.println("1. Scegli Viaggio");
+
+            // L'opzione 2 compare solo se l'utente ha prima selezionato una tratta valida
+            if (trattaSelezionata != null) {
+                System.out.println("2. Vidima biglietto su questo mezzo");
+            }
             System.out.println("0. Torna al menu principale");
             System.out.print("Scegli un'opzione: ");
 
@@ -212,7 +220,15 @@ public class Application {
             }
 
             switch (scelta) {
-                case 1 -> selezionaTratta(trattaDAO);
+                case 1 -> trattaSelezionata = selezionaTratta(trattaDAO);
+                case 2 -> {
+                    if (trattaSelezionata != null) {
+                        // Estraiamo l'oggetto MezzoTrasporto reale e lo passiamo al metodo di vidimazione
+                        vidimaBiglietto(titoloViaggioDAO, trattaSelezionata.getMezzoTrasporto());
+                    } else {
+                        System.out.println("Opzione non valida.");
+                    }
+                }
                 case 0 -> {
                     System.out.println("Torno al menu principale utente");
                     viaggioMenu = false;
@@ -852,22 +868,19 @@ public class Application {
 
     // Vidima biglietto
 
-    public static void vidimaBiglietto(TitoloViaggioDAO titoloDAO) {
+    private static void vidimaBiglietto(TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasporto mezzo) {
+        System.out.println("\n--- VIDIMAZIONE BIGLIETTO ---");
+        System.out.print("Inserisci il codice univoco del biglietto: ");
 
         try {
+            UUID codiceBiglietto = UUID.fromString(scanner.nextLine().trim());
 
-            System.out.println("Inserisci il codice univoco del biglietto:");
-
-            UUID codice = UUID.fromString(scanner.nextLine());
-
-            titoloDAO.vidimaBiglietto(codice);
+            // Invochiamo il DAO passando l'UUID e l'oggetto MezzoTrasporto
+            titoloViaggioDAO.vidimaBiglietto(codiceBiglietto, mezzo);
 
         } catch (IllegalArgumentException e) {
-
-            System.out.println("UUID non valido.");
-
+            System.out.println("Errore: Il formato del codice biglietto non è un UUID valido.");
         } catch (RuntimeException e) {
-
             System.out.println(e.getMessage());
         }
     }

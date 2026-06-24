@@ -3,28 +3,21 @@ package robertovisconti.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
-import robertovisconti.Application;
-import robertovisconti.entities.Abbonamento;
-import robertovisconti.entities.Biglietto;
-import robertovisconti.entities.PuntoDiEmissione;
-import robertovisconti.entities.TitoloViaggio;
+import robertovisconti.entities.*;
 import robertovisconti.enums.TipoAbbonamento;
-import robertovisconti.exceptions.PuntoDiEmissioneNonTrovatoException;
 
-import java.time.DateTimeException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 
-
 public class TitoloViaggioDAO {
-     public final EntityManager entityManager;
+    public final EntityManager entityManager;
 
-     public TitoloViaggioDAO(EntityManager em) {this.entityManager =em;}
+    public TitoloViaggioDAO(EntityManager em) {
+        this.entityManager = em;
+    }
 
-    public void save (TitoloViaggio newTitoloViaggio) {
+    public void save(TitoloViaggio newTitoloViaggio) {
         EntityTransaction transaction = this.entityManager.getTransaction();
 
         transaction.begin();
@@ -49,15 +42,15 @@ public class TitoloViaggioDAO {
     }
 
     public void delete(UUID codiceUnivoco) {
-         TitoloViaggio found = findByCodiceUnivoco(codiceUnivoco);
+        TitoloViaggio found = findByCodiceUnivoco(codiceUnivoco);
 
-         EntityTransaction transaction = entityManager.getTransaction();
+        EntityTransaction transaction = entityManager.getTransaction();
 
-         transaction.begin();
+        transaction.begin();
 
-         entityManager.remove(found);
+        entityManager.remove(found);
 
-         transaction.commit();
+        transaction.commit();
     }
 
     public void updateAbbonamento(
@@ -85,14 +78,11 @@ public class TitoloViaggioDAO {
 
             switch (tipoAbbonamento) {
 
-                case SETTIMANALE ->
-                        abbonamento.setDataScadenza(baseDate.plusWeeks(1));
+                case SETTIMANALE -> abbonamento.setDataScadenza(baseDate.plusWeeks(1));
 
-                case MENSILE ->
-                        abbonamento.setDataScadenza(baseDate.plusMonths(1));
+                case MENSILE -> abbonamento.setDataScadenza(baseDate.plusMonths(1));
 
-                case ANNUALE ->
-                        abbonamento.setDataScadenza(baseDate.plusYears(1));
+                case ANNUALE -> abbonamento.setDataScadenza(baseDate.plusYears(1));
             }
 
             abbonamento.setDataEmissione(dataEmissione);
@@ -145,6 +135,7 @@ public class TitoloViaggioDAO {
         query.setParameter("fine", fine);
         return query.getResultList().size();
     }
+
     public int countBigliettiBetween(LocalDateTime inizio, LocalDateTime fine, PuntoDiEmissione puntoDiEmissione) {
         TypedQuery<Biglietto> query = entityManager.createQuery("SELECT b FROM Biglietto b WHERE b.dataEmissione BETWEEN :inizio AND :fine AND b.puntoDiEmissione = :puntoDiEmissione", Biglietto.class);
         query.setParameter("inizio", inizio);
@@ -168,32 +159,41 @@ public class TitoloViaggioDAO {
         return query.getResultList().size();
     }
 
-    public void vidimaBiglietto(UUID codiceUnivoco) {
+    public void vidimaBiglietto(UUID codiceUnivoco, MezzoDiTrasporto mezzo) {
+        TitoloViaggio titolo;
+        try {
+            titolo = findByCodiceUnivoco(codiceUnivoco);
+        } catch (jakarta.persistence.NoResultException e) {
+            System.out.println("Errore: Il codice univoco inserito non esiste nel database.");
+            return;
+        }
 
         EntityTransaction transaction = entityManager.getTransaction();
 
-        transaction.begin();
+        try {
+            transaction.begin();
 
-        TitoloViaggio titolo = findByCodiceUnivoco(codiceUnivoco);
+            if (titolo instanceof Biglietto biglietto) {
+                if (biglietto.getDataValidazione() == null) {
 
-        if (titolo instanceof Biglietto biglietto) {
+                    biglietto.setMezzoDiTrasporto(mezzo);
+                    biglietto.setDataValidazione(LocalDateTime.now());
 
-            if (biglietto.getDataValidazione() == null) {
-
-                biglietto.setDataValidazione(LocalDateTime.now());
-
-                System.out.println("Biglietto vidimato con successo!");
-
+                    System.out.println("Biglietto vidimato con successo!");
+                } else {
+                    System.out.println("Errore: Biglietto già vidimato il: " + biglietto.getDataValidazione());
+                }
             } else {
-
-                System.out.println("Biglietto già vidimato il: " + biglietto.getDataValidazione());
+                System.out.println("Errore: Il codice inserito appartiene ad un abbonamento.");
             }
 
-        } else {
+            transaction.commit();
 
-            System.out.println("Il codice inserito non appartiene ad un biglietto.");
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            System.out.println("Errore imprevisto durante la vidimazione: " + e.getMessage());
         }
-
-        transaction.commit();
     }
 }

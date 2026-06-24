@@ -37,16 +37,16 @@ public class Percorrenza {
         this.dataFine = dataFine;
     }
 
-    public void setDataFine(LocalDateTime dataFine) {
-        this.dataFine = dataFine;
-    }
-
     public LocalDateTime getDataInizio() {
         return dataInizio;
     }
 
     public LocalDateTime getDataFine() {
         return dataFine;
+    }
+
+    public void setDataFine(LocalDateTime dataFine) {
+        this.dataFine = dataFine;
     }
 
     public Duration getTempoEffettivo() {
@@ -64,4 +64,10 @@ public class Percorrenza {
                 ", dataFine=" + dataFine +
                 '}';
     }
+
+    public MezzoDiTrasporto getMezzoTrasporto() {
+        return null;
+    }
+
+
 }

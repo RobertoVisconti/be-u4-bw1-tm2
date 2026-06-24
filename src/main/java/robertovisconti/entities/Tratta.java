@@ -6,16 +6,16 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name="tratte")
+@Table(name = "tratte")
 public class Tratta {
     @Id
     @GeneratedValue
     private UUID id;
-    @Column(name="punto_di_partenza", nullable = false)
+    @Column(name = "punto_di_partenza", nullable = false)
     private String puntoDiPartenza;
     @Column(nullable = false)
     private String capolinea;
-    @Column(name="tempo_percorrenza_stimato", nullable = false)
+    @Column(name = "tempo_percorrenza_stimato", nullable = false)
     private int tempoPercorrenzaStimato;
 
     public Tratta() {
@@ -31,20 +31,20 @@ public class Tratta {
         return puntoDiPartenza;
     }
 
-    public String getCapolinea() {
-        return capolinea;
-    }
-
-    public int getTempoPercorrenzaStimato() {
-        return tempoPercorrenzaStimato;
-    }
-
     public void setPuntoDiPartenza(String puntoDiPartenza) {
         this.puntoDiPartenza = puntoDiPartenza;
     }
 
+    public String getCapolinea() {
+        return capolinea;
+    }
+
     public void setCapolinea(String capolinea) {
         this.capolinea = capolinea;
+    }
+
+    public int getTempoPercorrenzaStimato() {
+        return tempoPercorrenzaStimato;
     }
 
     public void setTempoPercorrenzaStimato(int tempoPercorrenzaStimato) {
@@ -59,5 +59,9 @@ public class Tratta {
                 ", capolinea='" + capolinea + '\'' +
                 ", tempoPercorrenzaStimato=" + tempoPercorrenzaStimato +
                 '}';
+    }
+
+    public MezzoDiTrasporto getMezzoTrasporto() {
+        return null;
     }
 }

@@ -28,6 +28,8 @@ public class Biglietto extends TitoloViaggio {
         return mezzoDiTrasporto;
     }
 
+    public void setMezzoDiTrasporto(MezzoDiTrasporto mezzo) {
+    }
 
     public LocalDateTime getDataValidazione() {
         return dataValidazione;
@@ -44,6 +46,4 @@ public class Biglietto extends TitoloViaggio {
                 ", dataValidazione=" + dataValidazione +
                 '}';
     }
-
-
 }
