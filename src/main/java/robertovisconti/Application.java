@@ -4,12 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import net.datafaker.Faker;
-import robertovisconti.dao.MezzoDiTrasportoDAO;
-import robertovisconti.dao.PercorrenzaDAO;
-import robertovisconti.dao.PuntoDiEmissioneDAO;
-import robertovisconti.dao.TesseraDAO;
-import robertovisconti.dao.TrattaDAO;
-import robertovisconti.dao.UtenteDAO;
+import robertovisconti.dao.*;
 import robertovisconti.entities.*;
 import robertovisconti.enums.Ruolo;
 import robertovisconti.enums.StatoDistributoreAutomatico;
@@ -316,6 +311,44 @@ public class Application {
             System.out.println("Errore: Formato UUID non valido.");
         } catch (RuntimeException ex) {
             System.out.println("Errore: " + ex.getMessage());
+        }
+    }
+
+    //Storico Manutenzione
+
+    public static void storicoManutenzione(ManutenzioneDAO dao) {
+        System.out.println("\nInserisci la targa:");
+        String targa = scanner.nextLine();
+
+        List<Manutenzione> lista = dao.storicoManutenzioni(targa);
+
+        if (lista.isEmpty()) {
+            System.out.println("Nessuna manutenzione trovata.");
+            return;
+        }
+
+        System.out.println("\nStorico Manutenzioni:");
+        for(Manutenzione m : lista) {
+            System.out.println("\nInizio: " + m.getDataInizio());
+            System.out.println("Fine: " + m.getDataFine());
+            System.out.println("Motivo: " + m.getMotivo());
+        }
+    }
+
+    //Verifica abbonamento
+
+    public static void verificaAbbonamento(TitoloViaggioDAO titoloDAO) {
+
+        System.out.println("Inserisci il codice della tessera:");
+
+        UUID codice = UUID.fromString(scanner.nextLine());
+
+        boolean valido = titoloDAO.isAbbonamentoValido(codice);
+
+        if (valido) {
+            System.out.println("Abbonamento valido.");
+        } else {
+            System.out.println("Abbonamento scaduto o inesistente.");
         }
     }
 }

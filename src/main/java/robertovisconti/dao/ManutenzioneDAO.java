@@ -3,7 +3,6 @@ package robertovisconti.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
-import robertovisconti.Application;
 import robertovisconti.entities.Manutenzione;
 import robertovisconti.exceptions.ManutenzioneNonTrovata;
 
@@ -73,23 +72,5 @@ public class ManutenzioneDAO {
         return query.getResultList();
     }
 
-    public static void storicoManutenzione(ManutenzioneDAO dao) {
-        System.out.println("\nInserisci la targa:");
-        String targa = Application.scanner.nextLine();
-
-        List<Manutenzione> lista = dao.storicoManutenzioni(targa);
-
-        if (lista.isEmpty()) {
-            System.out.println("Nessuna manutenzione trovata.");
-            return;
-        }
-
-            System.out.println("\nStorico Manutenzioni:");
-        for(Manutenzione m : lista) {
-            System.out.println("\nInizio: " + m.getDataInizio());
-            System.out.println("Fine: " + m.getDataFine());
-            System.out.println("Motivo: " + m.getMotivo());
-        }
-    }
 
 }
