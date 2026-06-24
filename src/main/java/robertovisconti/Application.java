@@ -35,7 +35,7 @@ public class Application {
         PercorrenzaDAO percorrenzaDAO = new PercorrenzaDAO(em);
 
 
-//        utenteDAO.saveUtente(new Utente("Roberto", "Admin", "ciaosonounadmin@adming.it", Ruolo.ADMIN));
+
 
         boolean optionMenu = true;
         while (optionMenu) {
@@ -424,7 +424,7 @@ public class Application {
             TipoMezzo tipo = tipi[random.nextInt(tipi.length)];
             StatoMezzo stato = stati[random.nextInt(stati.length)];
 
-            // la capienza dipende dal tipo di mezzo: un bus porta meno persone di un tram
+            // la capienza dipende dal tipo di mezzo
             int capienza;
             if (tipo == TipoMezzo.BUS) {
                 capienza = random.nextInt(50, 121);   // bus: tra 50 e 120 posti
@@ -694,7 +694,7 @@ public class Application {
         }
     }
 
-    // VIdima biglietto
+    // Vidima biglietto
 
     public static void vidimaBiglietto(TitoloViaggioDAO titoloDAO) {
 
@@ -721,7 +721,7 @@ public class Application {
 
     public static void menuCountTitoliViaggio(TitoloViaggioDAO titoloViaggioDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
         while (true) {
-            System.out.println("\n******* SELEZIONA UN'OPZIONE *******\n");
+            System.out.println("\n SELEZIONA UN'OPZIONE \n");
             System.out.println("1. Conta biglietti emessi in un lasso di tempo.");
             System.out.println("2. Conta biglietti emessi in un lasso di tempo su un punto di emissione.");
             System.out.println("3. Conta abbonamenti emessi in un lasso di tempo.");
