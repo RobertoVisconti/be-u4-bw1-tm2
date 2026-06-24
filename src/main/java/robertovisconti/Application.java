@@ -38,6 +38,7 @@ public class Application {
         creazionePunti(puntoDiEmissioneDAO, genericDAO);
         creazioneTratte(trattaDAO, genericDAO);
         generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
+        creazioneBiglietti(titoloViaggioDAO, genericDAO, puntoDiEmissioneDAO, mezzoDiTrasportoDAO);
 
 
 
@@ -553,6 +554,24 @@ public class Application {
             trattaDAO.creaTratta(partenza, capolinea, tempoStimato);
         }
         System.out.println("Creazione 15 tratte completata.");
+    }
+
+    // Creazione biglietti in blocco
+    public static void creazioneBiglietti(TitoloViaggioDAO titoloViaggioDAO, GenericDAO genericDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+        if (!genericDAO.isTableEmpty(TitoloViaggio.class)) {
+            return;
+        }
+        List<PuntoDiEmissione> tuttiIPunti = puntoDiEmissioneDAO.findAllPuntiDiEmissione();
+        List<MezzoDiTrasporto> tuttiIMezzi = mezzoDiTrasportoDAO.findAll();
+        Random random = new Random();
+
+        for (int i = 0; i < 25; i++) {
+            PuntoDiEmissione puntoRandom = tuttiIPunti.get(random.nextInt(0, tuttiIPunti.size()));
+            MezzoDiTrasporto mezzoRandom = tuttiIMezzi.get(random.nextInt(0, tuttiIPunti.size()));
+            Biglietto biglietto = new Biglietto(LocalDateTime.now(), puntoRandom, mezzoRandom);
+            titoloViaggioDAO.save(biglietto);
+        }
+        System.out.println("Creazione 25 biglietti completata.");
     }
 
     // Genera percorrenze in blocco collegando tratte e mezzi gia' esistenti
