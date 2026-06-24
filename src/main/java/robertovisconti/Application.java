@@ -385,6 +385,8 @@ public class Application {
         }
     }
 
+    // VIdima biglietto
+
     public static void vidimaBiglietto(TitoloViaggioDAO titoloDAO) {
 
         try {
