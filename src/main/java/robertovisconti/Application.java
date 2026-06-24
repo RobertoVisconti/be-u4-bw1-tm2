@@ -32,7 +32,7 @@ public class Application {
         PercorrenzaDAO percorrenzaDAO = new PercorrenzaDAO(em);
 
 
-        utenteDAO.saveUtente(new Utente("Roberto", "Admin", "ciaosonounadmin@adming.it", Ruolo.ADMIN));
+//        utenteDAO.saveUtente(new Utente("Roberto", "Admin", "ciaosonounadmin@adming.it", Ruolo.ADMIN));
 
         boolean optionMenu = true;
         while (optionMenu) {
@@ -52,7 +52,8 @@ public class Application {
                 Utente emailScanner = utenteDAO.findByEmail(email);
 
                 switch (emailScanner.getRuolo()) {
-                    case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO);
+                    case ADMIN ->
+                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO);
                     case USER -> caseUser(tesseraDAO);
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
@@ -328,7 +329,7 @@ public class Application {
         }
 
         System.out.println("\nStorico Manutenzioni:");
-        for(Manutenzione m : lista) {
+        for (Manutenzione m : lista) {
             System.out.println("\nInizio: " + m.getDataInizio());
             System.out.println("Fine: " + m.getDataFine());
             System.out.println("Motivo: " + m.getMotivo());
