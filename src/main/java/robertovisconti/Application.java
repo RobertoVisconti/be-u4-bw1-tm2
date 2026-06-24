@@ -4,10 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import net.datafaker.Faker;
-import robertovisconti.dao.MezzoDiTrasportoDAO;
-import robertovisconti.dao.PuntoDiEmissioneDAO;
-import robertovisconti.dao.TesseraDAO;
-import robertovisconti.dao.UtenteDAO;
+import robertovisconti.dao.*;
 import robertovisconti.entities.*;
 import robertovisconti.enums.Ruolo;
 import robertovisconti.enums.StatoDistributoreAutomatico;
@@ -212,4 +209,26 @@ public class Application {
         }
         System.out.println("Creazione punti di emissione avvenuta con successo.");
     }
+    
+    //Storico Manutenzione
+
+    public static void storicoManutenzione(ManutenzioneDAO dao) {
+        System.out.println("\nInserisci la targa:");
+        String targa = scanner.nextLine();
+
+        List<Manutenzione> lista = dao.storicoManutenzioni(targa);
+
+        if (lista.isEmpty()) {
+            System.out.println("Nessuna manutenzione trovata.");
+            return;
+        }
+
+        System.out.println("\nStorico Manutenzioni:");
+        for(Manutenzione m : lista) {
+            System.out.println("\nInizio: " + m.getDataInizio());
+            System.out.println("Fine: " + m.getDataFine());
+            System.out.println("Motivo: " + m.getMotivo());
+        }
+    }
+
 }
