@@ -388,13 +388,13 @@ public class Application {
             return null;
         }
 
-        System.out.println("\nScegli un punto vendita:");
+        System.out.println("\nPunti vendita:");
         for (int i = 0; i < punti.size(); i++) {
             PuntoDiEmissione p = punti.get(i);
             System.out.println((i + 1) + ". " + p.getNome() + " -> " + p.getIndirizzo()
                     + " " + p.getCitta());
         }
-        System.out.print("Numero della tratta: ");
+        System.out.print("Scegli Punto vendita: ");
 
         try {
             int scelta = Integer.parseInt(scanner.nextLine().trim());
