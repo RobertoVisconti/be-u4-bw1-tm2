@@ -36,7 +36,7 @@ public class Application {
 
         boolean optionMenu = true;
         while (optionMenu) {
-            System.out.println("\n******* TRASPORTO PUBBLICO *******");
+            System.out.println("\nTRASPORTO PUBBLICO");
             System.out.println("Inserisci la tua email per accedere");
             System.out.println("0. Chiudi Applicazione");
             System.out.print("Scegli un'opzione o inserisci email: ");
@@ -81,6 +81,7 @@ public class Application {
             System.out.println("6. Genera percorrenze");
             System.out.println("7. Assegna tratta a un mezzo");
             System.out.println("8. Calcola tempo medio percorrenza");
+            System.out.println("9. Storico percorrenze mezzo/tratta");
             System.out.println("0. Logout");
             System.out.print("Scegli un'opzione: ");
 
@@ -101,6 +102,7 @@ public class Application {
                 case 6 -> generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 7 -> assegnaTrattaMezzo(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 8 -> calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
+                case 9 -> storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
                     adminMenu = false;
@@ -318,12 +320,43 @@ public class Application {
         }
     }
 
-    // Mostra l'elenco numerato delle tratte e restituisce quella scelta (null se non valida)
+    // Storico: quante volte un mezzo ha percorso una tratta e quanto ha impiegato ogni volta
+    public static void storicoPercorrenzeMezzoTratta(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
+        try {
+            System.out.print("Targa del mezzo: ");
+            String targa = scanner.nextLine().trim();
+            MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
+
+            // scelgo la tratta da un elenco numerato
+            Tratta tratta = selezionaTratta(trattaDAO);
+            if (tratta == null) {
+                return;
+            }
+
+            List<Duration> tempi = percorrenzaDAO.tempiPercorrenza(tratta, mezzo);
+
+            System.out.println("\nIl mezzo " + targa + " ha percorso questa tratta " + tempi.size() + " volte:");
+            if (tempi.isEmpty()) {
+                System.out.println("(nessuna percorrenza registrata)");
+            }
+            int n = 1;
+            for (Duration t : tempi) {
+                long minuti = t.toMinutes();
+                long secondi = t.minusMinutes(minuti).getSeconds();
+                System.out.println(n + ") " + minuti + " min " + secondi + " sec");
+                n++;
+            }
+        } catch (RuntimeException ex) {
+            System.out.println("Errore: " + ex.getMessage());
+        }
+    }
+
+    // Mostra l'elenco numerato delle tratte e restituisce quella scelta
     public static Tratta selezionaTratta(TrattaDAO trattaDAO) {
         List<Tratta> tratte = trattaDAO.findAll();
 
         if (tratte.isEmpty()) {
-            System.out.println("Nessuna tratta presente: creane prima con l'opzione 5.");
+            System.out.println("Nessuna tratta presente.");
             return null;
         }
 

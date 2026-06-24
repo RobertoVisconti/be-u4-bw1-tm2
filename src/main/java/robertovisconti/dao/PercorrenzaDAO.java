@@ -11,6 +11,7 @@ import robertovisconti.exceptions.PercorrenzaNonTrovataException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -121,6 +122,17 @@ public class PercorrenzaDAO {
     // TASK 2 (controllo extra) - conto quante volte un mezzo ha percorso una tratta
     public long numeroVolteTrattaPercorsa(Tratta tratta, MezzoDiTrasporto mezzo) {
         return percorrenzeSuTrattaPerMezzo(tratta, mezzo).size();
+    }
+
+    // tengo traccia di quante volte un mezzo percorre una tratta (= dimensione lista)
+    // e di quanto impiega ogni volta (= ogni Duration nella lista)
+    public List<Duration> tempiPercorrenza(Tratta tratta, MezzoDiTrasporto mezzo) {
+        List<Percorrenza> percorrenze = percorrenzeSuTrattaPerMezzo(tratta, mezzo);
+        List<Duration> tempi = new ArrayList<>();
+        for (Percorrenza percorrenza : percorrenze) {
+            tempi.add(percorrenza.getTempoEffettivo());
+        }
+        return tempi;
     }
 
 }
