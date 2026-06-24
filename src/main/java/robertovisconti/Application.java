@@ -252,9 +252,9 @@ public class Application {
 
         // Creazione Tessera
         System.out.println("\nGenerazione della tessera in corso...");
-        Tessera nuovaTessera = new Tessera(UUID.randomUUID());
+        Tessera nuovaTessera;
         try {
-            tesseraDAO.saveTessera(nuovaTessera);
+            nuovaTessera = tesseraDAO.creaTessera();
         } catch (Exception e) {
             System.out.println("Errore durante la creazione della tessera: " + e.getMessage());
             return;
@@ -389,8 +389,7 @@ public class Application {
 
             Utente utente = new Utente(faker.name().firstName(), faker.name().lastName(), email, ruolo);
             if (i % 5 == 0) {
-                Tessera tessera = new Tessera(UUID.randomUUID());
-                tesseraDAO.saveTessera(tessera);
+                Tessera tessera = tesseraDAO.creaTessera();
                 utente.setIdTessera(tessera);
             }
             utenteDAO.saveUtente(utente);
