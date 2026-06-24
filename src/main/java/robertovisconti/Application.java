@@ -14,6 +14,7 @@ import robertovisconti.entities.Utente;
 import robertovisconti.enums.Ruolo;
 import robertovisconti.enums.StatoMezzo;
 import robertovisconti.enums.TipoMezzo;
+import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
 import robertovisconti.exceptions.UtenteNonTrovatoException;
 
 import java.util.Objects;
@@ -33,7 +34,7 @@ public class Application {
         MezzoDiTrasportoDAO mezzoDiTrasportoDAO = new MezzoDiTrasportoDAO(em);
 
 
-//        utenteDAO.saveUtente(new Utente("Roberto", "Admin", "ciaosonounadmin@adming.it", Ruolo.ADMIN));
+        utenteDAO.saveUtente(new Utente("Roberto", "Admin", "ciaosonounadmin@adming.it", Ruolo.ADMIN));
 
         boolean chiuso = true;
         while (chiuso) {
@@ -58,7 +59,7 @@ public class Application {
                     default -> System.out.println("Ruolo non riconosciuto.");
                 }
 
-            } catch (NoResultException ex) {
+            } catch (UtenteEmailNonTrovatoException ex) {
                 System.out.println("Errore: Nessun utente associato a questa email.");
             }
         }
