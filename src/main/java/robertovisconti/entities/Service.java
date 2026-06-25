@@ -43,6 +43,22 @@ public class Service {
         System.out.println("Creazione utenti avvenuta con successo.");
     }
 
+    public static void creazioneUtenteSingolo(TesseraDAO tesseraDAO, UtenteDAO utenteDAO) {
+        Faker faker = new Faker();
+        Random random = new Random();
+
+        Ruolo ruolo = random.nextInt(10) == 0 ? Ruolo.ADMIN : Ruolo.USER;
+        String email = faker.internet().emailAddress();
+
+        Utente utente = new Utente(faker.name().firstName(), faker.name().lastName(), email, ruolo);
+        if (random.nextInt(5) == 0) {
+            Tessera tessera = tesseraDAO.creaTessera();
+            utente.setIdTessera(tessera);
+        }
+        utenteDAO.saveUtente(utente);
+        System.out.println("Utente creato con successo.");
+    }
+
     // Creazione Mezzi di trasporti
     public static void creazioneMezzi(MezzoDiTrasportoDAO mezzoDiTrasportoDAO, GenericDAO genericDAO) {
         if (!genericDAO.isTableEmpty(MezzoDiTrasporto.class)) {
@@ -72,6 +88,24 @@ public class Service {
             mezzoDiTrasportoDAO.save(mezzo);
         }
         System.out.println("Creazione 20 mezzi completata con successo.");
+    }
+
+    public static void creazioneMezzoSingolo(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+        Faker faker = new Faker();
+        Random random = new Random();
+
+        TipoMezzo[] tipi = TipoMezzo.values();
+        StatoMezzo[] stati = StatoMezzo.values();
+
+        TipoMezzo tipo = tipi[random.nextInt(tipi.length)];
+        StatoMezzo stato = stati[random.nextInt(stati.length)];
+
+        int capienza = (tipo == TipoMezzo.BUS) ? 120 : 250;
+        String targa = faker.vehicle().licensePlate();
+
+        MezzoDiTrasporto mezzo = new MezzoDiTrasporto(tipo, capienza, stato, targa);
+        mezzoDiTrasportoDAO.save(mezzo);
+        System.out.println("Mezzo creato con successo.");
     }
 
     // Creazione Punti Vendita
@@ -109,6 +143,32 @@ public class Service {
         System.out.println("Creazione punti di emissione avvenuta con successo.");
     }
 
+    public static void creazionePuntoSingolo(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
+        Faker faker = new Faker(new Locale("it", "IT"));
+        Random random = new Random();
+
+        StatoDistributoreAutomatico[] statoDistributore = StatoDistributoreAutomatico.values();
+
+        String indirizzo = faker.address().streetAddress();
+        String citta = faker.address().city();
+        String cap = faker.address().zipCode();
+        String piva = faker.number().digits(11);
+
+        if (random.nextBoolean()) {
+            String nome = "Distributore Automatico H24 - " + faker.address().streetAddress();
+            StatoDistributoreAutomatico stato = statoDistributore[random.nextInt(statoDistributore.length)];
+            DistributoreAutomatico distributore = new DistributoreAutomatico(nome, indirizzo, citta, cap, piva, stato);
+            puntoDiEmissioneDAO.savePuntoDiEmissione(distributore);
+        } else {
+            String[] prefissi = {"Ticket Point ", "Biglietteria ", "Ricevitoria ", "Tabaccheria "};
+            String nome = prefissi[random.nextInt(prefissi.length)] + faker.name().lastName();
+            boolean isAperto = random.nextBoolean();
+            Rivenditore rivenditore = new Rivenditore(nome, indirizzo, citta, cap, piva, isAperto);
+            puntoDiEmissioneDAO.savePuntoDiEmissione(rivenditore);
+        }
+        System.out.println("Punto di emissione creato con successo.");
+    }
+
     // Creazione tratte in blocco
     public static void creazioneTratte(TrattaDAO trattaDAO, GenericDAO genericDAO) {
         if (!genericDAO.isTableEmpty(Tratta.class)) {
@@ -125,6 +185,18 @@ public class Service {
             trattaDAO.creaTratta(partenza, capolinea, tempoStimato);
         }
         System.out.println("Creazione 15 tratte completata.");
+    }
+
+    public static void creazioneTrattaSingola(TrattaDAO trattaDAO) {
+        Faker faker = new Faker(new Locale("it", "IT"));
+        Random random = new Random();
+
+        String partenza = faker.address().city();
+        String capolinea = faker.address().city();
+        int tempoStimato = random.nextInt(10, 91);
+
+        trattaDAO.creaTratta(partenza, capolinea, tempoStimato);
+        System.out.println("Tratta creata con successo.");
     }
 
     // Creazione biglietti in blocco
