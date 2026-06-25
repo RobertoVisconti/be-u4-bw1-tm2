@@ -255,102 +255,107 @@ public class Service {
         System.out.print("Cognome: ");
         String cognome = scanner.nextLine().trim();
 
-        System.out.print("Email: ");
-        String email = scanner.nextLine().trim();
+        String email;
+        while (true) {
+            System.out.print("Email: ");
+            email = scanner.nextLine().trim();
 
-        try {
-            utenteDAO.findByEmail(email);
-            System.out.println("Esiste già un account con questa email.");
-            return;
-        } catch (UtenteEmailNonTrovatoException e) {
-            // email libera, si continua
+            try {
+                utenteDAO.findByEmail(email);
+                System.out.println("Errore: Esiste già un account con questa email. Riprova con un'altra.");
+            } catch (UtenteEmailNonTrovatoException e) {
+                break;
+            }
         }
 
-        System.out.println("Ruolo:");
-        System.out.println("1. Utente");
-        System.out.println("2. Amministratore");
-        System.out.print("Scelta: ");
+        Ruolo ruolo = null;
+        while (ruolo == null) {
+            System.out.println("\nRuolo:");
+            System.out.println("1. Utente");
+            System.out.println("2. Amministratore");
+            System.out.print("Scelta: ");
 
-        Ruolo ruolo;
-        switch (scanner.nextLine().trim()) {
-            case "1" -> ruolo = Ruolo.USER;
-            case "2" -> ruolo = Ruolo.ADMIN;
-            default -> {
-                System.out.println("Scelta non valida. Operazione annullata.");
-                return;
+            switch (scanner.nextLine().trim()) {
+                case "1" -> ruolo = Ruolo.USER;
+                case "2" -> ruolo = Ruolo.ADMIN;
+                default -> System.out.println("Scelta non valida. Inserisci 1 o 2.");
             }
         }
 
         Utente utente = new Utente(nome, cognome, email, ruolo);
         utenteDAO.saveUtente(utente);
-        System.out.println("Utente creato con successo.");
+        System.out.println("\nUtente creato con successo!");
     }
 
     public static void creazioneMezzoManuale(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
         System.out.println("\nINSERIMENTO MEZZO DI TRASPORTO");
 
-        System.out.println("Tipo di mezzo:");
-        System.out.println("1. Bus");
-        System.out.println("2. Tram");
-        System.out.print("Scelta: ");
+        TipoMezzo tipo = null;
+        while (tipo == null) {
+            System.out.println("\nTipo di mezzo:");
+            System.out.println("1. Bus");
+            System.out.println("2. Tram");
+            System.out.print("Scelta: ");
 
-        TipoMezzo tipo;
-        switch (scanner.nextLine().trim()) {
-            case "1" -> tipo = TipoMezzo.BUS;
-            case "2" -> tipo = TipoMezzo.TRAM;
-            default -> {
-                System.out.println("Scelta non valida. Operazione annullata.");
-                return;
+            switch (scanner.nextLine().trim()) {
+                case "1" -> tipo = TipoMezzo.BUS;
+                case "2" -> tipo = TipoMezzo.TRAM;
+                default -> System.out.println("Scelta non valida. Inserisci 1 o 2.");
             }
         }
 
-        System.out.print("Capienza massima: ");
-        int capienza;
-        try {
-            capienza = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Capienza non valida. Operazione annullata.");
-            return;
-        }
-
-        System.out.println("Stato:");
-        System.out.println("1. In servizio");
-        System.out.println("2. In manutenzione");
-        System.out.print("Scelta: ");
-
-        StatoMezzo stato;
-        switch (scanner.nextLine().trim()) {
-            case "1" -> stato = StatoMezzo.IN_SERVIZIO;
-            case "2" -> stato = StatoMezzo.IN_MANUTENZIONE;
-            default -> {
-                System.out.println("Scelta non valida. Operazione annullata.");
-                return;
+        int capienza = -1;
+        while (capienza <= 0) {
+            System.out.print("\nCapienza massima: ");
+            try {
+                capienza = Integer.parseInt(scanner.nextLine().trim());
+                if (capienza <= 0) {
+                    System.out.println("La capienza deve essere un numero maggiore di 0.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Capienza non valida. Inserisci un numero intero.");
             }
         }
 
-        System.out.print("Targa: ");
+        StatoMezzo stato = null;
+        while (stato == null) {
+            System.out.println("\nStato:");
+            System.out.println("1. In servizio");
+            System.out.println("2. In manutenzione");
+            System.out.print("Scelta: ");
+
+            switch (scanner.nextLine().trim()) {
+                case "1" -> stato = StatoMezzo.IN_SERVIZIO;
+                case "2" -> stato = StatoMezzo.IN_MANUTENZIONE;
+                default -> System.out.println("Scelta non valida. Inserisci 1 o 2.");
+            }
+        }
+
+        System.out.print("\nTarga: ");
         String targa = scanner.nextLine().trim();
 
         MezzoDiTrasporto mezzo = new MezzoDiTrasporto(tipo, capienza, stato, targa);
         mezzoDiTrasportoDAO.save(mezzo);
-        System.out.println("Mezzo creato con successo.");
+        System.out.println("\nMezzo creato con successo.");
     }
 
     public static void creazionePuntoManuale(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
         System.out.println("\nINSERIMENTO PUNTO DI EMISSIONE");
 
-        System.out.println("Tipo di punto:");
-        System.out.println("1. Distributore automatico");
-        System.out.println("2. Rivenditore");
-        System.out.print("Scelta: ");
-        String tipoScelto = scanner.nextLine().trim();
+        String tipoScelto = "";
+        while (!tipoScelto.equals("1") && !tipoScelto.equals("2")) {
+            System.out.println("\nTipo di punto:");
+            System.out.println("1. Distributore automatico");
+            System.out.println("2. Rivenditore");
+            System.out.print("Scelta: ");
+            tipoScelto = scanner.nextLine().trim();
 
-        if (!tipoScelto.equals("1") && !tipoScelto.equals("2")) {
-            System.out.println("Scelta non valida. Operazione annullata.");
-            return;
+            if (!tipoScelto.equals("1") && !tipoScelto.equals("2")) {
+                System.out.println("Scelta non valida. Inserisci 1 o 2.");
+            }
         }
 
-        System.out.print("Nome: ");
+        System.out.print("\nNome: ");
         String nome = scanner.nextLine().trim();
 
         System.out.print("Indirizzo: ");
@@ -366,41 +371,41 @@ public class Service {
         String piva = scanner.nextLine().trim();
 
         if (tipoScelto.equals("1")) {
-            System.out.println("Stato:");
-            System.out.println("1. Attivo");
-            System.out.println("2. Non attivo");
-            System.out.print("Scelta: ");
+            StatoDistributoreAutomatico stato = null;
+            while (stato == null) {
+                System.out.println("\nStato:");
+                System.out.println("1. Attivo");
+                System.out.println("2. Non attivo");
+                System.out.print("Scelta: ");
 
-            StatoDistributoreAutomatico stato;
-            switch (scanner.nextLine().trim()) {
-                case "1" -> stato = StatoDistributoreAutomatico.ATTIVO;
-                case "2" -> stato = StatoDistributoreAutomatico.NON_ATTIVO;
-                default -> {
-                    System.out.println("Scelta non valida. Operazione annullata.");
-                    return;
+                switch (scanner.nextLine().trim()) {
+                    case "1" -> stato = StatoDistributoreAutomatico.ATTIVO;
+                    case "2" -> stato = StatoDistributoreAutomatico.NON_ATTIVO;
+                    default -> System.out.println("Scelta non valida. Inserisci 1 o 2.");
                 }
             }
             DistributoreAutomatico distributore = new DistributoreAutomatico(nome, indirizzo, citta, cap, piva, stato);
             puntoDiEmissioneDAO.savePuntoDiEmissione(distributore);
-        } else {
-            System.out.println("Aperto?");
-            System.out.println("1. Sì");
-            System.out.println("2. No");
-            System.out.print("Scelta: ");
 
-            boolean aperto;
-            switch (scanner.nextLine().trim()) {
-                case "1" -> aperto = true;
-                case "2" -> aperto = false;
-                default -> {
-                    System.out.println("Scelta non valida. Operazione annullata.");
-                    return;
+        } else {
+            Boolean aperto = null;
+            while (aperto == null) {
+                System.out.println("\nAperto?");
+                System.out.println("1. Sì");
+                System.out.println("2. No");
+                System.out.print("Scelta: ");
+
+                switch (scanner.nextLine().trim()) {
+                    case "1" -> aperto = true;
+                    case "2" -> aperto = false;
+                    default -> System.out.println("Scelta non valida. Inserisci 1 o 2.");
                 }
             }
             Rivenditore rivenditore = new Rivenditore(nome, indirizzo, citta, cap, piva, aperto);
             puntoDiEmissioneDAO.savePuntoDiEmissione(rivenditore);
         }
-        System.out.println("Punto di emissione creato con successo.");
+
+        System.out.println("\nPunto di emissione creato con successo.");
     }
 
     public static void creazioneTrattaManuale(TrattaDAO trattaDAO) {
@@ -412,17 +417,21 @@ public class Service {
         System.out.print("Capolinea: ");
         String capolinea = scanner.nextLine().trim();
 
-        System.out.print("Tempo di percorrenza stimato (minuti): ");
-        int tempoStimato;
-        try {
-            tempoStimato = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Valore non valido. Operazione annullata.");
-            return;
+        int tempoStimato = -1;
+        while (tempoStimato <= 0) {
+            System.out.print("Tempo di percorrenza stimato (minuti): ");
+            try {
+                tempoStimato = Integer.parseInt(scanner.nextLine().trim());
+                if (tempoStimato <= 0) {
+                    System.out.println("Il tempo di percorrenza deve essere un numero maggiore di 0.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Valore non valido. Inserisci un numero intero (es. 45). Riprova.");
+            }
         }
-
         trattaDAO.creaTratta(partenza, capolinea, tempoStimato);
-        System.out.println("Tratta creata con successo.");
+
+        System.out.println("\nTratta creata con successo.");
     }
     //endregion
 
@@ -674,7 +683,7 @@ public class Service {
 
         System.out.println("\n--- RINNOVO TESSERA ---");
 
-            if (utente.getIdTessera() == null) {
+        if (utente.getIdTessera() == null) {
             System.out.println("Non hai una tessera associata al tuo account.");
             System.out.println("Crea una tessera per procedere.");
             return;
