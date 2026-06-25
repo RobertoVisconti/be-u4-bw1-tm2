@@ -792,6 +792,37 @@ public class Service {
     }
 //endregion
 
+    //region Mostra l'elenco dei mezzi
+    public static MezzoDiTrasporto selezionaMezzo(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+        List<MezzoDiTrasporto> mezzi = mezzoDiTrasportoDAO.findAll();
+
+        if (mezzi.isEmpty()) {
+            System.out.println("Nessun mezzo di trasporto presente");
+            return null;
+        }
+
+        while (true) {
+            System.out.println("\nMezzi di Trasporto:");
+            for (int i = 0; i < mezzi.size(); i++) {
+                MezzoDiTrasporto m = mezzi.get(i);
+                System.out.println((i + 1) + ". " + m.getTipoMezzo() + " -> " + m.getId());
+            }
+            System.out.print("Scegli Mezzo di Trasporto: ");
+
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+                if (scelta >= 1 && scelta <= mezzi.size()) {
+                    return mezzi.get(scelta - 1);
+                } else {
+                    System.out.println("Numero non valido. Per favore, riprova.");
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("Devi inserire un numero. Per favore, riprova.");
+            }
+        }
+    }
+//endregion
+
     //region Verifica abbonamento
 
     public static void verificaAbbonamento(TitoloViaggioDAO titoloDAO) {

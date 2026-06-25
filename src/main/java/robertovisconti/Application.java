@@ -409,6 +409,56 @@ public class Application {
         }
     }
 
+    //region  Menù Conta Biglietti Vidimati
+    public static void menuCountBigliettiVidimati(TitoloViaggioDAO titoloViaggioDAO) {
+        while (true) {
+            System.out.println("\n SELEZIONA UN'OPZIONE \n");
+            System.out.println("1. Conta biglietti vidimati per mezzo.");
+            System.out.println("2. Conta biglietti vidimati per periodo.");
+            System.out.println("0. Torna indietro");
+            System.out.print("Scelta: ");
+
+            int input;
+            try {
+                input = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException ex) {
+                System.out.println("Formato errato, inserisci un numero valido.");
+                continue;
+            }
+
+            if (input == 0) break;
+
+
+            LocalDateTime dataInizio = null;
+            LocalDateTime dataFine = null;
+            if (input >= 1 && input <= 2) {
+                while (true) {
+                    dataInizio = richiediData("Data di inizio");
+                    dataFine = richiediData("Data di fine");
+
+                    if (dataInizio.isAfter(dataFine)) {
+                        System.out.println("\n[ERRORE] La data di inizio non può essere successiva alla data di fine. Riprova l'inserimento.");
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            switch (input) {
+                case 1 -> {
+                    
+                    System.out.println("\nBiglietti vidimati: " +
+                            titoloViaggioDAO.countBigliettiVidimatiSuMezzo());
+                }
+
+                case 2 -> System.out.println("\nBiglietti vidimati tra " + dataInizio + " e " + dataFine ": "
+                        titoloViaggioDAO.countBigliettiVidimatiBetween(dataInizio, dataFine));
+
+                default -> System.out.println("Input non valido. Inserisci un numero da 0 a 4.");
+            }
+        }
+    }
+
     // METODO DATE TIME FORMATTER
     private static LocalDateTime richiediData(String tipoData) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
