@@ -714,7 +714,6 @@ public class Service {
 
     //endregion
 
-
     //region Metodo Rinnovo Tessera
     public static void rinnovotessera(TesseraDAO tesseraDAO, Utente utente) {
 
