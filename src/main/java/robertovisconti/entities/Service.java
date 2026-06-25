@@ -984,7 +984,6 @@ public class Service {
         }
     }
     
-
     //endregion
 
     //region Mostra l'elenco dei mezzi
