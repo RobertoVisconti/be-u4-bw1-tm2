@@ -166,18 +166,29 @@ public class Application {
 
     // region Menu Creazione Utenti
     public static void menuCreazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, GenericDAO genericDAO) {
-        System.out.println("\n1. Genera utenti in blocco (dati finti)");
-        System.out.println("2. Inserisci un utente a mano");
-        System.out.print("Scegli un'opzione: ");
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
-            switch (scelta) {
-                case 1 -> Service.creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
-                case 2 -> Service.creazioneUtenteManuale(utenteDAO);
-                default -> System.out.println("Opzione non valida.");
+        while (true) {
+            System.out.println("\n--- MENU CREAZIONE UTENTI ---");
+            System.out.println("1. Genera utenti in blocco (dati finti)");
+            System.out.println("2. Inserisci un utente a mano");
+            System.out.print("Scegli un'opzione: ");
+
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+                switch (scelta) {
+                    case 1 -> {
+                        Service.creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
+                        return;
+                    }
+                    case 2 -> {
+                        Service.creazioneUtenteManuale(utenteDAO);
+                        return;
+                    }
+                    default -> System.out.println("Opzione non valida. Inserisci 1 o 2.");
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("Errore: Inserire un numero valido.");
             }
-        } catch (NumberFormatException ex) {
-            System.out.println("Errore: Inserire un numero valido.");
+
         }
     }
     // endregion
@@ -269,6 +280,7 @@ public class Application {
     }
 
     // endregion
+
     // region Case Utente
     public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, Utente utente) {
         boolean userMenu = true;
@@ -457,6 +469,8 @@ public class Application {
             }
         }
     }
+
+    // endregion
 
     //region  Menù Conta Biglietti Vidimati
     public static void menuCountBigliettiVidimati(TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
