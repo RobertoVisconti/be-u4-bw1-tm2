@@ -109,8 +109,8 @@ public class Application {
         while (adminMenu) {
             System.out.println("\n MENU PRINCIPALE ADMIN\n");
             System.out.println("1. Genera utenti / tessera / non tessera");
-            System.out.println("2. Creazione mezzi di trasporto");
-            System.out.println("3. Creazione punti di emissione");
+            System.out.println("2. Creazione mezzo di trasporto");
+            System.out.println("3. Creazione punto di emissione");
             System.out.println("4. Ricerca utenti");
             System.out.println("5. Creazione tratte");
             System.out.println("6. Genera percorrenze");
