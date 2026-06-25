@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import robertovisconti.dao.*;
 import robertovisconti.entities.*;
+import robertovisconti.enums.Ruolo;
 import robertovisconti.enums.TipoAbbonamento;
 import robertovisconti.exceptions.PuntoDiEmissioneNonTrovatoException;
 import robertovisconti.exceptions.TesseraNonTrovataException;
@@ -16,7 +17,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 import java.util.UUID;
 
