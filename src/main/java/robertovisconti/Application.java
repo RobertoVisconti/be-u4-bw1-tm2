@@ -4,22 +4,17 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import robertovisconti.dao.*;
-import robertovisconti.entities.*;
-import robertovisconti.enums.Ruolo;
-import robertovisconti.enums.TipoAbbonamento;
+import robertovisconti.entities.PuntoDiEmissione;
+import robertovisconti.entities.Service;
+import robertovisconti.entities.Tratta;
+import robertovisconti.entities.Utente;
 import robertovisconti.exceptions.PuntoDiEmissioneNonTrovatoException;
-import robertovisconti.exceptions.TesseraNonTrovataException;
 import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
-import robertovisconti.exceptions.UtenteNonTrovatoException;
 
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
-import java.util.UUID;
 
 public class Application {
     private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
@@ -51,20 +46,13 @@ public class Application {
 
         boolean optionMenu = true;
         while (optionMenu) {
-            System.out.println("\nTRASPORTO PUBBLICO");
-            System.out.println("\nInserisci la tua email per accedere");
-            System.out.println("\n0. Chiudi Applicazione");
-            System.out.print("\nScegli un'opzione o inserisci email: ");
+            System.out.println("\nTRASPORTO PUBBLICO\n");
             System.out.println("1. Login");
             System.out.println("2. Registrazione");
             System.out.println("0. Chiudi Applicazione");
-            System.out.print("Scegli un'opzione: ");
+            System.out.print("\nScegli un'opzione: ");
 
-            String email = scanner.nextLine().trim();
-            if (Objects.equals(email, "0")) {
-                System.out.println("\nApplicazione in chiusura...");
-                break;
-            }
+
             int scelta;
             try {
                 scelta = Integer.parseInt(scanner.nextLine()
