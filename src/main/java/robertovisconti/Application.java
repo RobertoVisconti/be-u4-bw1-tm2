@@ -21,7 +21,8 @@ import java.util.Scanner;
 import java.util.UUID;
 
 public class Application {
-    private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("be-u4-bw1-tm2");
+    private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
+            "be-u4-bw1-tm2");
     public static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -49,30 +50,52 @@ public class Application {
         boolean optionMenu = true;
         while (optionMenu) {
             System.out.println("\nTRASPORTO PUBBLICO");
-            System.out.println("Inserisci la tua email per accedere");
+            System.out.println("1. Login");
+            System.out.println("2. Registrazione");
             System.out.println("0. Chiudi Applicazione");
-            System.out.print("Scegli un'opzione o inserisci email: ");
+            System.out.print("Scegli un'opzione: ");
 
-            String email = scanner.nextLine().trim();
-            if (Objects.equals(email, "0")) {
-                System.out.println("Applicazione in chiusura...");
-                break;
+            int scelta;
+            try {
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Inserisci un numero valido.");
+                continue;
             }
 
-            try {
+            switch (scelta) {
 
-                Utente emailScanner = utenteDAO.findByEmail(email);
+                case 1 -> {
+                    System.out.println("Inserisci la tua e-mail:");
 
-                switch (emailScanner.getRuolo()) {
-                    case ADMIN ->
-                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO, manutenzioneDAO);
-                    case USER ->
-                            caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO, mezzoDiTrasportoDAO);
-                    default -> System.out.println("Ruolo non riconosciuto.");
+                    String email = scanner.nextLine()
+                            .trim();
+
+                    try {
+
+                        Utente emailScanner = utenteDAO.findByEmail(email);
+
+                        switch (emailScanner.getRuolo()) {
+                            case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO,
+                                    trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO, manutenzioneDAO);
+                            case USER -> caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO,
+                                    mezzoDiTrasportoDAO);
+                            default -> System.out.println("Ruolo non riconosciuto.");
+                        }
+
+                    } catch (UtenteEmailNonTrovatoException ex) {
+                        System.out.println("Errore: Nessun utente associato a questa email.");
+                    }
+                }
+                case 2 -> registrazioneUtente(utenteDAO);
+
+                case 0 -> {
+                    System.out.println("Applicazione in chiusura...");
+                    optionMenu = false;
                 }
 
-            } catch (UtenteEmailNonTrovatoException ex) {
-                System.out.println("Errore: Nessun utente associato a questa email.");
+                default -> System.out.println("Scelta non valida.");
             }
         }
 
@@ -103,7 +126,8 @@ public class Application {
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
@@ -143,7 +167,8 @@ public class Application {
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
@@ -181,7 +206,8 @@ public class Application {
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
@@ -220,7 +246,8 @@ public class Application {
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
@@ -243,6 +270,44 @@ public class Application {
                 default -> System.out.println("Opzione non valida.");
             }
         }
+    }
+
+    // Registra nuovo user
+
+    public static void registrazioneUtente(UtenteDAO utenteDAO) {
+
+        System.out.println("\nREGISTRAZIONE UTENTE");
+
+        System.out.print("Nome: ");
+        String nome = scanner.nextLine().trim();
+
+        System.out.print("Cognome: ");
+        String cognome = scanner.nextLine().trim();
+
+        System.out.print("Email: ");
+        String email = scanner.nextLine().trim();
+
+        try {
+
+            utenteDAO.findByEmail(email);
+
+            System.out.println("Esiste già un account con questa email.");
+            return;
+
+        } catch (UtenteEmailNonTrovatoException e) {
+            // Nuova email continua la registrazione
+        }
+
+        Utente nuovoUtente = new Utente(
+                nome,
+                cognome,
+                email,
+                Ruolo.USER
+        );
+
+        utenteDAO.saveUtente(nuovoUtente);
+
+        System.out.println("Registrazione completata con successo!");
     }
 
     // Metodo Compra biglietto
@@ -279,7 +344,8 @@ public class Application {
         int risposta;
 
         try {
-            risposta = Integer.parseInt(scanner.nextLine().trim());
+            risposta = Integer.parseInt(scanner.nextLine()
+                    .trim());
         } catch (NumberFormatException e) {
             System.out.println("Input non valido.");
             return;
@@ -291,7 +357,8 @@ public class Application {
 
             try {
 
-                UUID codice = UUID.fromString(scanner.nextLine().trim());
+                UUID codice = UUID.fromString(scanner.nextLine()
+                        .trim());
 
                 tessera = tesseraDAO.findByUnCode(codice);
 
@@ -341,7 +408,8 @@ public class Application {
 
         try {
 
-            scelta = Integer.parseInt(scanner.nextLine().trim());
+            scelta = Integer.parseInt(scanner.nextLine()
+                    .trim());
 
         } catch (NumberFormatException e) {
 
@@ -384,7 +452,8 @@ public class Application {
 
         try {
 
-            Abbonamento nuovoAbbonamento = new Abbonamento(LocalDateTime.now(), puntoVendita, UUID.randomUUID(), tipoAbbonamento, tessera);
+            Abbonamento nuovoAbbonamento = new Abbonamento(LocalDateTime.now(), puntoVendita, UUID.randomUUID(),
+                    tipoAbbonamento, tessera);
 
 
             titoloViaggioDAO.save(nuovoAbbonamento);
@@ -408,7 +477,8 @@ public class Application {
         UUID codiceUnivoco;
 
         try {
-            codiceUnivoco = UUID.fromString(scanner.nextLine().trim());
+            codiceUnivoco = UUID.fromString(scanner.nextLine()
+                    .trim());
         } catch (IllegalArgumentException e) {
             System.out.println("UUID non valido.");
             return;
@@ -423,7 +493,8 @@ public class Application {
         int scelta;
 
         try {
-            scelta = Integer.parseInt(scanner.nextLine().trim());
+            scelta = Integer.parseInt(scanner.nextLine()
+                    .trim());
         } catch (NumberFormatException e) {
             System.out.println("Input non valido.");
             return;
@@ -452,7 +523,8 @@ public class Application {
             if (vecchiaScadenza.isAfter(LocalDate.now())) {
                 nuovaScadenza = vecchiaScadenza.plusYears(anni);
             } else {
-                nuovaScadenza = LocalDate.now().plusYears(anni);
+                nuovaScadenza = LocalDate.now()
+                        .plusYears(anni);
             }
 
             tesseraDAO.updateTessera(
@@ -478,7 +550,8 @@ public class Application {
         UUID codiceUnivoco;
 
         try {
-            codiceUnivoco = UUID.fromString(scanner.nextLine().trim());
+            codiceUnivoco = UUID.fromString(scanner.nextLine()
+                    .trim());
         } catch (IllegalArgumentException e) {
             System.out.println("UUID non valido.");
             return;
@@ -493,7 +566,8 @@ public class Application {
         int scelta;
 
         try {
-            scelta = Integer.parseInt(scanner.nextLine().trim());
+            scelta = Integer.parseInt(scanner.nextLine()
+                    .trim());
         } catch (NumberFormatException e) {
             System.out.println("Input non valido.");
             return;
@@ -528,7 +602,8 @@ public class Application {
     public static void ricercaUtenti(UtenteDAO utenteDAO) {
         try {
             System.out.print("Inserisci l'UUID dell'utente da cercare: ");
-            String inserito = scanner.nextLine().trim();
+            String inserito = scanner.nextLine()
+                    .trim();
             UUID id = UUID.fromString(inserito);
             Utente trovato = utenteDAO.findByID(id);
             System.out.println(trovato);
@@ -543,7 +618,8 @@ public class Application {
     public static void assegnaTrattaMezzo(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
         try {
             System.out.print("Targa del mezzo: ");
-            String targa = scanner.nextLine().trim();
+            String targa = scanner.nextLine()
+                    .trim();
             MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
 
             // scelgo la tratta da un elenco numerato
@@ -568,7 +644,8 @@ public class Application {
     public static void calcolaTempoMedio(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
         try {
             System.out.print("Targa del mezzo: ");
-            String targa = scanner.nextLine().trim();
+            String targa = scanner.nextLine()
+                    .trim();
             MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
 
             // scelgo la tratta da un elenco numerato
@@ -582,7 +659,8 @@ public class Application {
                 System.out.println("Nessuna percorrenza conclusa trovata per questo mezzo su questa tratta.");
             } else {
                 long minuti = media.toMinutes();
-                long secondi = media.minusMinutes(minuti).getSeconds();
+                long secondi = media.minusMinutes(minuti)
+                        .getSeconds();
                 System.out.println("Tempo medio di percorrenza: " + minuti + " min " + secondi + " sec.");
             }
         } catch (IllegalArgumentException ex) {
@@ -596,7 +674,8 @@ public class Application {
     public static void storicoPercorrenzeMezzoTratta(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
         try {
             System.out.print("Targa del mezzo: ");
-            String targa = scanner.nextLine().trim();
+            String targa = scanner.nextLine()
+                    .trim();
             MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
 
             // scelgo la tratta da un elenco numerato
@@ -614,7 +693,8 @@ public class Application {
             int n = 1;
             for (Duration t : tempi) {
                 long minuti = t.toMinutes();
-                long secondi = t.minusMinutes(minuti).getSeconds();
+                long secondi = t.minusMinutes(minuti)
+                        .getSeconds();
                 System.out.println(n + ") " + minuti + " min " + secondi + " sec");
                 n++;
             }
@@ -641,7 +721,8 @@ public class Application {
         System.out.print("Numero della tratta: ");
 
         try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
+            int scelta = Integer.parseInt(scanner.nextLine()
+                    .trim());
             if (scelta < 1 || scelta > tratte.size()) {
                 System.out.println("Numero non valido.");
                 return null;
@@ -728,7 +809,8 @@ public class Application {
         System.out.print("Inserisci il codice univoco del biglietto: ");
 
         try {
-            UUID codiceBiglietto = UUID.fromString(scanner.nextLine().trim());
+            UUID codiceBiglietto = UUID.fromString(scanner.nextLine()
+                    .trim());
 
             // Invochiamo il DAO passando l'UUID e l'oggetto MezzoTrasporto
             titoloViaggioDAO.vidimaBiglietto(codiceBiglietto, mezzo);
