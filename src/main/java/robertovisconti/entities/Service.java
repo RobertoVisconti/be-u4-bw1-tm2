@@ -14,6 +14,7 @@ import javax.naming.directory.InitialDirContext;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -1057,17 +1058,49 @@ public class Service {
     //region Verifica abbonamento
 
     public static void verificaAbbonamento(TitoloViaggioDAO titoloDAO) {
+        System.out.println("\n--- VERIFICA VALIDITÀ ABBONAMENTO ---");
 
-        System.out.println("Inserisci il codice della tessera:");
+        UUID codice = null;
+        Abbonamento abbonamento = null;
 
-        UUID codice = UUID.fromString(scanner.nextLine());
+        while (codice == null) {
+            System.out.print("Inserisci il codice della tessera: ");
+            String input = scanner.nextLine().trim();
 
-        boolean valido = titoloDAO.isAbbonamentoValido(codice);
+            if (input.isEmpty()) {
+                System.out.println("Il codice non può essere vuoto. Riprova.");
+                continue;
+            }
 
-        if (valido) {
-            System.out.println("Abbonamento valido.");
+            try {
+                codice = UUID.fromString(input);
+
+                abbonamento = titoloDAO.getUltimoAbbonamento(codice);
+
+            } catch (IllegalArgumentException ex) {
+                System.out.println("Errore: Formato codice non valido (deve essere un UUID). Riprova.");
+                codice = null; // Forza il ciclo a continuare
+            } catch (RuntimeException ex) {
+                System.out.println("Errore durante la verifica sul database: " + ex.getMessage() + ". Riprova.");
+                codice = null;
+            }
+        }
+
+        if (abbonamento != null) {
+            LocalDateTime scadenza = abbonamento.getDataScadenza();
+
+
+            if (scadenza.isAfter(LocalDateTime.now())) {
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy 'alle' HH:mm");
+                String dataFormattata = scadenza.format(formatter);
+
+                System.out.println("\nAbbonamento VALIDO! Scade il: " + dataFormattata);
+            } else {
+                System.out.println("\n[ATTENZIONE] Abbonamento SCADUTO.");
+            }
         } else {
-            System.out.println("Abbonamento scaduto o inesistente.");
+            System.out.println("\n[ATTENZIONE] Tessera INESISTENTE o nessun abbonamento associato.");
         }
     }
 //endregion
@@ -1421,14 +1454,12 @@ public class Service {
             String targa = scanner.nextLine().trim();
 
             try {
-
                 mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
 
                 if (mezzo == null) {
                     System.out.println("Nessun mezzo trovato con questa targa. Riprova.");
                 }
             } catch (Exception e) {
-
                 System.out.println("Errore nella ricerca: Mezzo non trovato. Riprova.");
             }
         }
@@ -1445,7 +1476,15 @@ public class Service {
             switch (scanner.nextLine().trim()) {
                 case "1" -> nuovoStato = StatoMezzo.IN_SERVIZIO;
                 case "2" -> nuovoStato = StatoMezzo.IN_MANUTENZIONE;
-                default -> System.out.println("Scelta non valida.");
+                default -> {
+                    System.out.println("Scelta non valida.");
+                    continue;
+                }
+            }
+
+            if (nuovoStato == mezzo.getStatoMezzo()) {
+                System.out.println("Il mezzo è già " + nuovoStato + ".");
+                nuovoStato = null;
             }
         }
 
@@ -1455,6 +1494,8 @@ public class Service {
                 mezzo.getCapienza(),
                 nuovoStato
         );
+
+        System.out.println("Stato del mezzo aggiornato con successo in: " + nuovoStato);
     }
     // endregion
 
