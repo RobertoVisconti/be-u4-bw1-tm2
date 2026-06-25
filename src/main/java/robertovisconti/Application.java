@@ -284,7 +284,7 @@ public class Application {
             switch (scelta) {
                 case 1 -> Service.compraBiglietto(titoloViaggioDAO, puntoVendita);
                 case 2 -> Service.compraAbbonamento(titoloViaggioDAO, tesseraDAO, puntoVendita, utente);
-                case 3 -> Service.rinnovotessera(tesseraDAO);
+                case 3 -> Service.rinnovotessera(tesseraDAO, utente);
                 case 4 -> Service.rinnovoAbbonamento(titoloViaggioDAO);
                 case 0 -> {
                     System.out.println("Torno al menu principale utente");

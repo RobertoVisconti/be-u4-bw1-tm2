@@ -640,27 +640,28 @@ public class Service {
 //endregion
 
     //region Metodo Rinnovo Tessera
-    public static void rinnovotessera(TesseraDAO tesseraDAO) {
+    public static void rinnovotessera(TesseraDAO tesseraDAO, Utente utente) {
 
         System.out.println("\n--- RINNOVO TESSERA ---");
-        System.out.print("Inserisci il Codice Univoco della tessera: ");
 
-        UUID codiceUnivoco;
-
-        try {
-            codiceUnivoco = UUID.fromString(scanner.nextLine().trim());
-        } catch (IllegalArgumentException e) {
-            System.out.println("UUID non valido.");
+            if (utente.getIdTessera() == null) {
+            System.out.println("Non hai una tessera associata al tuo account.");
+            System.out.println("Crea una tessera per procedere.");
             return;
         }
 
-        try {
+        Tessera tessera = utente.getIdTessera();
+        UUID codiceUnivoco = tessera.getCodiceUnivoco();
 
-            Tessera tessera = tesseraDAO.findByUnCode(codiceUnivoco);
+        System.out.println("Tessera trovata!");
+        System.out.println("Codice: " + codiceUnivoco);
+
+
+        try {
 
             LocalDate vecchiaScadenza = tessera.getDataScadenza();
             LocalDate nuovaScadenza;
-            
+
             if (vecchiaScadenza != null && vecchiaScadenza.isAfter(LocalDate.now())) {
                 nuovaScadenza = vecchiaScadenza.plusYears(1);
             } else {
