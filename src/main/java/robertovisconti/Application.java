@@ -119,10 +119,11 @@ public class Application {
             System.out.println("9. Storico percorrenze mezzo/tratta");
             System.out.println("10. Menù storici titoli di viaggio");
             System.out.println("11. Storico manutenzioni");
-            System.out.println("12. Verifica abbonamento");
-            System.out.println("13. Menù conto biglietti vidimati");
-            System.out.println("14. Aggiorna stato rivenditore");
-            System.out.println("15. Aggiorna stato distributore automatico");
+            System.out.println("12. Cambio Stato Mezzo");
+            System.out.println("13. Verifica abbonamento");
+            System.out.println("14. Menù conto biglietti vidimati");
+            System.out.println("15. Aggiorna stato rivenditore");
+            System.out.println("16. Aggiorna stato distributore automatico");
             System.out.println("0. Logout");
             System.out.print("\nScegli un'opzione: ");
 
@@ -147,10 +148,11 @@ public class Application {
                 case 9 -> Service.storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 10 -> menuCountTitoliViaggio(titoloViaggioDAO, puntoDiEmissioneDAO);
                 case 11 -> Service.storicoManutenzione(manutenzioneDAO);
-                case 12 -> Service.verificaAbbonamento(titoloViaggioDAO);
-                case 13 -> menuCountBigliettiVidimati(titoloViaggioDAO, mezzoDiTrasportoDAO);
-                case 14 -> Service.aggiornaStatoRivenditore(puntoDiEmissioneDAO);
-                case 15 -> Service.aggiornaStatoDistributore(puntoDiEmissioneDAO);
+                case 12 -> Service.cambiaStatoMezzo(mezzoDiTrasportoDAO);
+                case 13 -> Service.verificaAbbonamento(titoloViaggioDAO);
+                case 14 -> menuCountBigliettiVidimati(titoloViaggioDAO, mezzoDiTrasportoDAO);
+                case 15 -> Service.aggiornaStatoRivenditore(puntoDiEmissioneDAO);
+                case 16 -> Service.aggiornaStatoDistributore(puntoDiEmissioneDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
                     adminMenu = false;

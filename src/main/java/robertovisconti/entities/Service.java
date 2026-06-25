@@ -983,7 +983,7 @@ public class Service {
             System.out.println("Errore: " + e.getMessage());
         }
     }
-    
+
     //endregion
 
     //region Mostra l'elenco dei mezzi
@@ -1232,6 +1232,56 @@ public class Service {
         }
     }
 //endregion
+
+    //region Cambia Stato Mezzo
+    public static void cambiaStatoMezzo(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+        System.out.println("\n--- CAMBIO STATO MEZZO (SERVIZIO / MANUTENZIONE) ---");
+
+        MezzoDiTrasporto mezzo = null;
+
+        while (mezzo == null) {
+            System.out.print("Inserisci la targa del mezzo: ");
+            String targa = scanner.nextLine().trim();
+
+            try {
+
+                mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
+
+                if (mezzo == null) {
+                    System.out.println("Nessun mezzo trovato con questa targa. Riprova.");
+                }
+            } catch (Exception e) {
+
+                System.out.println("Errore nella ricerca: Mezzo non trovato. Riprova.");
+            }
+        }
+
+        System.out.println("Mezzo trovato! Stato attuale: " + mezzo.getStatoMezzo());
+
+        StatoMezzo nuovoStato = null;
+        while (nuovoStato == null) {
+            System.out.println("\nSeleziona il nuovo stato:");
+            System.out.println("1. In servizio");
+            System.out.println("2. In manutenzione");
+            System.out.print("Scelta: ");
+
+            switch (scanner.nextLine().trim()) {
+                case "1" -> nuovoStato = StatoMezzo.IN_SERVIZIO;
+                case "2" -> nuovoStato = StatoMezzo.IN_MANUTENZIONE;
+                default -> System.out.println("Scelta non valida.");
+            }
+        }
+
+        mezzoDiTrasportoDAO.updateMezzo(
+                mezzo.getTarga(),
+                mezzo.getTipoMezzo(),
+                mezzo.getCapienza(),
+                nuovoStato
+        );
+    }
+    // endregion
+
+
 
 
 //    public Biglietto vendiBiglietto(MezzoDiTrasporto mezzoDiTrasporto) {
