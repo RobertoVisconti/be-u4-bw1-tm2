@@ -40,6 +40,7 @@ public class Application {
         GenericDAO genericDAO = new GenericDAO(em);
         ManutenzioneDAO manutenzioneDAO = new ManutenzioneDAO(em, mezzoDiTrasportoDAO);
 
+
         Service.creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
         Service.creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
         Service.creazionePunti(puntoDiEmissioneDAO, genericDAO);
@@ -80,8 +81,13 @@ public class Application {
                         switch (emailScanner.getRuolo()) {
                             case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO,
                                     trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO, manutenzioneDAO);
-                            case USER -> caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO,
-                                    mezzoDiTrasportoDAO);
+                            case USER -> caseUser(
+                                    tesseraDAO,
+                                    puntoDiEmissioneDAO,
+                                    trattaDAO,
+                                    titoloViaggioDAO,
+                                    mezzoDiTrasportoDAO,
+                                    emailScanner);
                             default -> System.out.println("Ruolo non riconosciuto.");
                         }
 
@@ -157,7 +163,7 @@ public class Application {
     }
 
     //Case Utente
-    public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+    public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, Utente utente) {
         boolean userMenu = true;
         while (userMenu) {
             System.out.println("\n MENU PRINCIPALE UTENTE");
@@ -179,7 +185,7 @@ public class Application {
                 case 1 -> {
                     PuntoDiEmissione punto = selezionaPunto(puntoDiEmissioneDAO);
                     if (punto != null) {
-                        casePunto(punto, titoloViaggioDAO, tesseraDAO);
+                        casePunto(punto, titoloViaggioDAO, tesseraDAO, utente);
                     }
                 }
 
@@ -194,7 +200,7 @@ public class Application {
     }
 
     // Case Punto Vendita
-    public static void casePunto(PuntoDiEmissione puntoVendita, TitoloViaggioDAO titoloViaggioDAO, TesseraDAO tesseraDAO) {
+    public static void casePunto(PuntoDiEmissione puntoVendita, TitoloViaggioDAO titoloViaggioDAO, TesseraDAO tesseraDAO, Utente utente) {
         boolean puntoMenu = true;
         while (puntoMenu) {
             System.out.println("\n MENU PUNTO VENDITA");
@@ -216,7 +222,7 @@ public class Application {
 
             switch (scelta) {
                 case 1 -> compraBiglietto(titoloViaggioDAO, puntoVendita);
-                case 2 -> compraAbbonamento(titoloViaggioDAO, tesseraDAO, puntoVendita);
+                case 2 -> compraAbbonamento(titoloViaggioDAO, tesseraDAO, puntoVendita, utente);
                 case 3 -> rinnovotessera(tesseraDAO);
                 case 4 -> rinnovoAbbonamento(titoloViaggioDAO);
                 case 0 -> {
@@ -330,27 +336,36 @@ public class Application {
     public static void compraAbbonamento(
             TitoloViaggioDAO titoloViaggioDAO,
             TesseraDAO tesseraDAO,
-            PuntoDiEmissione puntoVendita) {
+            PuntoDiEmissione puntoVendita,
+            Utente utente) {
 
-        System.out.println("\n--- ACQUISTO ABBONAMENTO ---");
+        System.out.println("\nACQUISTO ABBONAMENTO");
 
         Tessera tessera;
 
-        // Verifica se l'utente possiede già una tessera
-        System.out.println("Hai già una tessera?");
-        System.out.println("1. Sì");
-        System.out.println("2. No");
-        System.out.print("Scelta: ");
-
+        
         int risposta;
 
-        try {
-            risposta = Integer.parseInt(scanner.nextLine()
-                    .trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Input non valido.");
-            return;
+        while (true) {
+            System.out.println("\nHai già una tessera?");
+            System.out.println("1. Sì");
+            System.out.println("2. No");
+            System.out.print("Scelta: ");
+
+            try {
+                risposta = Integer.parseInt(scanner.nextLine().trim());
+
+                if (risposta == 1 || risposta == 2) {
+                    break;
+                }
+
+                System.out.println("Scelta non valida. Scegli opzione 1 o 2.");
+
+            } catch (NumberFormatException e) {
+                System.out.println("Input non valido. Inserisci un numero.");
+            }
         }
+
 
         if (risposta == 1) {
 
@@ -358,8 +373,7 @@ public class Application {
 
             try {
 
-                UUID codice = UUID.fromString(scanner.nextLine()
-                        .trim());
+                UUID codice = UUID.fromString(scanner.nextLine().trim());
 
                 tessera = tesseraDAO.findByUnCode(codice);
 
@@ -376,91 +390,90 @@ public class Application {
                 return;
             }
 
-        } else if (risposta == 2) {
-
-            try {
-
-                tessera = tesseraDAO.creaTessera();
-
-                System.out.println("Tessera creata con successo!");
-                System.out.println("Codice tessera: " + tessera.getCodiceUnivoco());
-
-            } catch (Exception e) {
-
-                System.out.println("Errore nella creazione della tessera: " + e.getMessage());
-                return;
-            }
-
-        } else {
-
-            System.out.println("Scelta non valida.");
-            return;
         }
 
-        // Selezione tipo abbonamento
+
+        else {
+
+            if (utente.getIdTessera() != null) {
+
+                System.out.println("Hai già una tessera associata al tuo account.");
+                System.out.println("Codice tessera: " +
+                        utente.getIdTessera().getCodiceUnivoco());
+
+                tessera = utente.getIdTessera();
+
+            } else {
+
+                try {
+
+                    tessera = tesseraDAO.creaTessera();
+
+                    utente.setIdTessera(tessera);
+
+                    System.out.println("Tessera creata con successo!");
+                    System.out.println("Codice tessera: " +
+                            tessera.getCodiceUnivoco());
+
+                } catch (Exception e) {
+
+                    System.out.println("Errore nella creazione della tessera: "
+                            + e.getMessage());
+                    return;
+                }
+            }
+        }
+
 
         System.out.println("\nSeleziona il tipo di abbonamento:");
-        System.out.println("1. Settimanale");
-        System.out.println("2. Mensile");
-        System.out.println("3. Annuale");
-        System.out.print("Scelta: ");
 
         int scelta;
 
-        try {
+        while (true) {
+            System.out.println("1. Settimanale");
+            System.out.println("2. Mensile");
+            System.out.println("3. Annuale");
+            System.out.print("Scelta: ");
 
-            scelta = Integer.parseInt(scanner.nextLine()
-                    .trim());
+            try {
+                scelta = Integer.parseInt(scanner.nextLine().trim());
 
-        } catch (NumberFormatException e) {
+                if (scelta >= 1 && scelta <= 3) {
+                    break;
+                }
 
-            System.out.println("Input non valido.");
-            return;
+                System.out.println("Scelta non valida.");
+
+            } catch (NumberFormatException e) {
+                System.out.println("Input non valido.");
+            }
         }
 
         TipoAbbonamento tipoAbbonamento;
 
-
         switch (scelta) {
-
-            case 1 -> {
-
-                tipoAbbonamento = TipoAbbonamento.SETTIMANALE;
-
-
-            }
-
-            case 2 -> {
-
-                tipoAbbonamento = TipoAbbonamento.MENSILE;
-
-
-            }
-
-            case 3 -> {
-
-                tipoAbbonamento = TipoAbbonamento.ANNUALE;
-
-
-            }
-
-            default -> {
-
-                System.out.println("Scelta non valida.");
-                return;
-            }
+            case 1 -> tipoAbbonamento = TipoAbbonamento.SETTIMANALE;
+            case 2 -> tipoAbbonamento = TipoAbbonamento.MENSILE;
+            case 3 -> tipoAbbonamento = TipoAbbonamento.ANNUALE;
+            default -> throw new IllegalStateException("Unexpected value: " + scelta);
         }
+
 
         try {
 
-            Abbonamento nuovoAbbonamento = new Abbonamento(LocalDateTime.now(), puntoVendita, UUID.randomUUID(),
-                    tipoAbbonamento, tessera);
-
+            Abbonamento nuovoAbbonamento = new Abbonamento(
+                    LocalDateTime.now(),
+                    puntoVendita,
+                    UUID.randomUUID(),
+                    tipoAbbonamento,
+                    tessera
+            );
 
             titoloViaggioDAO.save(nuovoAbbonamento);
 
             System.out.println("\nAbbonamento acquistato con successo!");
             System.out.println("Tipo: " + tipoAbbonamento);
+            System.out.println("Scadenza: " + nuovoAbbonamento.getDataScadenza());
             System.out.println("Punto vendita: " + puntoVendita.getNome());
 
         } catch (Exception e) {
@@ -468,6 +481,8 @@ public class Application {
             System.out.println("Errore durante il salvataggio: " + e.getMessage());
         }
     }
+
+
 
     // Metodo Rinnovo Tessera
     public static void rinnovotessera(TesseraDAO tesseraDAO) {
