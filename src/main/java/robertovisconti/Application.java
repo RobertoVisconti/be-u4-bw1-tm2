@@ -3,10 +3,9 @@ package robertovisconti;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import net.datafaker.Faker;
 import robertovisconti.dao.*;
 import robertovisconti.entities.*;
-import robertovisconti.enums.*;
+import robertovisconti.enums.TipoAbbonamento;
 import robertovisconti.exceptions.PuntoDiEmissioneNonTrovatoException;
 import robertovisconti.exceptions.TesseraNonTrovataException;
 import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
@@ -16,7 +15,10 @@ import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.UUID;
 
 public class Application {
     private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("be-u4-bw1-tm2");
@@ -738,7 +740,7 @@ public class Application {
     }
 
 
-//    // MENU' per cercare titoli di viaggio per periodo o per periodo e punto vendita.
+    // #region MENU' per cercare titoli di viaggio per periodo o per periodo e punto vendita.
 
     public static void menuCountTitoliViaggio(TitoloViaggioDAO titoloViaggioDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
         while (true) {
@@ -981,4 +983,5 @@ public class Application {
             }
         }
     }
+    // #endregion
 }
