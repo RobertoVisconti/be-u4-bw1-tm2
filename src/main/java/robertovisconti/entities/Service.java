@@ -76,9 +76,9 @@ public class Service {
             // la capienza dipende dal tipo di mezzo
             int capienza;
             if (tipo == TipoMezzo.BUS) {
-                capienza = 120;
+                capienza = 80;
             } else {
-                capienza = 250;
+                capienza = 220;
             }
 
             String targa = faker.vehicle().licensePlate();
@@ -288,9 +288,11 @@ public class Service {
     }
 
     public static void creazioneMezzoManuale(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+
         System.out.println("\nINSERIMENTO MEZZO DI TRASPORTO");
 
         TipoMezzo tipo = null;
+
         while (tipo == null) {
             System.out.println("\nTipo di mezzo:");
             System.out.println("1. Bus");
@@ -305,19 +307,28 @@ public class Service {
         }
 
         int capienza = -1;
-        while (capienza <= 0) {
-            System.out.print("\nCapienza massima: ");
+        int maxCapienza = (tipo == TipoMezzo.BUS) ? 80 : 220;
+
+        while (capienza <= 0 || capienza > maxCapienza) {
+
+            System.out.print("\nCapienza massima (max " + maxCapienza + "): ");
+
             try {
                 capienza = Integer.parseInt(scanner.nextLine().trim());
+
                 if (capienza <= 0) {
-                    System.out.println("La capienza deve essere un numero maggiore di 0.");
+                    System.out.println("La capienza deve essere maggiore di 0.");
+                } else if (capienza > maxCapienza) {
+                    System.out.println("Capienza troppo alta! Max consentito per " + tipo + " = " + maxCapienza);
                 }
+
             } catch (NumberFormatException e) {
-                System.out.println("Capienza non valida. Inserisci un numero intero.");
+                System.out.println("Capienza non valida. Inserisci un numero valido.");
             }
         }
 
         StatoMezzo stato = null;
+
         while (stato == null) {
             System.out.println("\nStato:");
             System.out.println("1. In servizio");
@@ -331,11 +342,37 @@ public class Service {
             }
         }
 
-        System.out.print("\nTarga: ");
-        String targa = scanner.nextLine().trim();
+        String targa;
+
+        while (true) {
+
+            System.out.print("\nTarga (formato XXX-1111): ");
+            targa = scanner.nextLine().trim().toUpperCase();
+
+
+            if (targa.length() > 8) {
+                System.out.println("Errore: la targa non può superare 8 caratteri.");
+                continue;
+            }
+
+            if (!targa.matches("[A-Z]{3}-\\d{4}")) {
+                System.out.println("Formato non valido! Esempio corretto: ABC-1234");
+                continue;
+            }
+
+            try {
+                mezzoDiTrasportoDAO.findByTarga(targa);
+                System.out.println("Errore: targa già esistente. Inseriscine un'altra.");
+                continue;
+            } catch (Exception e) {
+
+                break;
+            }
+        }
 
         MezzoDiTrasporto mezzo = new MezzoDiTrasporto(tipo, capienza, stato, targa);
         mezzoDiTrasportoDAO.save(mezzo);
+
         System.out.println("\nMezzo creato con successo.");
     }
 
@@ -802,6 +839,7 @@ public class Service {
 
     //region Mostra l'elenco dei punti vendita
     public static PuntoDiEmissione selezionaPunto(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
+
         List<PuntoDiEmissione> punti = puntoDiEmissioneDAO.findAllPuntiDiEmissione();
 
         if (punti.isEmpty()) {
@@ -810,23 +848,47 @@ public class Service {
         }
 
         while (true) {
+
             System.out.println("\nPunti vendita:");
+
             for (int i = 0; i < punti.size(); i++) {
                 PuntoDiEmissione p = punti.get(i);
-                System.out.println((i + 1) + ". " + p.getNome() + " -> " + p.getIndirizzo()
+                System.out.println((i + 1) + ". " + p.getNome()
+                        + " -> " + p.getIndirizzo()
                         + " " + p.getCitta());
             }
+
             System.out.print("Scegli Punto vendita: ");
 
             try {
                 int scelta = Integer.parseInt(scanner.nextLine().trim());
-                if (scelta >= 1 && scelta <= punti.size()) {
-                    return punti.get(scelta - 1);
-                } else {
-                    System.out.println("Numero non valido. Per favore, riprova.");
+
+                if (scelta < 1 || scelta > punti.size()) {
+                    System.out.println("Numero non valido. Riprova.");
+                    continue;
                 }
+
+                PuntoDiEmissione selezionato = punti.get(scelta - 1);
+
+                if (selezionato instanceof Rivenditore rivenditore) {
+
+                    if (!rivenditore.isAperto()) {
+                        System.out.println("Questo rivenditore è chiuso. Scegli un altro punto.");
+                        continue;
+                    }
+                }
+
+                if (selezionato instanceof DistributoreAutomatico distributore) {
+
+                    if (distributore.getStato() == StatoDistributoreAutomatico.NON_ATTIVO) {
+                        System.out.println("Questo distributore automatico non è attivo. Scegli un altro punto.");
+                        continue;
+                    }
+                }
+                return selezionato;
+
             } catch (NumberFormatException ex) {
-                System.out.println("Devi inserire un numero. Per favore, riprova.");
+                System.out.println("Devi inserire un numero. Riprova.");
             }
         }
     }

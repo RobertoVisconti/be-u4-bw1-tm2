@@ -27,7 +27,7 @@ public class MezzoDiTrasporto {
     @Enumerated(EnumType.STRING)
     private StatoMezzo statoMezzo;
 
-    @Column(name = "targa", unique = true, nullable = false)
+    @Column(name = "targa", unique = true, nullable = false, length = 8)
     private String targa;
 
 
