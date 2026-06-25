@@ -839,6 +839,7 @@ public class Service {
 
     //region Mostra l'elenco dei punti vendita
     public static PuntoDiEmissione selezionaPunto(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
+
         List<PuntoDiEmissione> punti = puntoDiEmissioneDAO.findAllPuntiDiEmissione();
 
         if (punti.isEmpty()) {
@@ -847,23 +848,47 @@ public class Service {
         }
 
         while (true) {
+
             System.out.println("\nPunti vendita:");
+
             for (int i = 0; i < punti.size(); i++) {
                 PuntoDiEmissione p = punti.get(i);
-                System.out.println((i + 1) + ". " + p.getNome() + " -> " + p.getIndirizzo()
+                System.out.println((i + 1) + ". " + p.getNome()
+                        + " -> " + p.getIndirizzo()
                         + " " + p.getCitta());
             }
+
             System.out.print("Scegli Punto vendita: ");
 
             try {
                 int scelta = Integer.parseInt(scanner.nextLine().trim());
-                if (scelta >= 1 && scelta <= punti.size()) {
-                    return punti.get(scelta - 1);
-                } else {
-                    System.out.println("Numero non valido. Per favore, riprova.");
+
+                if (scelta < 1 || scelta > punti.size()) {
+                    System.out.println("Numero non valido. Riprova.");
+                    continue;
                 }
+
+                PuntoDiEmissione selezionato = punti.get(scelta - 1);
+
+                if (selezionato instanceof Rivenditore rivenditore) {
+
+                    if (!rivenditore.isAperto()) {
+                        System.out.println("Questo rivenditore è chiuso. Scegli un altro punto.");
+                        continue;
+                    }
+                }
+
+                if (selezionato instanceof DistributoreAutomatico distributore) {
+
+                    if (distributore.getStato() == StatoDistributoreAutomatico.NON_ATTIVO) {
+                        System.out.println("Questo distributore automatico non è attivo. Scegli un altro punto.");
+                        continue;
+                    }
+                }
+                return selezionato;
+
             } catch (NumberFormatException ex) {
-                System.out.println("Devi inserire un numero. Per favore, riprova.");
+                System.out.println("Devi inserire un numero. Riprova.");
             }
         }
     }
