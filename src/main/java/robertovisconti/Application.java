@@ -8,12 +8,11 @@ import robertovisconti.entities.PuntoDiEmissione;
 import robertovisconti.entities.Service;
 import robertovisconti.entities.Tratta;
 import robertovisconti.entities.Utente;
-import robertovisconti.exceptions.PuntoDiEmissioneNonTrovatoException;
 import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
 
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class Application {
@@ -352,236 +351,84 @@ public class Application {
             System.out.println("3. Conta abbonamenti emessi in un lasso di tempo.");
             System.out.println("4. Conta abbonamenti emessi in un lasso di tempo su un punto di emissione.");
             System.out.println("0. Torna indietro");
-            int input = -1;
+            System.out.print("Scelta: ");
+
+            int input;
             try {
                 input = Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException ex) {
-                System.out.println("Formato errato, inserisci un numbero");
+                System.out.println("Formato errato, inserisci un numero valido.");
                 continue;
             }
+
             if (input == 0) break;
 
-            try {
-                switch (input) {
-                    case 1 -> {
-                        LocalDateTime dataInizio = null;
-                        LocalDateTime dataFine = null;
-                        System.out.println("Data di inizio:");
-                        System.out.println("Inserisci il giorno:");
-                        int giornoInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il mese:");
-                        int meseInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'anno:");
-                        int annoInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'ora:");
-                        int oraInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il minuto");
-                        int minutoInizio = Integer.parseInt(scanner.nextLine().trim());
-
-                        try {
-                            dataInizio = LocalDateTime.of(annoInizio, meseInizio, giornoInizio, oraInizio, minutoInizio);
-                        } catch (DateTimeException ex) {
-                            System.out.println("Data non valida: " + ex.getMessage());
-                        }
-
-                        System.out.println("Data di fine:");
-                        System.out.println("Inserisci il giorno:");
-                        int giornoFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il mese:");
-                        int meseFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'anno:");
-                        int annoFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'ora:");
-                        int oraFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il minuto");
-                        int minutoFine = Integer.parseInt(scanner.nextLine().trim());
-
-                        try {
-                            dataFine = LocalDateTime.of(annoFine, meseFine, giornoFine, oraFine, minutoFine);
-                        } catch (DateTimeException ex) {
-                            System.out.println("Data non valida: " + ex.getMessage());
-                        }
-
-                        if (dataInizio != null && dataFine != null && dataInizio.isAfter(dataFine)) {
-                            System.out.println("\nLa data di inizio non può essere successiva alla data di fine.\n");
-                            continue;
-                        }
-
-                        System.out.println("\nBiglietti emessi tra " + dataInizio + " e " + dataFine + ": " + titoloViaggioDAO.countBigliettiBetween(dataInizio, dataFine));
+            PuntoDiEmissione puntoDiEmissione = null;
+            if (input == 2 || input == 4) {
+                try {
+                    puntoDiEmissione = Service.selezionaPunto(puntoDiEmissioneDAO);
+                    if (puntoDiEmissione == null) {
+                        continue;
                     }
-
-                    case 2 -> {
-                        PuntoDiEmissione puntoDiEmissione = null;
-                        try {
-                            puntoDiEmissione = Service.selezionaPunto(puntoDiEmissioneDAO);
-                            if (puntoDiEmissione == null) {
-                                continue;
-                            }
-                        } catch (PuntoDiEmissioneNonTrovatoException ex) {
-                            System.out.println(ex.getMessage());
-                            continue;
-                        }
-
-                        LocalDateTime dataInizio = null;
-                        LocalDateTime dataFine = null;
-                        System.out.println("Data di inizio:");
-                        System.out.println("Inserisci il giorno:");
-                        int giornoInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il mese:");
-                        int meseInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'anno:");
-                        int annoInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'ora:");
-                        int oraInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il minuto");
-                        int minutoInizio = Integer.parseInt(scanner.nextLine().trim());
-
-                        try {
-                            dataInizio = LocalDateTime.of(annoInizio, meseInizio, giornoInizio, oraInizio, minutoInizio);
-                        } catch (DateTimeException ex) {
-                            System.out.println("Data non valida: " + ex.getMessage());
-                        }
-
-                        System.out.println("Data di fine:");
-                        System.out.println("Inserisci il giorno:");
-                        int giornoFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il mese:");
-                        int meseFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'anno:");
-                        int annoFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'ora:");
-                        int oraFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il minuto");
-                        int minutoFine = Integer.parseInt(scanner.nextLine().trim());
-
-                        try {
-                            dataFine = LocalDateTime.of(annoFine, meseFine, giornoFine, oraFine, minutoFine);
-                        } catch (DateTimeException ex) {
-                            System.out.println("Data non valida: " + ex.getMessage());
-                        }
-                        if (dataInizio != null && dataFine != null && dataInizio.isAfter(dataFine)) {
-                            System.out.println("\nLa data di inizio non può essere successiva alla data di fine.\n");
-                            continue;
-                        }
-
-                        if (puntoDiEmissione == null) {
-                            System.out.println("Errore in immissione dati, controllare i dati inseriti e riprovare.\n");
-                            continue;
-                        }
-                        ;
-                        System.out.println("\nBiglietti emessi tra " + dataInizio + " e " + dataFine + " presso " + puntoDiEmissione.getNome() + ": " + titoloViaggioDAO.countBigliettiBetween(dataInizio, dataFine, puntoDiEmissione));
-                    }
-
-                    case 3 -> {
-                        LocalDateTime dataInizio = null;
-                        LocalDateTime dataFine = null;
-                        System.out.println("Data di inizio:");
-                        System.out.println("Inserisci il giorno:");
-                        int giornoInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il mese:");
-                        int meseInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'anno:");
-                        int annoInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'ora:");
-                        int oraInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il minuto");
-                        int minutoInizio = Integer.parseInt(scanner.nextLine().trim());
-
-                        try {
-                            dataInizio = LocalDateTime.of(annoInizio, meseInizio, giornoInizio, oraInizio, minutoInizio);
-                        } catch (DateTimeException ex) {
-                            System.out.println("Data non valida: " + ex.getMessage());
-                        }
-
-                        System.out.println("Data di fine:");
-                        System.out.println("Inserisci il giorno:");
-                        int giornoFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il mese:");
-                        int meseFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'anno:");
-                        int annoFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'ora:");
-                        int oraFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il minuto");
-                        int minutoFine = Integer.parseInt(scanner.nextLine().trim());
-
-                        try {
-                            dataFine = LocalDateTime.of(annoFine, meseFine, giornoFine, oraFine, minutoFine);
-                        } catch (DateTimeException ex) {
-                            System.out.println("Data non valida: " + ex.getMessage());
-                        }
-
-                        if (dataInizio != null && dataFine != null && dataInizio.isAfter(dataFine)) {
-                            System.out.println("\nLa data di inizio non può essere successiva alla data di fine.\n");
-                            continue;
-                        }
-
-                        System.out.println("\nAbbonamenti emessi tra " + dataInizio + " e " + dataFine + ": " + titoloViaggioDAO.countAbbonamentiBetween(dataInizio, dataFine));
-                    }
-
-                    case 4 -> {
-                        PuntoDiEmissione puntoDiEmissione = null;
-                        try {
-                            puntoDiEmissione = Service.selezionaPunto(puntoDiEmissioneDAO);
-                            if (puntoDiEmissione == null) {
-                                continue;
-                            }
-                        } catch (PuntoDiEmissioneNonTrovatoException ex) {
-                            System.out.println(ex.getMessage());
-                            continue;
-                        }
-
-                        LocalDateTime dataInizio = null;
-                        LocalDateTime dataFine = null;
-                        System.out.println("Data di inizio:");
-                        System.out.println("Inserisci il giorno:");
-                        int giornoInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il mese:");
-                        int meseInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'anno:");
-                        int annoInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'ora:");
-                        int oraInizio = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il minuto");
-                        int minutoInizio = Integer.parseInt(scanner.nextLine().trim());
-
-                        try {
-                            dataInizio = LocalDateTime.of(annoInizio, meseInizio, giornoInizio, oraInizio, minutoInizio);
-                        } catch (DateTimeException ex) {
-                            System.out.println("Data non valida: " + ex.getMessage());
-                        }
-
-                        System.out.println("Data di fine:");
-                        System.out.println("Inserisci il giorno:");
-                        int giornoFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il mese:");
-                        int meseFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'anno:");
-                        int annoFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci l'ora:");
-                        int oraFine = Integer.parseInt(scanner.nextLine().trim());
-                        System.out.println("Inserisci il minuto");
-                        int minutoFine = Integer.parseInt(scanner.nextLine().trim());
-
-                        try {
-                            dataFine = LocalDateTime.of(annoFine, meseFine, giornoFine, oraFine, minutoFine);
-                        } catch (DateTimeException ex) {
-                            System.out.println("Data non valida: " + ex.getMessage());
-                        }
-
-                        if (dataInizio != null && dataFine != null && dataInizio.isAfter(dataFine)) {
-                            System.out.println("\nLa data di inizio non può essere successiva alla data di fine.\n");
-                            continue;
-                        }
-
-                        System.out.println("\nAbbonamenti emessi tra " + dataInizio + " e " + dataFine + " presso " + puntoDiEmissione.getNome() + ": " + titoloViaggioDAO.countAbbonamentiBetween(dataInizio, dataFine, puntoDiEmissione));
-                    }
-
-                    default -> System.out.println("Input non valido");
+                } catch (Exception ex) {
+                    System.out.println("Errore nella selezione del punto vendita.");
+                    continue;
                 }
-            } catch (NumberFormatException ex) {
-                System.out.println("Input errato, inserisci un numero valido");
-                continue;
+            }
+
+            LocalDateTime dataInizio = null;
+            LocalDateTime dataFine = null;
+            if (input >= 1 && input <= 4) {
+                while (true) {
+                    dataInizio = richiediData("Data di inizio");
+                    dataFine = richiediData("Data di fine");
+
+                    if (dataInizio.isAfter(dataFine)) {
+                        System.out.println("\n[ERRORE] La data di inizio non può essere successiva alla data di fine. Riprova l'inserimento.");
+                    } else {
+                        break; // Date cronologicamente corrette, esce dal loop di controllo date
+                    }
+                }
+            }
+
+            switch (input) {
+                case 1 -> System.out.println("\nBiglietti emessi: " +
+                        titoloViaggioDAO.countBigliettiBetween(dataInizio, dataFine));
+
+                case 2 -> System.out.println("\nBiglietti emessi presso " + puntoDiEmissione.getNome() + ": " +
+                        titoloViaggioDAO.countBigliettiBetween(dataInizio, dataFine, puntoDiEmissione));
+
+                case 3 -> System.out.println("\nAbbonamenti emessi: " +
+                        titoloViaggioDAO.countAbbonamentiBetween(dataInizio, dataFine));
+
+                case 4 -> System.out.println("\nAbbonamenti emessi presso " + puntoDiEmissione.getNome() + ": " +
+                        titoloViaggioDAO.countAbbonamentiBetween(dataInizio, dataFine, puntoDiEmissione));
+
+                default -> System.out.println("Input non valido. Inserisci un numero da 0 a 4.");
+            }
+        }
+    }
+
+    // METODO DATE TIME FORMATTER
+    private static LocalDateTime richiediData(String tipoData) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        while (true) {
+            try {
+                System.out.println("\n--- " + tipoData.toUpperCase() + " ---");
+
+                System.out.print("Inserisci la data (gg/mm/aaaa): ");
+                String dataInput = scanner.nextLine().trim();
+
+                System.out.print("Inserisci l'ora (hh:mm): ");
+                String oraInput = scanner.nextLine().trim();
+
+                String dataCompleta = dataInput + " " + oraInput;
+
+                return LocalDateTime.parse(dataCompleta, formatter);
+
+            } catch (DateTimeParseException e) {
+                System.out.println("Errore: Formato o valori non validi. Assicurati di scrivere la data come gg/mm/aaaa (es. 25/06/2026) e l'ora come hh:mm (es. 12:50). Riprova.");
             }
         }
     }
