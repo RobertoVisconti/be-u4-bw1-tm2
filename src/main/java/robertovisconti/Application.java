@@ -222,7 +222,7 @@ public class Application {
         }
     }
 
-    //Case Utente
+    // region Case Utente
     public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, Utente utente) {
         boolean userMenu = true;
         while (userMenu) {

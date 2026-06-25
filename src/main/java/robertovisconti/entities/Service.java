@@ -659,7 +659,7 @@ public class Service {
 
             LocalDate vecchiaScadenza = tessera.getDataScadenza();
             LocalDate nuovaScadenza;
-            
+
             if (vecchiaScadenza != null && vecchiaScadenza.isAfter(LocalDate.now())) {
                 nuovaScadenza = vecchiaScadenza.plusYears(1);
             } else {
@@ -739,16 +739,22 @@ public class Service {
 
     //region Ricerca utente
     public static void ricercaUtenti(UtenteDAO utenteDAO) {
-        try {
-            System.out.print("Inserisci l'UUID dell'utente da cercare: ");
-            String inserito = scanner.nextLine().trim();
-            UUID id = UUID.fromString(inserito);
-            Utente trovato = utenteDAO.findByID(id);
-            System.out.println(trovato);
-        } catch (UtenteNonTrovatoException ex) {
-            System.out.println("Errore: " + ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            System.out.println("Errore: Formato UUID non valido.");
+        while (true) {
+            try {
+                System.out.print("Inserisci l'UUID dell'utente da cercare: ");
+                String inserito = scanner.nextLine().trim();
+
+                UUID id = UUID.fromString(inserito);
+                Utente trovato = utenteDAO.findByID(id);
+
+                System.out.println("\nUtente trovato:");
+                System.out.println(trovato);
+                break;
+            } catch (IllegalArgumentException ex) {
+                System.out.println("Errore: Formato UUID non valido. Riprova.");
+            } catch (UtenteNonTrovatoException ex) {
+                System.out.println("Errore: " + ex.getMessage() + " Riprova.");
+            }
         }
     }
 //endregion
