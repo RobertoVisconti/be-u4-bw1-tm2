@@ -53,9 +53,9 @@ public class Service {
             // la capienza dipende dal tipo di mezzo
             int capienza;
             if (tipo == TipoMezzo.BUS) {
-                capienza = 120;   // bus: tra 50 e 120 posti
+                capienza = 120;   
             } else {
-                capienza = 250;  // tram: tra 120 e 250 posti
+                capienza = 250;
             }
 
             String targa = faker.vehicle().licensePlate();
