@@ -52,11 +52,7 @@ public class Application {
             System.out.println("0. Chiudi Applicazione");
             System.out.print("\nScegli un'opzione: ");
 
-            String email = scanner.nextLine().trim();
-            if (Objects.equals(email, "0")) {
-                System.out.println("\nApplicazione in chiusura...");
-                break;
-            }
+
             int scelta;
             try {
                 scelta = Integer.parseInt(scanner.nextLine()
