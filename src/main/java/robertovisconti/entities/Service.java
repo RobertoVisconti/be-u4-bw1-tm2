@@ -638,6 +638,37 @@ public class Service {
     }
 //endregion
 
+    //region Metodo crea tessera
+
+    public static void creaTesseraUtente(Utente utente, TesseraDAO tesseraDAO) {
+
+        if (utente == null) {
+            System.out.println("Errore: utente non valido.");
+            return;
+        }
+
+        if (utente.getIdTessera() != null) {
+            System.out.println("Hai già una tessera associata al tuo account.");
+            System.out.println("Codice tessera: " + utente.getIdTessera().getCodiceUnivoco());
+            return;
+        }
+
+        try {
+            Tessera nuovaTessera = tesseraDAO.creaTessera();
+
+            utente.setIdTessera(nuovaTessera);
+
+            System.out.println("Tessera creata con successo!");
+            System.out.println("Codice tessera: " + nuovaTessera.getCodiceUnivoco());
+
+        } catch (Exception e) {
+            System.out.println("Errore nella creazione della tessera: " + e.getMessage());
+        }
+    }
+
+    //endregion
+
+
     //region Metodo Rinnovo Tessera
     public static void rinnovotessera(TesseraDAO tesseraDAO, Utente utente) {
 

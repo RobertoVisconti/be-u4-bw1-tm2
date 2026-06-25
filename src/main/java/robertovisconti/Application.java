@@ -267,8 +267,9 @@ public class Application {
             System.out.println("\n MENU PUNTO VENDITA");
             System.out.println("1. Compra biglietto");
             System.out.println("2. Compra abbonamento");
-            System.out.println("3. Rinnova tessera");
-            System.out.println("4. Rinnova Abbonamento");
+            System.out.println("3. Crea tessera");
+            System.out.println("4. Rinnova tessera");
+            System.out.println("5. Rinnova Abbonamento");
             System.out.println("0. Torna al menu principale");
             System.out.print("Scegli un'opzione: ");
 
@@ -284,8 +285,9 @@ public class Application {
             switch (scelta) {
                 case 1 -> Service.compraBiglietto(titoloViaggioDAO, puntoVendita);
                 case 2 -> Service.compraAbbonamento(titoloViaggioDAO, tesseraDAO, puntoVendita, utente);
-                case 3 -> Service.rinnovotessera(tesseraDAO, utente);
-                case 4 -> Service.rinnovoAbbonamento(titoloViaggioDAO);
+                case 3 -> Service.creaTesseraUtente(utente, tesseraDAO);
+                case 4 -> Service.rinnovotessera(tesseraDAO, utente);
+                case 5 -> Service.rinnovoAbbonamento(titoloViaggioDAO);
                 case 0 -> {
                     System.out.println("Torno al menu principale utente");
                     puntoMenu = false;
