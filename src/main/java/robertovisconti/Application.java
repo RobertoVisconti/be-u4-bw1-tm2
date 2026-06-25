@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import robertovisconti.dao.*;
 import robertovisconti.entities.*;
+import robertovisconti.enums.Ruolo;
 import robertovisconti.enums.TipoAbbonamento;
 import robertovisconti.exceptions.PuntoDiEmissioneNonTrovatoException;
 import robertovisconti.exceptions.TesseraNonTrovataException;
@@ -21,7 +22,8 @@ import java.util.Scanner;
 import java.util.UUID;
 
 public class Application {
-    private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("be-u4-bw1-tm2");
+    private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
+            "be-u4-bw1-tm2");
     public static Scanner scanner = new Scanner(System.in);
 
     //region APPLICATION
@@ -53,27 +55,56 @@ public class Application {
             System.out.println("\nInserisci la tua email per accedere");
             System.out.println("\n0. Chiudi Applicazione");
             System.out.print("\nScegli un'opzione o inserisci email: ");
+            System.out.println("1. Login");
+            System.out.println("2. Registrazione");
+            System.out.println("0. Chiudi Applicazione");
+            System.out.print("Scegli un'opzione: ");
 
             String email = scanner.nextLine().trim();
             if (Objects.equals(email, "0")) {
                 System.out.println("\nApplicazione in chiusura...");
                 break;
+            int scelta;
+            try {
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Inserisci un numero valido.");
+                continue;
             }
 
-            try {
+            switch (scelta) {
 
-                Utente emailScanner = utenteDAO.findByEmail(email);
+                case 1 -> {
+                    System.out.println("Inserisci la tua e-mail:");
 
-                switch (emailScanner.getRuolo()) {
-                    case ADMIN ->
-                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO, manutenzioneDAO);
-                    case USER ->
-                            caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO, mezzoDiTrasportoDAO);
-                    default -> System.out.println("Ruolo non riconosciuto.");
+                    String email = scanner.nextLine()
+                            .trim();
+
+                    try {
+
+                        Utente emailScanner = utenteDAO.findByEmail(email);
+
+                        switch (emailScanner.getRuolo()) {
+                            case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO,
+                                    trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO, manutenzioneDAO);
+                            case USER -> caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO,
+                                    mezzoDiTrasportoDAO);
+                            default -> System.out.println("Ruolo non riconosciuto.");
+                        }
+
+                    } catch (UtenteEmailNonTrovatoException ex) {
+                        System.out.println("Errore: Nessun utente associato a questa email.");
+                    }
+                }
+                case 2 -> registrazioneUtente(utenteDAO);
+
+                case 0 -> {
+                    System.out.println("Applicazione in chiusura...");
+                    optionMenu = false;
                 }
 
-            } catch (UtenteEmailNonTrovatoException ex) {
-                System.out.println("Errore: Nessun utente associato a questa email.");
+                default -> System.out.println("Scelta non valida.");
             }
         }
 
@@ -104,7 +135,8 @@ public class Application {
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
@@ -145,7 +177,8 @@ public class Application {
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
@@ -184,7 +217,8 @@ public class Application {
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
@@ -224,7 +258,8 @@ public class Application {
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
@@ -249,6 +284,145 @@ public class Application {
         }
     }
 //endregion
+
+    // Registra nuovo user
+
+    public static void registrazioneUtente(UtenteDAO utenteDAO) {
+
+        System.out.println("\nREGISTRAZIONE UTENTE");
+
+        System.out.print("Nome: ");
+        String nome = scanner.nextLine().trim();
+
+        System.out.print("Cognome: ");
+        String cognome = scanner.nextLine().trim();
+
+        System.out.print("Email: ");
+        String email = scanner.nextLine().trim();
+
+        try {
+
+            utenteDAO.findByEmail(email);
+
+            System.out.println("Esiste già un account con questa email.");
+            return;
+
+        } catch (UtenteEmailNonTrovatoException e) {
+            // Nuova email continua la registrazione
+        }
+
+        Utente nuovoUtente = new Utente(
+                nome,
+                cognome,
+                email,
+                Ruolo.USER
+        );
+
+        utenteDAO.saveUtente(nuovoUtente);
+
+        System.out.println("Registrazione completata con successo!");
+    }
+
+    // Metodo Compra biglietto
+    public static void compraBiglietto(TitoloViaggioDAO titoloViaggioDAO, PuntoDiEmissione puntoVendita) {
+        Biglietto nuovoBiglietto = new Biglietto();
+        nuovoBiglietto.setDataEmissione(LocalDateTime.now());
+        nuovoBiglietto.setPuntoDiEmissione(puntoVendita);
+        nuovoBiglietto.setCodiceUnivoco(UUID.randomUUID());
+        try {
+            titoloViaggioDAO.save(nuovoBiglietto);
+            System.out.println("Biglietto acquistato al punto: " + puntoVendita.getNome());
+        } catch (Exception ex) {
+            System.out.println("Errore durante la vendita del biglietto: " + ex.getMessage());
+        }
+    }
+
+
+    // Metodo Compra Abbonamento
+    public static void compraAbbonamento(
+            TitoloViaggioDAO titoloViaggioDAO,
+            TesseraDAO tesseraDAO,
+            PuntoDiEmissione puntoVendita) {
+
+        System.out.println("\n--- ACQUISTO ABBONAMENTO ---");
+
+        Tessera tessera;
+
+        // Verifica se l'utente possiede già una tessera
+        System.out.println("Hai già una tessera?");
+        System.out.println("1. Sì");
+        System.out.println("2. No");
+        System.out.print("Scelta: ");
+
+        int risposta;
+
+        try {
+            risposta = Integer.parseInt(scanner.nextLine()
+                    .trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Input non valido.");
+            return;
+        }
+
+        if (risposta == 1) {
+
+            System.out.print("Inserisci il codice univoco della tessera: ");
+
+            try {
+
+                UUID codice = UUID.fromString(scanner.nextLine()
+                        .trim());
+
+                tessera = tesseraDAO.findByUnCode(codice);
+
+                System.out.println("Tessera trovata!");
+
+            } catch (IllegalArgumentException e) {
+
+                System.out.println("Formato UUID non valido.");
+                return;
+
+            } catch (TesseraNonTrovataException e) {
+
+                System.out.println(e.getMessage());
+                return;
+            }
+
+        } else if (risposta == 2) {
+
+            try {
+
+                tessera = tesseraDAO.creaTessera();
+
+                System.out.println("Tessera creata con successo!");
+                System.out.println("Codice tessera: " + tessera.getCodiceUnivoco());
+
+            } catch (Exception e) {
+
+                System.out.println("Errore nella creazione della tessera: " + e.getMessage());
+                return;
+            }
+
+        } else {
+
+            System.out.println("Scelta non valida.");
+            return;
+        }
+
+        // Selezione tipo abbonamento
+
+        System.out.println("\nSeleziona il tipo di abbonamento:");
+        System.out.println("1. Settimanale");
+        System.out.println("2. Mensile");
+        System.out.println("3. Annuale");
+        System.out.print("Scelta: ");
+
+        int scelta;
+
+        try {
+
+            scelta = Integer.parseInt(scanner.nextLine()
+                    .trim());
 
     //region MENU' per cercare titoli di viaggio per periodo o per periodo e punto vendita.
 
