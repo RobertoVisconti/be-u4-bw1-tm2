@@ -288,9 +288,11 @@ public class Service {
     }
 
     public static void creazioneMezzoManuale(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+
         System.out.println("\nINSERIMENTO MEZZO DI TRASPORTO");
 
         TipoMezzo tipo = null;
+
         while (tipo == null) {
             System.out.println("\nTipo di mezzo:");
             System.out.println("1. Bus");
@@ -305,19 +307,28 @@ public class Service {
         }
 
         int capienza = -1;
-        while (capienza <= 0) {
-            System.out.print("\nCapienza massima: ");
+        int maxCapienza = (tipo == TipoMezzo.BUS) ? 80 : 220;
+
+        while (capienza <= 0 || capienza > maxCapienza) {
+
+            System.out.print("\nCapienza massima (max " + maxCapienza + "): ");
+
             try {
                 capienza = Integer.parseInt(scanner.nextLine().trim());
+
                 if (capienza <= 0) {
-                    System.out.println("La capienza deve essere un numero maggiore di 0.");
+                    System.out.println("La capienza deve essere maggiore di 0.");
+                } else if (capienza > maxCapienza) {
+                    System.out.println("Capienza troppo alta! Max consentito per " + tipo + " = " + maxCapienza);
                 }
+
             } catch (NumberFormatException e) {
-                System.out.println("Capienza non valida. Inserisci un numero intero.");
+                System.out.println("Capienza non valida. Inserisci un numero valido.");
             }
         }
 
         StatoMezzo stato = null;
+
         while (stato == null) {
             System.out.println("\nStato:");
             System.out.println("1. In servizio");
@@ -331,11 +342,37 @@ public class Service {
             }
         }
 
-        System.out.print("\nTarga: ");
-        String targa = scanner.nextLine().trim();
+        String targa;
+
+        while (true) {
+
+            System.out.print("\nTarga (formato XXX-1111): ");
+            targa = scanner.nextLine().trim().toUpperCase();
+
+
+            if (targa.length() > 8) {
+                System.out.println("Errore: la targa non può superare 8 caratteri.");
+                continue;
+            }
+
+            if (!targa.matches("[A-Z]{3}-\\d{4}")) {
+                System.out.println("Formato non valido! Esempio corretto: ABC-1234");
+                continue;
+            }
+
+            try {
+                mezzoDiTrasportoDAO.findByTarga(targa);
+                System.out.println("Errore: targa già esistente. Inseriscine un'altra.");
+                continue;
+            } catch (Exception e) {
+
+                break;
+            }
+        }
 
         MezzoDiTrasporto mezzo = new MezzoDiTrasporto(tipo, capienza, stato, targa);
         mezzoDiTrasportoDAO.save(mezzo);
+
         System.out.println("\nMezzo creato con successo.");
     }
 
