@@ -110,6 +110,4 @@ public class PuntoDiEmissioneDAO {
 
         return query.getResultList();
     }
-
-
 }

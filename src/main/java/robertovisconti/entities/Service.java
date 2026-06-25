@@ -894,6 +894,99 @@ public class Service {
     }
 //endregion
 
+    //region aggiorna stati punto di emissione
+
+    public static void aggiornaStatoRivenditore(PuntoDiEmissioneDAO puntoDAO) {
+
+        System.out.println("\n--- AGGIORNA STATO RIVENDITORE ---");
+        System.out.print("Inserisci ID  del rivenditore: ");
+
+        UUID id;
+
+        try {
+            id = UUID.fromString(scanner.nextLine().trim());
+        } catch (IllegalArgumentException e) {
+            System.out.println("ID non valido.");
+            return;
+        }
+
+        System.out.println("1. Apri rivenditore");
+        System.out.println("2. Chiudi rivenditore");
+        System.out.print("Scelta: ");
+
+        boolean stato;
+
+        try {
+            int scelta = Integer.parseInt(scanner.nextLine().trim());
+
+            switch (scelta) {
+                case 1 -> stato = true;
+                case 2 -> stato = false;
+                default -> {
+                    System.out.println("Scelta non valida.");
+                    return;
+                }
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Input non valido.");
+            return;
+        }
+
+        try {
+            puntoDAO.updateStatoRivenditoreById(id, stato);
+        } catch (Exception e) {
+            System.out.println("Errore: " + e.getMessage());
+        }
+    }
+
+    public static void aggiornaStatoDistributore(PuntoDiEmissioneDAO puntoDAO) {
+
+        System.out.println("\n--- AGGIORNA STATO DISTRIBUTORE ---");
+        System.out.print("Inserisci ID del distributore: ");
+
+        UUID id;
+
+        try {
+            id = UUID.fromString(scanner.nextLine().trim());
+        } catch (IllegalArgumentException e) {
+            System.out.println("ID non valido.");
+            return;
+        }
+
+        System.out.println("1. Attiva distributore");
+        System.out.println("2. Disattiva distributore");
+        System.out.print("Scelta: ");
+
+        StatoDistributoreAutomatico stato;
+
+        try {
+            int scelta = Integer.parseInt(scanner.nextLine().trim());
+
+            switch (scelta) {
+                case 1 -> stato = StatoDistributoreAutomatico.ATTIVO;
+                case 2 -> stato = StatoDistributoreAutomatico.NON_ATTIVO;
+                default -> {
+                    System.out.println("Scelta non valida.");
+                    return;
+                }
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Input non valido.");
+            return;
+        }
+
+        try {
+            puntoDAO.updateStatoDistributoreById(id, stato);
+        } catch (Exception e) {
+            System.out.println("Errore: " + e.getMessage());
+        }
+    }
+    
+
+    //endregion
+
     //region Mostra l'elenco dei mezzi
     public static MezzoDiTrasporto selezionaMezzo(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
         List<MezzoDiTrasporto> mezzi = mezzoDiTrasportoDAO.findAll();
@@ -1140,4 +1233,15 @@ public class Service {
         }
     }
 //endregion
+
+
+//    public Biglietto vendiBiglietto(MezzoDiTrasporto mezzoDiTrasporto) {
+//        if ((this instanceof DistributoreAutomatico && ((DistributoreAutomatico) this).getStato() == StatoDistributoreAutomatico.NON_ATTIVO) || !(this instanceof Rivenditore && ((Rivenditore) this).isAperto())) {
+//            throw new RuntimeException("Punto di Emissione CHIUSO.");
+//        } else {
+//            Biglietto biglietto = new Biglietto(LocalDateTime.now(), this, mezzoDiTrasporto);
+//            System.out.println("Il biglietto " + biglietto + " è stato creato e venduto!");
+//            return biglietto;
+//        }
+//    }
 }

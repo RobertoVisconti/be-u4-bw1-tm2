@@ -121,6 +121,8 @@ public class Application {
             System.out.println("11. Storico manutenzioni");
             System.out.println("12. Verifica abbonamento");
             System.out.println("13. Menù conto biglietti vidimati");
+            System.out.println("14. Aggiorna stato rivenditore");
+            System.out.println("15. Aggiorna stato distributore automatico");
             System.out.println("0. Logout");
             System.out.print("\nScegli un'opzione: ");
 
@@ -147,6 +149,8 @@ public class Application {
                 case 11 -> Service.storicoManutenzione(manutenzioneDAO);
                 case 12 -> Service.verificaAbbonamento(titoloViaggioDAO);
                 case 13 -> menuCountBigliettiVidimati(titoloViaggioDAO, mezzoDiTrasportoDAO);
+                case 14 -> Service.aggiornaStatoRivenditore(puntoDiEmissioneDAO);
+                case 15 -> Service.aggiornaStatoDistributore(puntoDiEmissioneDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
                     adminMenu = false;
