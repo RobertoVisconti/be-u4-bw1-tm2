@@ -76,9 +76,9 @@ public class Service {
             // la capienza dipende dal tipo di mezzo
             int capienza;
             if (tipo == TipoMezzo.BUS) {
-                capienza = 120;
+                capienza = 80;
             } else {
-                capienza = 250;
+                capienza = 220;
             }
 
             String targa = faker.vehicle().licensePlate();

@@ -158,6 +158,8 @@ public class Application {
     }
 //endregion
 
+
+    // region Menu Creazione Utenti
     public static void menuCreazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, GenericDAO genericDAO) {
         System.out.println("\n1. Genera utenti in blocco (dati finti)");
         System.out.println("2. Inserisci un utente a mano");
@@ -173,55 +175,95 @@ public class Application {
             System.out.println("Errore: Inserire un numero valido.");
         }
     }
+    // endregion
 
+    // region Menu Creazione Mezzi
     public static void menuCreazioneMezzi(MezzoDiTrasportoDAO mezzoDiTrasportoDAO, GenericDAO genericDAO) {
-        System.out.println("\n1. Genera mezzi in blocco (dati finti)");
-        System.out.println("2. Inserisci un mezzo a mano");
-        System.out.print("Scegli un'opzione: ");
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
-            switch (scelta) {
-                case 1 -> Service.creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
-                case 2 -> Service.creazioneMezzoManuale(mezzoDiTrasportoDAO);
-                default -> System.out.println("Opzione non valida.");
+        while (true) {
+            System.out.println("\n--- MENU CREAZIONE MEZZI ---");
+            System.out.println("1. Genera mezzi in blocco (dati finti)");
+            System.out.println("2. Inserisci un mezzo a mano");
+            System.out.print("Scegli un'opzione: ");
+
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+                switch (scelta) {
+                    case 1 -> {
+                        Service.creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
+                        return;
+                    }
+                    case 2 -> {
+                        Service.creazioneMezzoManuale(mezzoDiTrasportoDAO);
+                        return;
+                    }
+                    default -> System.out.println("Opzione non valida. Inserisci 1 o 2.");
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("Errore: Inserire un numero valido.");
             }
-        } catch (NumberFormatException ex) {
-            System.out.println("Errore: Inserire un numero valido.");
+
         }
     }
 
+    // endregion
+
+    // region Menu Creazione Punti
     public static void menuCreazionePunti(PuntoDiEmissioneDAO puntoDiEmissioneDAO, GenericDAO genericDAO) {
-        System.out.println("\n1. Genera punti di emissione in blocco (dati finti)");
-        System.out.println("2. Inserisci un punto di emissione a mano");
-        System.out.print("Scegli un'opzione: ");
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
-            switch (scelta) {
-                case 1 -> Service.creazionePunti(puntoDiEmissioneDAO, genericDAO);
-                case 2 -> Service.creazionePuntoManuale(puntoDiEmissioneDAO);
-                default -> System.out.println("Opzione non valida.");
+        while (true) {
+            System.out.println("\n--- MENU CREAZIONE PUNTI DI EMISSIONE ---");
+            System.out.println("1. Genera punti di emissione in blocco (dati finti)");
+            System.out.println("2. Inserisci un punto di emissione a mano");
+            System.out.print("Scegli un'opzione: ");
+
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+                switch (scelta) {
+                    case 1 -> {
+                        Service.creazionePunti(puntoDiEmissioneDAO, genericDAO);
+                        return;
+                    }
+                    case 2 -> {
+                        Service.creazionePuntoManuale(puntoDiEmissioneDAO);
+                        return;
+                    }
+                    default -> System.out.println("Opzione non valida. Inserisci 1 o 2.");
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("Errore: Inserire un numero valido.");
             }
-        } catch (NumberFormatException ex) {
-            System.out.println("Errore: Inserire un numero valido.");
         }
     }
 
+    // endregion
+
+    // region Menu Creazione Tratte
     public static void menuCreazioneTratte(TrattaDAO trattaDAO, GenericDAO genericDAO) {
-        System.out.println("\n1. Genera tratte in blocco (dati finti)");
-        System.out.println("2. Inserisci una tratta a mano");
-        System.out.print("Scegli un'opzione: ");
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
-            switch (scelta) {
-                case 1 -> Service.creazioneTratte(trattaDAO, genericDAO);
-                case 2 -> Service.creazioneTrattaManuale(trattaDAO);
-                default -> System.out.println("Opzione non valida.");
+        while (true) {
+            System.out.println("\n--- MENU CREAZIONE TRATTE ---");
+            System.out.println("1. Genera tratte in blocco (dati finti)");
+            System.out.println("2. Inserisci una tratta a mano");
+            System.out.print("Scegli un'opzione: ");
+
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+                switch (scelta) {
+                    case 1 -> {
+                        Service.creazioneTratte(trattaDAO, genericDAO);
+                        return;
+                    }
+                    case 2 -> {
+                        Service.creazioneTrattaManuale(trattaDAO);
+                        return;
+                    }
+                    default -> System.out.println("Opzione non valida. Inserisci 1 o 2.");
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("Errore: Inserire un numero valido.");
             }
-        } catch (NumberFormatException ex) {
-            System.out.println("Errore: Inserire un numero valido.");
         }
     }
 
+    // endregion
     // region Case Utente
     public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, Utente utente) {
         boolean userMenu = true;
