@@ -4,6 +4,7 @@ import net.datafaker.Faker;
 import robertovisconti.dao.*;
 import robertovisconti.enums.*;
 import robertovisconti.exceptions.TesseraNonTrovataException;
+import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
 import robertovisconti.exceptions.UtenteNonTrovatoException;
 
 import java.time.Duration;
@@ -537,6 +538,45 @@ public class Service {
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
+    }
+//endregion
+
+    //region Registra nuovo user
+
+    public static void registrazioneUtente(UtenteDAO utenteDAO) {
+
+        System.out.println("\nREGISTRAZIONE UTENTE");
+
+        System.out.print("Nome: ");
+        String nome = scanner.nextLine().trim();
+
+        System.out.print("Cognome: ");
+        String cognome = scanner.nextLine().trim();
+
+        System.out.print("Email: ");
+        String email = scanner.nextLine().trim();
+
+        try {
+
+            utenteDAO.findByEmail(email);
+
+            System.out.println("Esiste già un account con questa email.");
+            return;
+
+        } catch (UtenteEmailNonTrovatoException e) {
+            // Nuova email continua la registrazione
+        }
+
+        Utente nuovoUtente = new Utente(
+                nome,
+                cognome,
+                email,
+                Ruolo.USER
+        );
+
+        utenteDAO.saveUtente(nuovoUtente);
+
+        System.out.println("Registrazione completata con successo!");
     }
 //endregion
 
