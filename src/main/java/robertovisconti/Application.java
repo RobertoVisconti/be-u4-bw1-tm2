@@ -147,7 +147,7 @@ public class Application {
                 case 8 -> Service.calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 9 -> Service.storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 10 -> menuCountTitoliViaggio(titoloViaggioDAO, puntoDiEmissioneDAO);
-                case 11 -> Service.storicoManutenzione(manutenzioneDAO);
+                case 11 -> Service.storicoManutenzione(manutenzioneDAO, mezzoDiTrasportoDAO);
                 case 12 -> Service.cambiaStatoMezzo(mezzoDiTrasportoDAO);
                 case 13 -> Service.verificaAbbonamento(titoloViaggioDAO);
                 case 14 -> menuCountBigliettiVidimati(titoloViaggioDAO, mezzoDiTrasportoDAO);
@@ -162,7 +162,6 @@ public class Application {
         }
     }
 //endregion
-
 
     // region Menu Creazione Utenti
     public static void menuCreazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, GenericDAO genericDAO) {
@@ -443,11 +442,15 @@ public class Application {
                 while (true) {
                     dataInizio = richiediData("Data di inizio");
                     dataFine = richiediData("Data di fine");
+                    LocalDateTime adesso = LocalDateTime.now();
 
                     if (dataInizio.isAfter(dataFine)) {
                         System.out.println("\n[ERRORE] La data di inizio non può essere successiva alla data di fine. Riprova l'inserimento.");
+                    } else if (dataInizio.isAfter(adesso) || dataFine.isAfter(adesso)) {
+
+                        System.out.println("\n[ERRORE] Non puoi selezionare date future. L'analisi è valida solo fino al momento attuale. Riprova.");
                     } else {
-                        break; // Date cronologicamente corrette, esce dal loop di controllo date
+                        break;
                     }
                 }
             }

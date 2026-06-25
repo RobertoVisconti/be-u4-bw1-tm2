@@ -7,6 +7,10 @@ import robertovisconti.exceptions.TesseraNonTrovataException;
 import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
 import robertovisconti.exceptions.UtenteNonTrovatoException;
 
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.InitialDirContext;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import static robertovisconti.Application.scanner;
 
@@ -249,21 +254,54 @@ public class Service {
     public static void creazioneUtenteManuale(UtenteDAO utenteDAO) {
         System.out.println("\nINSERIMENTO UTENTE");
 
-        System.out.print("Nome: ");
-        String nome = scanner.nextLine().trim();
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pattern = Pattern.compile(emailRegex);
 
-        System.out.print("Cognome: ");
-        String cognome = scanner.nextLine().trim();
+        String nome = "";
+        while (nome.isEmpty()) {
+            System.out.print("Nome: ");
+            nome = scanner.nextLine().trim();
+            if (nome.isEmpty()) {
+                System.out.println("Il nome non può essere vuoto. Riprova.");
+            }
+        }
 
-        String email;
+        String cognome = "";
+        while (cognome.isEmpty()) {
+            System.out.print("Cognome: ");
+            cognome = scanner.nextLine().trim();
+            if (cognome.isEmpty()) {
+                System.out.println("Il cognome non può essere vuoto. Riprova.");
+            }
+        }
+
+
+        String email2 = "";
         while (true) {
             System.out.print("Email: ");
-            email = scanner.nextLine().trim();
+            email2 = scanner.nextLine().trim();
+
+            if (email2.isEmpty()) {
+                System.out.println("L'email non può essere vuota. Riprova.");
+                continue;
+            }
+
+            if (!pattern.matcher(email2).matches()) {
+                System.out.println("Errore: Il formato dell'email non è valido (es. esempio@gmail.com).");
+                continue;
+            }
+
+            if (!verificaDominioEsistente(email2)) {
+                System.out.println("Errore: Il dominio di questa email non esiste o non può ricevere messaggi. Riprova.");
+                continue;
+            }
+
 
             try {
-                utenteDAO.findByEmail(email);
+                utenteDAO.findByEmail(email2);
                 System.out.println("Errore: Esiste già un account con questa email. Riprova con un'altra.");
             } catch (UtenteEmailNonTrovatoException e) {
+
                 break;
             }
         }
@@ -282,7 +320,7 @@ public class Service {
             }
         }
 
-        Utente utente = new Utente(nome, cognome, email, ruolo);
+        Utente utente = new Utente(nome, cognome, email2, ruolo);
         utenteDAO.saveUtente(utente);
         System.out.println("\nUtente creato con successo!");
     }
@@ -714,7 +752,6 @@ public class Service {
 
     //endregion
 
-
     //region Metodo Rinnovo Tessera
     public static void rinnovotessera(TesseraDAO tesseraDAO, Utente utente) {
 
@@ -1058,27 +1095,56 @@ public class Service {
     //region Registra nuovo user
 
     public static void registrazioneUtente(UtenteDAO utenteDAO) {
-
         System.out.println("\nREGISTRAZIONE UTENTE");
 
-        System.out.print("Nome: ");
-        String nome = scanner.nextLine().trim();
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pattern = Pattern.compile(emailRegex);
 
-        System.out.print("Cognome: ");
-        String cognome = scanner.nextLine().trim();
+        String nome = "";
+        while (nome.isEmpty()) {
+            System.out.print("Nome: ");
+            nome = scanner.nextLine().trim();
+            if (nome.isEmpty()) {
+                System.out.println("Il nome non può essere vuoto. Riprova.");
+            }
+        }
 
-        System.out.print("Email: ");
-        String email = scanner.nextLine().trim();
 
-        try {
+        String cognome = "";
+        while (cognome.isEmpty()) {
+            System.out.print("Cognome: ");
+            cognome = scanner.nextLine().trim();
+            if (cognome.isEmpty()) {
+                System.out.println("Il cognome non può essere vuoto. Riprova.");
+            }
+        }
 
-            utenteDAO.findByEmail(email);
+        String email = "";
+        while (true) {
+            System.out.print("Email: ");
+            email = scanner.nextLine().trim();
 
-            System.out.println("Esiste già un account con questa email.");
-            return;
+            if (email.isEmpty()) {
+                System.out.println("L'email non può essere vuota. Riprova.");
+                continue;
+            }
 
-        } catch (UtenteEmailNonTrovatoException e) {
-            // Nuova email continua la registrazione
+            if (!pattern.matcher(email).matches()) {
+                System.out.println("Errore: Il formato dell'email non è valido (es. esempio@dominio.com). Riprova.");
+                continue;
+            }
+
+            if (!verificaDominioEsistente(email)) {
+                System.out.println("Errore: Il dominio di questa email non esiste o non può ricevere messaggi. Riprova.");
+                continue;
+            }
+
+            try {
+                utenteDAO.findByEmail(email);
+                System.out.println("Errore: Esiste già un account con questa email. Scegli un altro indirizzo.");
+            } catch (UtenteEmailNonTrovatoException e) {
+                break;
+            }
         }
 
         Utente nuovoUtente = new Utente(
@@ -1089,8 +1155,28 @@ public class Service {
         );
 
         utenteDAO.saveUtente(nuovoUtente);
+        System.out.println("\nRegistrazione completata con successo!");
+    }
 
-        System.out.println("Registrazione completata con successo!");
+
+    public static boolean verificaDominioEsistente(String email) {
+        try {
+            // Estraggo il dominio
+            String dominio = email.substring(email.indexOf("@") + 1);
+
+            // Inizializzo le richieste alla rete
+            InitialDirContext ctx = new InitialDirContext();
+
+            // Chiedo il Mail Exchange ( MX ) per il dominio
+            Attributes attrs = ctx.getAttributes("dns:///" + dominio, new String[]{"MX"});
+            Attribute mx = attrs.get("MX");
+
+            return (mx != null && mx.size() > 0);
+
+        } catch (NamingException e) {
+            System.out.println("[Info Server] Impossibile verificare online il dominio. Controllo saltato.");
+            return true;
+        }
     }
 //endregion
 
@@ -1127,108 +1213,199 @@ public class Service {
 
     //region ADMIN: Assegna una tratta a un mezzo
     public static void assegnaTrattaMezzo(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
-        try {
+        System.out.println("\n--- ASSEGNAZIONE TRATTA A MEZZO ---");
+
+        MezzoDiTrasporto mezzo = null;
+        while (mezzo == null) {
             System.out.print("Targa del mezzo: ");
             String targa = scanner.nextLine().trim();
-            MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
 
-            // scelgo la tratta da un elenco numerato
-            Tratta tratta = selezionaTratta(trattaDAO);
-            if (tratta == null) {
-                return;
+            if (targa.isEmpty()) {
+                System.out.println("La targa non può essere vuota. Riprova.");
+                continue;
             }
 
+            try {
+                mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
+                if (mezzo == null) {
+                    System.out.println("Nessun mezzo trovato con questa targa. Riprova.");
+                }
+            } catch (RuntimeException ex) {
+                System.out.println("Errore nella ricerca del mezzo: " + ex.getMessage() + ". Riprova.");
+            }
+        }
+
+        Tratta tratta = null;
+        while (tratta == null) {
+            tratta = selezionaTratta(trattaDAO);
+            if (tratta == null) {
+                System.out.println("Selezione non valida. Devi scegliere una tratta dall'elenco. Riprova.");
+            }
+        }
+
+        try {
             LocalDateTime inizio = LocalDateTime.now();
             LocalDateTime fine = inizio.plusMinutes(tratta.getTempoPercorrenzaStimato());
 
             Percorrenza percorrenza = percorrenzaDAO.assegnaTrattaAMezzo(tratta, mezzo, inizio, fine);
-            System.out.println("Tratta assegnata al mezzo: " + percorrenza);
+            System.out.println("\nTratta assegnata al mezzo con successo!");
+            System.out.println("Dettagli: " + percorrenza);
+
         } catch (IllegalArgumentException ex) {
             System.out.println("Errore: Formato UUID non valido.");
         } catch (RuntimeException ex) {
-            System.out.println("Errore: " + ex.getMessage());
+            System.out.println("Errore durante il salvataggio: " + ex.getMessage());
         }
     }
 //endregion
 
     //region ADMIN: Calcola il tempo medio di percorrenza di una tratta da parte di un mezzo
     public static void calcolaTempoMedio(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
-        try {
+        System.out.println("\n--- CALCOLO TEMPO MEDIO DI PERCORRENZA ---");
+
+        MezzoDiTrasporto mezzo = null;
+        while (mezzo == null) {
             System.out.print("Targa del mezzo: ");
             String targa = scanner.nextLine().trim();
-            MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
 
-            // scelgo la tratta da un elenco numerato
-            Tratta tratta = selezionaTratta(trattaDAO);
-            if (tratta == null) {
-                return;
+            if (targa.isEmpty()) {
+                System.out.println("La targa non può essere vuota. Riprova.");
+                continue;
             }
 
+            try {
+                mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
+                if (mezzo == null) {
+                    System.out.println("Nessun mezzo trovato con questa targa. Riprova.");
+                }
+            } catch (RuntimeException ex) {
+                System.out.println("Errore nella ricerca del mezzo: " + ex.getMessage() + ". Riprova.");
+            }
+        }
+
+        Tratta tratta = null;
+        while (tratta == null) {
+            tratta = selezionaTratta(trattaDAO);
+            if (tratta == null) {
+                System.out.println("Selezione non valida. Devi scegliere una tratta dall'elenco. Riprova.");
+            }
+        }
+
+        try {
             Duration media = percorrenzaDAO.tempoMedioPercorrenza(tratta, mezzo);
             if (media.isZero()) {
-                System.out.println("Nessuna percorrenza conclusa trovata per questo mezzo su questa tratta.");
+                System.out.println("\nNessuna percorrenza conclusa trovata per questo mezzo su questa tratta.");
             } else {
                 long minuti = media.toMinutes();
                 long secondi = media.minusMinutes(minuti).getSeconds();
-                System.out.println("Tempo medio di percorrenza: " + minuti + " min " + secondi + " sec.");
+                System.out.println("\nTempo medio di percorrenza: " + minuti + " min " + secondi + " sec.");
             }
         } catch (IllegalArgumentException ex) {
             System.out.println("Errore: Formato UUID non valido.");
         } catch (RuntimeException ex) {
-            System.out.println("Errore: " + ex.getMessage());
+            System.out.println("Errore durante il calcolo: " + ex.getMessage());
         }
     }
 //endregion
 
     //region Storico: quante volte un mezzo ha percorso una tratta e quanto ha impiegato ogni volta
     public static void storicoPercorrenzeMezzoTratta(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
-        try {
+        System.out.println("\n--- STORICO PERCORRENZE MEZZO/TRATTA ---");
+
+        MezzoDiTrasporto mezzo = null;
+        while (mezzo == null) {
             System.out.print("Targa del mezzo: ");
             String targa = scanner.nextLine().trim();
-            MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
 
-            // scelgo la tratta da un elenco numerato
-            Tratta tratta = selezionaTratta(trattaDAO);
-            if (tratta == null) {
-                return;
+            if (targa.isEmpty()) {
+                System.out.println("La targa non può essere vuota. Riprova.");
+                continue;
             }
 
+            try {
+                mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
+                if (mezzo == null) {
+                    System.out.println("Nessun mezzo trovato con questa targa. Riprova.");
+                }
+            } catch (RuntimeException ex) {
+                System.out.println("Errore nella ricerca del mezzo: " + ex.getMessage() + ". Riprova.");
+            }
+        }
+
+        Tratta tratta = null;
+        while (tratta == null) {
+            tratta = selezionaTratta(trattaDAO);
+            if (tratta == null) {
+                System.out.println("Selezione non valida. Devi scegliere una tratta dall'elenco. Riprova.");
+            }
+        }
+
+        try {
             List<Duration> tempi = percorrenzaDAO.tempiPercorrenza(tratta, mezzo);
 
-            System.out.println("\nIl mezzo " + targa + " ha percorso questa tratta " + tempi.size() + " volte:");
+            System.out.println("\nIl mezzo " + mezzo.getTarga() + " ha percorso questa tratta " + tempi.size() + " volte:");
+
             if (tempi.isEmpty()) {
                 System.out.println("(nessuna percorrenza registrata)");
-            }
-            int n = 1;
-            for (Duration t : tempi) {
-                long minuti = t.toMinutes();
-                long secondi = t.minusMinutes(minuti).getSeconds();
-                System.out.println(n + ") " + minuti + " min " + secondi + " sec");
-                n++;
+            } else {
+                int n = 1;
+                for (Duration t : tempi) {
+                    long minuti = t.toMinutes();
+                    long secondi = t.minusMinutes(minuti).getSeconds();
+                    System.out.println(n + ") " + minuti + " min " + secondi + " sec");
+                    n++;
+                }
             }
         } catch (RuntimeException ex) {
-            System.out.println("Errore: " + ex.getMessage());
+            System.out.println("Errore durante il recupero dello storico: " + ex.getMessage());
         }
     }
 //endregion
 
     //region Storico: Manutenzioni
-    public static void storicoManutenzione(ManutenzioneDAO dao) {
-        System.out.println("\nInserisci la targa:");
-        String targa = scanner.nextLine();
+    public static void storicoManutenzione(ManutenzioneDAO dao, MezzoDiTrasportoDAO mezzoDAO) {
+        System.out.println("\n--- STORICO MANUTENZIONI MEZZO ---");
 
-        List<Manutenzione> lista = dao.storicoManutenzioni(targa);
+        List<Manutenzione> lista;
+        String targa;
 
-        if (lista.isEmpty()) {
-            System.out.println("Nessuna manutenzione trovata.");
+        while (true) {
+            System.out.print("Inserisci la targa del mezzo: ");
+            targa = scanner.nextLine().trim();
+
+            if (targa.isEmpty()) {
+                System.out.println("La targa non può essere vuota. Riprova.");
+                continue;
+            }
+
+            try {
+                MezzoDiTrasporto mezzo = mezzoDAO.findByTarga(targa);
+
+                if (mezzo == null) {
+                    System.out.println("Errore: Il mezzo con targa '" + targa + "' non esiste. Riprova.");
+                    continue;
+                }
+
+                lista = dao.storicoManutenzioni(targa);
+                break;
+
+            } catch (RuntimeException ex) {
+                System.out.println("Mezzo non trovato o errore di ricerca. Riprova.");
+            }
+        }
+
+        if (lista == null || lista.isEmpty()) {
+            System.out.println("\nIl mezzo con targa " + targa + " esiste ma non ha nessuna manutenzione registrata.");
             return;
         }
 
-        System.out.println("\nStorico Manutenzioni:");
+        // Stampa dello storico
+        System.out.println("\nStorico Manutenzioni trovate (" + lista.size() + "):");
         for (Manutenzione m : lista) {
-            System.out.println("\nInizio: " + m.getDataInizio());
-            System.out.println("Fine: " + m.getDataFine());
-            System.out.println("Motivo: " + m.getMotivo());
+            System.out.println("\n---------------------------------");
+            System.out.println("Inizio : " + m.getDataInizio());
+            System.out.println("Fine   : " + (m.getDataFine() != null ? m.getDataFine() : "In corso..."));
+            System.out.println("Motivo : " + m.getMotivo());
         }
     }
 //endregion
@@ -1280,8 +1457,6 @@ public class Service {
         );
     }
     // endregion
-
-
 
 
 //    public Biglietto vendiBiglietto(MezzoDiTrasporto mezzoDiTrasporto) {
