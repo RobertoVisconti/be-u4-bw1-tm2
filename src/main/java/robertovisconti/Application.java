@@ -296,7 +296,7 @@ public class Application {
             return;
 
         } catch (UtenteEmailNonTrovatoException e) {
-            // Nuova email continua la registrazione
+            // Nuova email allora continua con la registrazione
         }
 
         Utente nuovoUtente = new Utente(
