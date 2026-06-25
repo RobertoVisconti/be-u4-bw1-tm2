@@ -137,11 +137,11 @@ public class Application {
             }
 
             switch (scelta) {
-                case 1 -> Service.creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
-                case 2 -> Service.creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
-                case 3 -> Service.creazionePunti(puntoDiEmissioneDAO, genericDAO);
+                case 1 -> menuCreazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
+                case 2 -> menuCreazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
+                case 3 -> menuCreazionePunti(puntoDiEmissioneDAO, genericDAO);
                 case 4 -> Service.ricercaUtenti(utenteDAO);
-                case 5 -> Service.creazioneTratte(trattaDAO, genericDAO);
+                case 5 -> menuCreazioneTratte(trattaDAO, genericDAO);
                 case 6 -> Service.generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
                 case 7 -> Service.assegnaTrattaMezzo(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 8 -> Service.calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
@@ -158,6 +158,70 @@ public class Application {
         }
     }
 //endregion
+
+    public static void menuCreazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, GenericDAO genericDAO) {
+        System.out.println("\n1. Genera utenti in blocco (dati finti)");
+        System.out.println("2. Inserisci un utente a mano");
+        System.out.print("Scegli un'opzione: ");
+        try {
+            int scelta = Integer.parseInt(scanner.nextLine().trim());
+            switch (scelta) {
+                case 1 -> Service.creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
+                case 2 -> Service.creazioneUtenteManuale(utenteDAO);
+                default -> System.out.println("Opzione non valida.");
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("Errore: Inserire un numero valido.");
+        }
+    }
+
+    public static void menuCreazioneMezzi(MezzoDiTrasportoDAO mezzoDiTrasportoDAO, GenericDAO genericDAO) {
+        System.out.println("\n1. Genera mezzi in blocco (dati finti)");
+        System.out.println("2. Inserisci un mezzo a mano");
+        System.out.print("Scegli un'opzione: ");
+        try {
+            int scelta = Integer.parseInt(scanner.nextLine().trim());
+            switch (scelta) {
+                case 1 -> Service.creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
+                case 2 -> Service.creazioneMezzoManuale(mezzoDiTrasportoDAO);
+                default -> System.out.println("Opzione non valida.");
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("Errore: Inserire un numero valido.");
+        }
+    }
+
+    public static void menuCreazionePunti(PuntoDiEmissioneDAO puntoDiEmissioneDAO, GenericDAO genericDAO) {
+        System.out.println("\n1. Genera punti di emissione in blocco (dati finti)");
+        System.out.println("2. Inserisci un punto di emissione a mano");
+        System.out.print("Scegli un'opzione: ");
+        try {
+            int scelta = Integer.parseInt(scanner.nextLine().trim());
+            switch (scelta) {
+                case 1 -> Service.creazionePunti(puntoDiEmissioneDAO, genericDAO);
+                case 2 -> Service.creazionePuntoManuale(puntoDiEmissioneDAO);
+                default -> System.out.println("Opzione non valida.");
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("Errore: Inserire un numero valido.");
+        }
+    }
+
+    public static void menuCreazioneTratte(TrattaDAO trattaDAO, GenericDAO genericDAO) {
+        System.out.println("\n1. Genera tratte in blocco (dati finti)");
+        System.out.println("2. Inserisci una tratta a mano");
+        System.out.print("Scegli un'opzione: ");
+        try {
+            int scelta = Integer.parseInt(scanner.nextLine().trim());
+            switch (scelta) {
+                case 1 -> Service.creazioneTratte(trattaDAO, genericDAO);
+                case 2 -> Service.creazioneTrattaManuale(trattaDAO);
+                default -> System.out.println("Opzione non valida.");
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("Errore: Inserire un numero valido.");
+        }
+    }
 
     //Case Utente
     public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, Utente utente) {

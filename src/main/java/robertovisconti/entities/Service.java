@@ -246,6 +246,187 @@ public class Service {
     }
     //endregion
 
+    //region CREAZIONE MANUALE (Admin)
+    public static void creazioneUtenteManuale(UtenteDAO utenteDAO) {
+        System.out.println("\nINSERIMENTO UTENTE");
+
+        System.out.print("Nome: ");
+        String nome = scanner.nextLine().trim();
+
+        System.out.print("Cognome: ");
+        String cognome = scanner.nextLine().trim();
+
+        System.out.print("Email: ");
+        String email = scanner.nextLine().trim();
+
+        try {
+            utenteDAO.findByEmail(email);
+            System.out.println("Esiste già un account con questa email.");
+            return;
+        } catch (UtenteEmailNonTrovatoException e) {
+            // email libera, si continua
+        }
+
+        System.out.println("Ruolo:");
+        System.out.println("1. Utente");
+        System.out.println("2. Amministratore");
+        System.out.print("Scelta: ");
+
+        Ruolo ruolo;
+        switch (scanner.nextLine().trim()) {
+            case "1" -> ruolo = Ruolo.USER;
+            case "2" -> ruolo = Ruolo.ADMIN;
+            default -> {
+                System.out.println("Scelta non valida. Operazione annullata.");
+                return;
+            }
+        }
+
+        Utente utente = new Utente(nome, cognome, email, ruolo);
+        utenteDAO.saveUtente(utente);
+        System.out.println("Utente creato con successo.");
+    }
+
+    public static void creazioneMezzoManuale(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+        System.out.println("\nINSERIMENTO MEZZO DI TRASPORTO");
+
+        System.out.println("Tipo di mezzo:");
+        System.out.println("1. Bus");
+        System.out.println("2. Tram");
+        System.out.print("Scelta: ");
+
+        TipoMezzo tipo;
+        switch (scanner.nextLine().trim()) {
+            case "1" -> tipo = TipoMezzo.BUS;
+            case "2" -> tipo = TipoMezzo.TRAM;
+            default -> {
+                System.out.println("Scelta non valida. Operazione annullata.");
+                return;
+            }
+        }
+
+        System.out.print("Capienza massima: ");
+        int capienza;
+        try {
+            capienza = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Capienza non valida. Operazione annullata.");
+            return;
+        }
+
+        System.out.println("Stato:");
+        System.out.println("1. In servizio");
+        System.out.println("2. In manutenzione");
+        System.out.print("Scelta: ");
+
+        StatoMezzo stato;
+        switch (scanner.nextLine().trim()) {
+            case "1" -> stato = StatoMezzo.IN_SERVIZIO;
+            case "2" -> stato = StatoMezzo.IN_MANUTENZIONE;
+            default -> {
+                System.out.println("Scelta non valida. Operazione annullata.");
+                return;
+            }
+        }
+
+        System.out.print("Targa: ");
+        String targa = scanner.nextLine().trim();
+
+        MezzoDiTrasporto mezzo = new MezzoDiTrasporto(tipo, capienza, stato, targa);
+        mezzoDiTrasportoDAO.save(mezzo);
+        System.out.println("Mezzo creato con successo.");
+    }
+
+    public static void creazionePuntoManuale(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
+        System.out.println("\nINSERIMENTO PUNTO DI EMISSIONE");
+
+        System.out.println("Tipo di punto:");
+        System.out.println("1. Distributore automatico");
+        System.out.println("2. Rivenditore");
+        System.out.print("Scelta: ");
+        String tipoScelto = scanner.nextLine().trim();
+
+        if (!tipoScelto.equals("1") && !tipoScelto.equals("2")) {
+            System.out.println("Scelta non valida. Operazione annullata.");
+            return;
+        }
+
+        System.out.print("Nome: ");
+        String nome = scanner.nextLine().trim();
+
+        System.out.print("Indirizzo: ");
+        String indirizzo = scanner.nextLine().trim();
+
+        System.out.print("Città: ");
+        String citta = scanner.nextLine().trim();
+
+        System.out.print("CAP: ");
+        String cap = scanner.nextLine().trim();
+
+        System.out.print("Partita IVA: ");
+        String piva = scanner.nextLine().trim();
+
+        if (tipoScelto.equals("1")) {
+            System.out.println("Stato:");
+            System.out.println("1. Attivo");
+            System.out.println("2. Non attivo");
+            System.out.print("Scelta: ");
+
+            StatoDistributoreAutomatico stato;
+            switch (scanner.nextLine().trim()) {
+                case "1" -> stato = StatoDistributoreAutomatico.ATTIVO;
+                case "2" -> stato = StatoDistributoreAutomatico.NON_ATTIVO;
+                default -> {
+                    System.out.println("Scelta non valida. Operazione annullata.");
+                    return;
+                }
+            }
+            DistributoreAutomatico distributore = new DistributoreAutomatico(nome, indirizzo, citta, cap, piva, stato);
+            puntoDiEmissioneDAO.savePuntoDiEmissione(distributore);
+        } else {
+            System.out.println("Aperto?");
+            System.out.println("1. Sì");
+            System.out.println("2. No");
+            System.out.print("Scelta: ");
+
+            boolean aperto;
+            switch (scanner.nextLine().trim()) {
+                case "1" -> aperto = true;
+                case "2" -> aperto = false;
+                default -> {
+                    System.out.println("Scelta non valida. Operazione annullata.");
+                    return;
+                }
+            }
+            Rivenditore rivenditore = new Rivenditore(nome, indirizzo, citta, cap, piva, aperto);
+            puntoDiEmissioneDAO.savePuntoDiEmissione(rivenditore);
+        }
+        System.out.println("Punto di emissione creato con successo.");
+    }
+
+    public static void creazioneTrattaManuale(TrattaDAO trattaDAO) {
+        System.out.println("\nINSERIMENTO TRATTA");
+
+        System.out.print("Punto di partenza: ");
+        String partenza = scanner.nextLine().trim();
+
+        System.out.print("Capolinea: ");
+        String capolinea = scanner.nextLine().trim();
+
+        System.out.print("Tempo di percorrenza stimato (minuti): ");
+        int tempoStimato;
+        try {
+            tempoStimato = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Valore non valido. Operazione annullata.");
+            return;
+        }
+
+        trattaDAO.creaTratta(partenza, capolinea, tempoStimato);
+        System.out.println("Tratta creata con successo.");
+    }
+    //endregion
+
     //region Metodo Compra biglietto
     public static void compraBiglietto(TitoloViaggioDAO titoloViaggioDAO, PuntoDiEmissione puntoVendita) {
         Biglietto nuovoBiglietto = new Biglietto();
