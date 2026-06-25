@@ -193,137 +193,194 @@ public class Service {
     public static void compraAbbonamento(
             TitoloViaggioDAO titoloViaggioDAO,
             TesseraDAO tesseraDAO,
-            PuntoDiEmissione puntoVendita) {
+            PuntoDiEmissione puntoVendita,
+            Utente utente) {
 
-        System.out.println("\n--- ACQUISTO ABBONAMENTO ---");
+        System.out.println("\nACQUISTO ABBONAMENTO");
 
         Tessera tessera;
 
-        // Verifica se l'utente possiede già una tessera
-        System.out.println("Hai già una tessera?");
-        System.out.println("1. Sì");
-        System.out.println("2. No");
-        System.out.print("Scelta: ");
-
         int risposta;
 
-        try {
-            risposta = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Input non valido.");
-            return;
+
+        while (true) {
+            System.out.println("\nHai già una tessera?");
+            System.out.println("1. Sì");
+            System.out.println("2. No");
+            System.out.print("Scelta: ");
+
+            try {
+                risposta = Integer.parseInt(scanner.nextLine().trim());
+
+                if (risposta == 1 || risposta == 2) {
+                    break;
+                }
+
+                System.out.println("Scelta non valida. Scegli opzione 1 o 2.");
+
+            } catch (NumberFormatException e) {
+                System.out.println("Input non valido. Inserisci un numero.");
+            }
         }
+
 
         if (risposta == 1) {
 
-            System.out.print("Inserisci il codice univoco della tessera: ");
 
-            try {
+            if (utente.getIdTessera() != null) {
 
-                UUID codice = UUID.fromString(scanner.nextLine().trim());
+                tessera = utente.getIdTessera();
 
-                tessera = tesseraDAO.findByUnCode(codice);
+                System.out.println("Hai già una tessera associata al tuo account.");
+                System.out.println("Codice tessera: " +
+                        tessera.getCodiceUnivoco());
 
-                System.out.println("Tessera trovata!");
+            } else {
 
-            } catch (IllegalArgumentException e) {
+                System.out.println("Non hai una tessera associata al tuo account.");
 
-                System.out.println("Formato UUID non valido.");
-                return;
+                int scelta;
 
-            } catch (TesseraNonTrovataException e) {
+                while (true) {
+                    System.out.println("\nScegli tra le seguinti opzioni:");
+                    System.out.println("1. Inserire codice tessera esistente");
+                    System.out.println("2. Creare nuova tessera");
+                    System.out.print("Scelta: ");
 
-                System.out.println(e.getMessage());
-                return;
+                    try {
+                        scelta = Integer.parseInt(scanner.nextLine().trim());
+
+                        if (scelta == 1 || scelta == 2) {
+                            break;
+                        }
+
+                        System.out.println("Scelta non valida.");
+
+                    } catch (NumberFormatException e) {
+                        System.out.println("Input non valido.");
+                    }
+                }
+
+                if (scelta == 1) {
+
+                    System.out.print("Inserisci il codice univoco della tessera: ");
+
+                    try {
+
+                        UUID codice = UUID.fromString(scanner.nextLine().trim());
+
+                        tessera = tesseraDAO.findByUnCode(codice);
+
+                        System.out.println("Tessera trovata!");
+
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Formato UUID non valido.");
+                        return;
+
+                    } catch (TesseraNonTrovataException e) {
+                        System.out.println(e.getMessage());
+                        return;
+                    }
+
+                } else {
+
+                    try {
+
+                        tessera = tesseraDAO.creaTessera();
+                        utente.setIdTessera(tessera);
+
+                        System.out.println("Tessera creata con successo!");
+                        System.out.println("Codice tessera: " +
+                                tessera.getCodiceUnivoco());
+
+                    } catch (Exception e) {
+                        System.out.println("Errore nella creazione della tessera: "
+                                + e.getMessage());
+                        return;
+                    }
+                }
             }
 
-        } else if (risposta == 2) {
-
-            try {
-
-                tessera = tesseraDAO.creaTessera();
-
-                System.out.println("Tessera creata con successo!");
-                System.out.println("Codice tessera: " + tessera.getCodiceUnivoco());
-
-            } catch (Exception e) {
-
-                System.out.println("Errore nella creazione della tessera: " + e.getMessage());
-                return;
-            }
 
         } else {
 
-            System.out.println("Scelta non valida.");
-            return;
+            if (utente.getIdTessera() != null) {
+
+                System.out.println("Hai già una tessera associata al tuo account.");
+                System.out.println("Codice tessera: " +
+                        utente.getIdTessera().getCodiceUnivoco());
+
+                tessera = utente.getIdTessera();
+
+            } else {
+
+                try {
+
+                    tessera = tesseraDAO.creaTessera();
+                    utente.setIdTessera(tessera);
+
+                    System.out.println("Tessera creata con successo!");
+                    System.out.println("Codice tessera: " +
+                            tessera.getCodiceUnivoco());
+
+                } catch (Exception e) {
+                    System.out.println("Errore nella creazione della tessera: "
+                            + e.getMessage());
+                    return;
+                }
+            }
         }
 
-        // Selezione tipo abbonamento
-
-        System.out.println("\nSeleziona il tipo di abbonamento:");
-        System.out.println("1. Settimanale");
-        System.out.println("2. Mensile");
-        System.out.println("3. Annuale");
-        System.out.print("Scelta: ");
 
         int scelta;
 
-        try {
+        while (true) {
+            System.out.println("\nSeleziona il tipo di abbonamento:");
+            System.out.println("1. Settimanale");
+            System.out.println("2. Mensile");
+            System.out.println("3. Annuale");
+            System.out.print("Scelta: ");
 
-            scelta = Integer.parseInt(scanner.nextLine().trim());
+            try {
+                scelta = Integer.parseInt(scanner.nextLine().trim());
 
-        } catch (NumberFormatException e) {
-
-            System.out.println("Input non valido.");
-            return;
-        }
-
-        TipoAbbonamento tipoAbbonamento;
-
-
-        switch (scelta) {
-
-            case 1 -> {
-
-                tipoAbbonamento = TipoAbbonamento.SETTIMANALE;
-
-
-            }
-
-            case 2 -> {
-
-                tipoAbbonamento = TipoAbbonamento.MENSILE;
-
-
-            }
-
-            case 3 -> {
-
-                tipoAbbonamento = TipoAbbonamento.ANNUALE;
-
-
-            }
-
-            default -> {
+                if (scelta >= 1 && scelta <= 3) {
+                    break;
+                }
 
                 System.out.println("Scelta non valida.");
-                return;
+
+            } catch (NumberFormatException e) {
+                System.out.println("Input non valido.");
             }
         }
 
+        TipoAbbonamento tipoAbbonamento = switch (scelta) {
+            case 1 -> TipoAbbonamento.SETTIMANALE;
+            case 2 -> TipoAbbonamento.MENSILE;
+            case 3 -> TipoAbbonamento.ANNUALE;
+            default -> throw new IllegalStateException("Unexpected value: " + scelta);
+        };
+
+
         try {
 
-            Abbonamento nuovoAbbonamento = new Abbonamento(LocalDateTime.now(), puntoVendita, UUID.randomUUID(), tipoAbbonamento, tessera);
-
+            Abbonamento nuovoAbbonamento = new Abbonamento(
+                    LocalDateTime.now(),
+                    puntoVendita,
+                    UUID.randomUUID(),
+                    tipoAbbonamento,
+                    tessera
+            );
 
             titoloViaggioDAO.save(nuovoAbbonamento);
 
             System.out.println("\nAbbonamento acquistato con successo!");
             System.out.println("Tipo: " + tipoAbbonamento);
+            System.out.println("Scadenza: " + nuovoAbbonamento.getDataScadenza());
             System.out.println("Punto vendita: " + puntoVendita.getNome());
 
         } catch (Exception e) {
-
             System.out.println("Errore durante il salvataggio: " + e.getMessage());
         }
     }
