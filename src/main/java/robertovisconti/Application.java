@@ -260,7 +260,7 @@ public class Application {
     }
 //endregion
 
-    // Case Punto Vendita
+    // region Case Punto Vendita
     public static void casePunto(PuntoDiEmissione puntoVendita, TitoloViaggioDAO titoloViaggioDAO, TesseraDAO tesseraDAO, Utente utente) {
         boolean puntoMenu = true;
         while (puntoMenu) {

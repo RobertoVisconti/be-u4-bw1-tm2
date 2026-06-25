@@ -20,7 +20,6 @@ import static robertovisconti.Application.scanner;
 public class Service {
 
 
-
     //region CREAZIONE AUTOMATICA TABELLE
     // Creazione Utenti
     public static void creazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, GenericDAO genericDAO) {
@@ -791,24 +790,25 @@ public class Service {
             return null;
         }
 
-        System.out.println("\nPunti vendita:");
-        for (int i = 0; i < punti.size(); i++) {
-            PuntoDiEmissione p = punti.get(i);
-            System.out.println((i + 1) + ". " + p.getNome() + " -> " + p.getIndirizzo()
-                    + " " + p.getCitta());
-        }
-        System.out.print("Scegli Punto vendita: ");
-
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
-            if (scelta < 1 || scelta > punti.size()) {
-                System.out.println("Numero non valido.");
-                return null;
+        while (true) {
+            System.out.println("\nPunti vendita:");
+            for (int i = 0; i < punti.size(); i++) {
+                PuntoDiEmissione p = punti.get(i);
+                System.out.println((i + 1) + ". " + p.getNome() + " -> " + p.getIndirizzo()
+                        + " " + p.getCitta());
             }
-            return punti.get(scelta - 1);
-        } catch (NumberFormatException ex) {
-            System.out.println("Devi inserire un numero.");
-            return null;
+            System.out.print("Scegli Punto vendita: ");
+
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+                if (scelta >= 1 && scelta <= punti.size()) {
+                    return punti.get(scelta - 1);
+                } else {
+                    System.out.println("Numero non valido. Per favore, riprova.");
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("Devi inserire un numero. Per favore, riprova.");
+            }
         }
     }
 //endregion
