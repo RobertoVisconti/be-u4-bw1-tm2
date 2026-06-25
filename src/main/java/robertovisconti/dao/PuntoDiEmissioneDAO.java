@@ -27,8 +27,6 @@ public class PuntoDiEmissioneDAO {
         em.persist(newPuntoDiEmissione);
 
         transaction.commit();
-
-        System.out.println("Il punto di emissione " + newPuntoDiEmissione + " è stato correttamente salvato!");
     }
 
     public PuntoDiEmissione findPuntoDiEmissioneById(UUID puntoEmissioneId) {

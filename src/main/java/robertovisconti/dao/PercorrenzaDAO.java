@@ -29,7 +29,6 @@ public class PercorrenzaDAO {
         tx.begin();
         em.persist(percorrenza);
         tx.commit();
-        System.out.println(percorrenza + " Percorrenza salvata con successo.");
     }
 
     // cerco una percorrenza tramite il suo id;

@@ -21,8 +21,6 @@ public class TrattaDAO {
         this.entityManager.persist(newTratta);
 
         transaction.commit();
-
-        System.out.println(newTratta + "creata con successo!");
     }
 
     // TASK 3a - creo una tratta e la salvo subito

@@ -26,8 +26,6 @@ public class TitoloViaggioDAO {
         this.entityManager.persist(newTitoloViaggio);
 
         transaction.commit();
-
-        System.out.println(newTitoloViaggio + "creato con successo!");
     }
 
     public TitoloViaggio findByCodiceUnivoco(UUID codiceUnivoco) {

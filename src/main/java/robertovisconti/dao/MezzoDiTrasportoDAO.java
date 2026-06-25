@@ -23,8 +23,6 @@ public class MezzoDiTrasportoDAO {
         this.entityManager.persist(newMezzo);
 
         transaction.commit();
-
-        System.out.println(newMezzo + "creato con successo!");
     }
 
     // restituisco tutti i mezzi presenti nel database
