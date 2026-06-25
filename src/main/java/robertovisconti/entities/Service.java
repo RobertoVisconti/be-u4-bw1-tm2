@@ -20,7 +20,6 @@ import static robertovisconti.Application.scanner;
 public class Service {
 
 
-
     //region CREAZIONE AUTOMATICA TABELLE
     // Creazione Utenti
     public static void creazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, GenericDAO genericDAO) {
@@ -640,27 +639,28 @@ public class Service {
 //endregion
 
     //region Metodo Rinnovo Tessera
-    public static void rinnovotessera(TesseraDAO tesseraDAO) {
+    public static void rinnovotessera(TesseraDAO tesseraDAO, Utente utente) {
 
         System.out.println("\n--- RINNOVO TESSERA ---");
-        System.out.print("Inserisci il Codice Univoco della tessera: ");
 
-        UUID codiceUnivoco;
-
-        try {
-            codiceUnivoco = UUID.fromString(scanner.nextLine().trim());
-        } catch (IllegalArgumentException e) {
-            System.out.println("UUID non valido.");
+            if (utente.getIdTessera() == null) {
+            System.out.println("Non hai una tessera associata al tuo account.");
+            System.out.println("Crea una tessera per procedere.");
             return;
         }
 
-        try {
+        Tessera tessera = utente.getIdTessera();
+        UUID codiceUnivoco = tessera.getCodiceUnivoco();
 
-            Tessera tessera = tesseraDAO.findByUnCode(codiceUnivoco);
+        System.out.println("Tessera trovata!");
+        System.out.println("Codice: " + codiceUnivoco);
+
+
+        try {
 
             LocalDate vecchiaScadenza = tessera.getDataScadenza();
             LocalDate nuovaScadenza;
-            
+
             if (vecchiaScadenza != null && vecchiaScadenza.isAfter(LocalDate.now())) {
                 nuovaScadenza = vecchiaScadenza.plusYears(1);
             } else {
@@ -740,16 +740,22 @@ public class Service {
 
     //region Ricerca utente
     public static void ricercaUtenti(UtenteDAO utenteDAO) {
-        try {
-            System.out.print("Inserisci l'UUID dell'utente da cercare: ");
-            String inserito = scanner.nextLine().trim();
-            UUID id = UUID.fromString(inserito);
-            Utente trovato = utenteDAO.findByID(id);
-            System.out.println(trovato);
-        } catch (UtenteNonTrovatoException ex) {
-            System.out.println("Errore: " + ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            System.out.println("Errore: Formato UUID non valido.");
+        while (true) {
+            try {
+                System.out.print("Inserisci l'UUID dell'utente da cercare: ");
+                String inserito = scanner.nextLine().trim();
+
+                UUID id = UUID.fromString(inserito);
+                Utente trovato = utenteDAO.findByID(id);
+
+                System.out.println("\nUtente trovato:");
+                System.out.println(trovato);
+                break;
+            } catch (IllegalArgumentException ex) {
+                System.out.println("Errore: Formato UUID non valido. Riprova.");
+            } catch (UtenteNonTrovatoException ex) {
+                System.out.println("Errore: " + ex.getMessage() + " Riprova.");
+            }
         }
     }
 //endregion
@@ -763,24 +769,25 @@ public class Service {
             return null;
         }
 
-        System.out.println("\nPunti vendita:");
-        for (int i = 0; i < punti.size(); i++) {
-            PuntoDiEmissione p = punti.get(i);
-            System.out.println((i + 1) + ". " + p.getNome() + " -> " + p.getIndirizzo()
-                    + " " + p.getCitta());
-        }
-        System.out.print("Scegli Punto vendita: ");
-
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
-            if (scelta < 1 || scelta > punti.size()) {
-                System.out.println("Numero non valido.");
-                return null;
+        while (true) {
+            System.out.println("\nPunti vendita:");
+            for (int i = 0; i < punti.size(); i++) {
+                PuntoDiEmissione p = punti.get(i);
+                System.out.println((i + 1) + ". " + p.getNome() + " -> " + p.getIndirizzo()
+                        + " " + p.getCitta());
             }
-            return punti.get(scelta - 1);
-        } catch (NumberFormatException ex) {
-            System.out.println("Devi inserire un numero.");
-            return null;
+            System.out.print("Scegli Punto vendita: ");
+
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+                if (scelta >= 1 && scelta <= punti.size()) {
+                    return punti.get(scelta - 1);
+                } else {
+                    System.out.println("Numero non valido. Per favore, riprova.");
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("Devi inserire un numero. Per favore, riprova.");
+            }
         }
     }
 //endregion
