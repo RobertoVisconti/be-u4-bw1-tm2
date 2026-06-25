@@ -53,7 +53,7 @@ public class Service {
             // la capienza dipende dal tipo di mezzo
             int capienza;
             if (tipo == TipoMezzo.BUS) {
-                capienza = 120;   
+                capienza = 120;
             } else {
                 capienza = 250;
             }
