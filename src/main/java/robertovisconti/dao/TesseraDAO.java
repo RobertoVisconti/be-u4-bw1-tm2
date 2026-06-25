@@ -23,7 +23,6 @@ public class TesseraDAO {
         tx.begin();
         em.persist(tessera);
         tx.commit();
-        System.out.println(tessera + " Associata con successo.");
     }
 
     // creo una nuova tessera (con codice univoco generato automaticamente) e la salvo subito

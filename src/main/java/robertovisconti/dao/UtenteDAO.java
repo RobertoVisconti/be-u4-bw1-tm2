@@ -26,7 +26,6 @@ public class UtenteDAO {
         tx.begin();
         em.persist(utente);
         tx.commit();
-        System.out.println(utente + " Utente salvato con successo.");
     }
 
     public Utente findByID(UUID id) {

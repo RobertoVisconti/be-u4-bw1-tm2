@@ -838,6 +838,7 @@ public class Service {
 
     //region Mostra l'elenco dei punti vendita
     public static PuntoDiEmissione selezionaPunto(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
+
         List<PuntoDiEmissione> punti = puntoDiEmissioneDAO.findAllPuntiDiEmissione();
 
         if (punti.isEmpty()) {
@@ -846,18 +847,73 @@ public class Service {
         }
 
         while (true) {
+
             System.out.println("\nPunti vendita:");
+
             for (int i = 0; i < punti.size(); i++) {
                 PuntoDiEmissione p = punti.get(i);
-                System.out.println((i + 1) + ". " + p.getNome() + " -> " + p.getIndirizzo()
+                System.out.println((i + 1) + ". " + p.getNome()
+                        + " -> " + p.getIndirizzo()
                         + " " + p.getCitta());
             }
+
             System.out.print("Scegli Punto vendita: ");
 
             try {
                 int scelta = Integer.parseInt(scanner.nextLine().trim());
-                if (scelta >= 1 && scelta <= punti.size()) {
-                    return punti.get(scelta - 1);
+
+                if (scelta < 1 || scelta > punti.size()) {
+                    System.out.println("Numero non valido. Riprova.");
+                    continue;
+                }
+
+                PuntoDiEmissione selezionato = punti.get(scelta - 1);
+
+                if (selezionato instanceof Rivenditore rivenditore) {
+
+                    if (!rivenditore.isAperto()) {
+                        System.out.println("Questo rivenditore è chiuso. Scegli un altro punto.");
+                        continue;
+                    }
+                }
+
+                if (selezionato instanceof DistributoreAutomatico distributore) {
+
+                    if (distributore.getStato() == StatoDistributoreAutomatico.NON_ATTIVO) {
+                        System.out.println("Questo distributore automatico non è attivo. Scegli un altro punto.");
+                        continue;
+                    }
+                }
+                return selezionato;
+
+            } catch (NumberFormatException ex) {
+                System.out.println("Devi inserire un numero. Riprova.");
+            }
+        }
+    }
+//endregion
+
+    //region Mostra l'elenco dei mezzi
+    public static MezzoDiTrasporto selezionaMezzo(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+        List<MezzoDiTrasporto> mezzi = mezzoDiTrasportoDAO.findAll();
+
+        if (mezzi.isEmpty()) {
+            System.out.println("Nessun mezzo di trasporto presente");
+            return null;
+        }
+
+        while (true) {
+            System.out.println("\nMezzi di Trasporto:");
+            for (int i = 0; i < mezzi.size(); i++) {
+                MezzoDiTrasporto m = mezzi.get(i);
+                System.out.println((i + 1) + ". " + m.getTipoMezzo() + " -> Targa: " + m.getTarga());
+            }
+            System.out.print("Scegli Mezzo di Trasporto: ");
+
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+                if (scelta >= 1 && scelta <= mezzi.size()) {
+                    return mezzi.get(scelta - 1);
                 } else {
                     System.out.println("Numero non valido. Per favore, riprova.");
                 }

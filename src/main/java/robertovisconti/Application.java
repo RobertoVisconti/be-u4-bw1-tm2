@@ -4,10 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import robertovisconti.dao.*;
-import robertovisconti.entities.PuntoDiEmissione;
-import robertovisconti.entities.Service;
-import robertovisconti.entities.Tratta;
-import robertovisconti.entities.Utente;
+import robertovisconti.entities.*;
 import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
 
 import java.time.LocalDateTime;
@@ -123,6 +120,7 @@ public class Application {
             System.out.println("10. Menù storici titoli di viaggio");
             System.out.println("11. Storico manutenzioni");
             System.out.println("12. Verifica abbonamento");
+            System.out.println("13. Menù conto biglietti vidimati");
             System.out.println("0. Logout");
             System.out.print("\nScegli un'opzione: ");
 
@@ -148,6 +146,7 @@ public class Application {
                 case 10 -> menuCountTitoliViaggio(titoloViaggioDAO, puntoDiEmissioneDAO);
                 case 11 -> Service.storicoManutenzione(manutenzioneDAO);
                 case 12 -> Service.verificaAbbonamento(titoloViaggioDAO);
+                case 13 -> menuCountBigliettiVidimati(titoloViaggioDAO, mezzoDiTrasportoDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
                     adminMenu = false;
@@ -448,6 +447,56 @@ public class Application {
 
                 case 4 -> System.out.println("\nAbbonamenti emessi presso " + puntoDiEmissione.getNome() + ": " +
                         titoloViaggioDAO.countAbbonamentiBetween(dataInizio, dataFine, puntoDiEmissione));
+
+                default -> System.out.println("Input non valido. Inserisci un numero da 0 a 4.");
+            }
+        }
+    }
+
+    //region  Menù Conta Biglietti Vidimati
+    public static void menuCountBigliettiVidimati(TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+        while (true) {
+            System.out.println("\n SELEZIONA UN'OPZIONE \n");
+            System.out.println("1. Conta biglietti vidimati per mezzo.");
+            System.out.println("2. Conta biglietti vidimati per periodo.");
+            System.out.println("0. Torna indietro");
+            System.out.print("Scelta: ");
+
+            int input;
+            try {
+                input = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException ex) {
+                System.out.println("Formato errato, inserisci un numero valido.");
+                continue;
+            }
+
+            if (input == 0) break;
+
+
+            LocalDateTime dataInizio = null;
+            LocalDateTime dataFine = null;
+            if (input >= 1 && input <= 2) {
+                while (true) {
+                    dataInizio = richiediData("Data di inizio");
+                    dataFine = richiediData("Data di fine");
+
+                    if (dataInizio.isAfter(dataFine)) {
+                        System.out.println("\n[ERRORE] La data di inizio non può essere successiva alla data di fine. Riprova l'inserimento.");
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            switch (input) {
+                case 1 -> {
+                    MezzoDiTrasporto mezzo = Service.selezionaMezzo(mezzoDiTrasportoDAO);
+                    System.out.println("\nBiglietti vidimati: " +
+                            titoloViaggioDAO.countBigliettiVidimatiSuMezzo(mezzo));
+                }
+
+                case 2 -> System.out.println("\nBiglietti vidimati tra " + dataInizio + " e " + dataFine + ": " +
+                        titoloViaggioDAO.countBigliettiVidimatiBetween(dataInizio, dataFine));
 
                 default -> System.out.println("Input non valido. Inserisci un numero da 0 a 4.");
             }

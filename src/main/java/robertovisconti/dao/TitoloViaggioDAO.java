@@ -7,6 +7,7 @@ import robertovisconti.entities.*;
 import robertovisconti.enums.TipoAbbonamento;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -25,8 +26,6 @@ public class TitoloViaggioDAO {
         this.entityManager.persist(newTitoloViaggio);
 
         transaction.commit();
-
-        System.out.println(newTitoloViaggio + "creato con successo!");
     }
 
     public TitoloViaggio findByCodiceUnivoco(UUID codiceUnivoco) {
@@ -127,6 +126,20 @@ public class TitoloViaggioDAO {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public int countBigliettiVidimatiSuMezzo(MezzoDiTrasporto mezzoDiTrasporto){
+        TypedQuery<Biglietto> query = entityManager.createQuery("SELECT b FROM Biglietto b WHERE b.mezzoDiTrasporto = :mezzoDiTrasporto AND b.dataValidazione IS NOT NULL", Biglietto.class);
+        query.setParameter("mezzoDiTrasporto", mezzoDiTrasporto);
+        return query.getResultList().size();
+    }
+
+    public long countBigliettiVidimatiBetween(LocalDateTime inizio, LocalDateTime fine){
+        TypedQuery<Long> query = entityManager.createQuery(
+                "SELECT COUNT(b) FROM Biglietto b WHERE b.dataValidazione IS NOT NULL AND b.dataValidazione BETWEEN :inizio AND :fine", Long.class);
+        query.setParameter("inizio", inizio);
+        query.setParameter("fine", fine);
+        return query.getSingleResult();
     }
 
     public int countBigliettiBetween(LocalDateTime inizio, LocalDateTime fine) {
