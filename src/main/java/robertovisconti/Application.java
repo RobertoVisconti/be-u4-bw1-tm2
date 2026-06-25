@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import robertovisconti.dao.*;
 import robertovisconti.entities.*;
+import robertovisconti.enums.Ruolo;
 import robertovisconti.enums.TipoAbbonamento;
 import robertovisconti.exceptions.PuntoDiEmissioneNonTrovatoException;
 import robertovisconti.exceptions.TesseraNonTrovataException;
@@ -21,9 +22,11 @@ import java.util.Scanner;
 import java.util.UUID;
 
 public class Application {
-    private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("be-u4-bw1-tm2");
+    private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
+            "be-u4-bw1-tm2");
     public static Scanner scanner = new Scanner(System.in);
 
+    //region APPLICATION
     public static void main(String[] args) {
         EntityManager em = entityManagerFactory.createEntityManager();
 
@@ -49,43 +52,73 @@ public class Application {
         boolean optionMenu = true;
         while (optionMenu) {
             System.out.println("\nTRASPORTO PUBBLICO");
-            System.out.println("Inserisci la tua email per accedere");
+            System.out.println("\nInserisci la tua email per accedere");
+            System.out.println("\n0. Chiudi Applicazione");
+            System.out.print("\nScegli un'opzione o inserisci email: ");
+            System.out.println("1. Login");
+            System.out.println("2. Registrazione");
             System.out.println("0. Chiudi Applicazione");
-            System.out.print("Scegli un'opzione o inserisci email: ");
+            System.out.print("Scegli un'opzione: ");
 
             String email = scanner.nextLine().trim();
             if (Objects.equals(email, "0")) {
-                System.out.println("Applicazione in chiusura...");
+                System.out.println("\nApplicazione in chiusura...");
                 break;
             }
-
+            int scelta;
             try {
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Inserisci un numero valido.");
+                continue;
+            }
 
-                Utente emailScanner = utenteDAO.findByEmail(email);
+            switch (scelta) {
 
-                switch (emailScanner.getRuolo()) {
-                    case ADMIN ->
-                            caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO, trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO, manutenzioneDAO);
-                    case USER ->
-                            caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO, mezzoDiTrasportoDAO);
-                    default -> System.out.println("Ruolo non riconosciuto.");
+                case 1 -> {
+                    System.out.println("Inserisci la tua e-mail:");
+
+                    String email2 = scanner.nextLine()
+                            .trim();
+
+                    try {
+
+                        Utente emailScanner = utenteDAO.findByEmail(email2);
+
+                        switch (emailScanner.getRuolo()) {
+                            case ADMIN -> caseAdmin(tesseraDAO, utenteDAO, mezzoDiTrasportoDAO, puntoDiEmissioneDAO,
+                                    trattaDAO, percorrenzaDAO, titoloViaggioDAO, genericDAO, manutenzioneDAO);
+                            case USER -> caseUser(tesseraDAO, puntoDiEmissioneDAO, trattaDAO, titoloViaggioDAO,
+                                    mezzoDiTrasportoDAO);
+                            default -> System.out.println("Ruolo non riconosciuto.");
+                        }
+
+                    } catch (UtenteEmailNonTrovatoException ex) {
+                        System.out.println("Errore: Nessun utente associato a questa email.");
+                    }
+                }
+                case 2 -> Service.registrazioneUtente(utenteDAO);
+
+                case 0 -> {
+                    System.out.println("Applicazione in chiusura...");
+                    optionMenu = false;
                 }
 
-            } catch (UtenteEmailNonTrovatoException ex) {
-                System.out.println("Errore: Nessun utente associato a questa email.");
+                default -> System.out.println("Scelta non valida.");
             }
         }
 
         em.close();
         entityManagerFactory.close();
     }
+//endregion
 
-
-    // Case Amministratore
+    //region Case Amministratore
     public static void caseAdmin(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, PercorrenzaDAO percorrenzaDAO, TitoloViaggioDAO titoloViaggioDAO, GenericDAO genericDAO, ManutenzioneDAO manutenzioneDAO) {
         boolean adminMenu = true;
         while (adminMenu) {
-            System.out.println("\n MENU PRINCIPALE ADMIN ");
+            System.out.println("\n MENU PRINCIPALE ADMIN\n");
             System.out.println("1. Genera utenti / tessera / non tessera");
             System.out.println("2. Creazione mezzi di trasporto");
             System.out.println("3. Creazione punti di emissione");
@@ -99,11 +132,12 @@ public class Application {
             System.out.println("11. Storico manutenzioni");
             System.out.println("12. Verifica abbonamento");
             System.out.println("0. Logout");
-            System.out.print("Scegli un'opzione: ");
+            System.out.print("\nScegli un'opzione: ");
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
@@ -113,15 +147,15 @@ public class Application {
                 case 1 -> menuCreazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
                 case 2 -> menuCreazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
                 case 3 -> menuCreazionePunti(puntoDiEmissioneDAO, genericDAO);
-                case 4 -> ricercaUtenti(utenteDAO);
+                case 4 -> Service.ricercaUtenti(utenteDAO);
                 case 5 -> menuCreazioneTratte(trattaDAO, genericDAO);
                 case 6 -> Service.generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
-                case 7 -> assegnaTrattaMezzo(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
-                case 8 -> calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
-                case 9 -> storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
+                case 7 -> Service.assegnaTrattaMezzo(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
+                case 8 -> Service.calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
+                case 9 -> Service.storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 10 -> menuCountTitoliViaggio(titoloViaggioDAO, puntoDiEmissioneDAO);
-                case 11 -> storicoManutenzione(manutenzioneDAO);
-                case 12 -> verificaAbbonamento(titoloViaggioDAO);
+                case 11 -> Service.storicoManutenzione(manutenzioneDAO);
+                case 12 -> Service.verificaAbbonamento(titoloViaggioDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
                     adminMenu = false;
@@ -130,6 +164,7 @@ public class Application {
             }
         }
     }
+//endregion
 
     public static void menuCreazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, GenericDAO genericDAO) {
         System.out.println("\n1. Genera utenti in blocco (dati finti)");
@@ -195,7 +230,7 @@ public class Application {
         }
     }
 
-    //Case Utente
+    //region Case Utente
     public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
         boolean userMenu = true;
         while (userMenu) {
@@ -207,7 +242,8 @@ public class Application {
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
@@ -215,7 +251,7 @@ public class Application {
 
             switch (scelta) {
                 case 1 -> {
-                    PuntoDiEmissione punto = selezionaPunto(puntoDiEmissioneDAO);
+                    PuntoDiEmissione punto = Service.selezionaPunto(puntoDiEmissioneDAO);
                     if (punto != null) {
                         casePunto(punto, titoloViaggioDAO, tesseraDAO);
                     }
@@ -230,8 +266,9 @@ public class Application {
             }
         }
     }
+//endregion
 
-    // Case Punto Vendita
+    //region Case Punto Vendita
     public static void casePunto(PuntoDiEmissione puntoVendita, TitoloViaggioDAO titoloViaggioDAO, TesseraDAO tesseraDAO) {
         boolean puntoMenu = true;
         while (puntoMenu) {
@@ -245,17 +282,18 @@ public class Application {
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
             }
 
             switch (scelta) {
-                case 1 -> compraBiglietto(titoloViaggioDAO, puntoVendita);
-                case 2 -> compraAbbonamento(titoloViaggioDAO, tesseraDAO, puntoVendita);
-                case 3 -> rinnovotessera(tesseraDAO);
-                case 4 -> rinnovoAbbonamento(titoloViaggioDAO);
+                case 1 -> Service.compraBiglietto(titoloViaggioDAO, puntoVendita);
+                case 2 -> Service.compraAbbonamento(titoloViaggioDAO, tesseraDAO, puntoVendita);
+                case 3 -> Service.rinnovotessera(tesseraDAO);
+                case 4 -> Service.rinnovoAbbonamento(titoloViaggioDAO);
                 case 0 -> {
                     System.out.println("Torno al menu principale utente");
                     puntoMenu = false;
@@ -265,8 +303,9 @@ public class Application {
 
         }
     }
+//endregion
 
-    // Case Viaggio
+    //region Case Viaggio
     public static void caseViaggio(TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO) {
         boolean viaggioMenu = true;
         Tratta trattaSelezionata = null;
@@ -284,18 +323,19 @@ public class Application {
 
             int scelta;
             try {
-                scelta = Integer.parseInt(scanner.nextLine().trim());
+                scelta = Integer.parseInt(scanner.nextLine()
+                        .trim());
             } catch (NumberFormatException ex) {
                 System.out.println("Errore: Inserire un numero valido.");
                 scelta = -1;
             }
 
             switch (scelta) {
-                case 1 -> trattaSelezionata = selezionaTratta(trattaDAO);
+                case 1 -> trattaSelezionata = Service.selezionaTratta(trattaDAO);
                 case 2 -> {
                     if (trattaSelezionata != null) {
                         // Estraiamo l'oggetto MezzoTrasporto reale e lo passiamo al metodo di vidimazione
-                        vidimaBiglietto(titoloViaggioDAO, trattaSelezionata.getMezzoTrasporto());
+                        Service.vidimaBiglietto(titoloViaggioDAO, trattaSelezionata.getMezzoTrasporto());
                     } else {
                         System.out.println("Opzione non valida.");
                     }
@@ -308,504 +348,9 @@ public class Application {
             }
         }
     }
+//endregion
 
-    // Metodo Compra biglietto
-    public static void compraBiglietto(TitoloViaggioDAO titoloViaggioDAO, PuntoDiEmissione puntoVendita) {
-        Biglietto nuovoBiglietto = new Biglietto();
-        nuovoBiglietto.setDataEmissione(LocalDateTime.now());
-        nuovoBiglietto.setPuntoDiEmissione(puntoVendita);
-        nuovoBiglietto.setCodiceUnivoco(UUID.randomUUID());
-        try {
-            titoloViaggioDAO.save(nuovoBiglietto);
-            System.out.println("Biglietto acquistato al punto: " + puntoVendita.getNome());
-        } catch (Exception ex) {
-            System.out.println("Errore durante la vendita del biglietto: " + ex.getMessage());
-        }
-    }
-
-
-    // Metodo Compra Abbonamento
-    public static void compraAbbonamento(
-            TitoloViaggioDAO titoloViaggioDAO,
-            TesseraDAO tesseraDAO,
-            PuntoDiEmissione puntoVendita) {
-
-        System.out.println("\n--- ACQUISTO ABBONAMENTO ---");
-
-        Tessera tessera;
-
-        // Verifica se l'utente possiede già una tessera
-        System.out.println("Hai già una tessera?");
-        System.out.println("1. Sì");
-        System.out.println("2. No");
-        System.out.print("Scelta: ");
-
-        int risposta;
-
-        try {
-            risposta = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Input non valido.");
-            return;
-        }
-
-        if (risposta == 1) {
-
-            System.out.print("Inserisci il codice univoco della tessera: ");
-
-            try {
-
-                UUID codice = UUID.fromString(scanner.nextLine().trim());
-
-                tessera = tesseraDAO.findByUnCode(codice);
-
-                System.out.println("Tessera trovata!");
-
-            } catch (IllegalArgumentException e) {
-
-                System.out.println("Formato UUID non valido.");
-                return;
-
-            } catch (TesseraNonTrovataException e) {
-
-                System.out.println(e.getMessage());
-                return;
-            }
-
-        } else if (risposta == 2) {
-
-            try {
-
-                tessera = tesseraDAO.creaTessera();
-
-                System.out.println("Tessera creata con successo!");
-                System.out.println("Codice tessera: " + tessera.getCodiceUnivoco());
-
-            } catch (Exception e) {
-
-                System.out.println("Errore nella creazione della tessera: " + e.getMessage());
-                return;
-            }
-
-        } else {
-
-            System.out.println("Scelta non valida.");
-            return;
-        }
-
-        // Selezione tipo abbonamento
-
-        System.out.println("\nSeleziona il tipo di abbonamento:");
-        System.out.println("1. Settimanale");
-        System.out.println("2. Mensile");
-        System.out.println("3. Annuale");
-        System.out.print("Scelta: ");
-
-        int scelta;
-
-        try {
-
-            scelta = Integer.parseInt(scanner.nextLine().trim());
-
-        } catch (NumberFormatException e) {
-
-            System.out.println("Input non valido.");
-            return;
-        }
-
-        TipoAbbonamento tipoAbbonamento;
-
-
-        switch (scelta) {
-
-            case 1 -> {
-
-                tipoAbbonamento = TipoAbbonamento.SETTIMANALE;
-
-
-            }
-
-            case 2 -> {
-
-                tipoAbbonamento = TipoAbbonamento.MENSILE;
-
-
-            }
-
-            case 3 -> {
-
-                tipoAbbonamento = TipoAbbonamento.ANNUALE;
-
-
-            }
-
-            default -> {
-
-                System.out.println("Scelta non valida.");
-                return;
-            }
-        }
-
-        try {
-
-            Abbonamento nuovoAbbonamento = new Abbonamento(LocalDateTime.now(), puntoVendita, UUID.randomUUID(), tipoAbbonamento, tessera);
-
-
-            titoloViaggioDAO.save(nuovoAbbonamento);
-
-            System.out.println("\nAbbonamento acquistato con successo!");
-            System.out.println("Tipo: " + tipoAbbonamento);
-            System.out.println("Punto vendita: " + puntoVendita.getNome());
-
-        } catch (Exception e) {
-
-            System.out.println("Errore durante il salvataggio: " + e.getMessage());
-        }
-    }
-
-    // Metodo Rinnovo Tessera
-    public static void rinnovotessera(TesseraDAO tesseraDAO) {
-
-        System.out.println("\n--- RINNOVO TESSERA ---");
-        System.out.print("Inserisci il Codice Univoco della tessera: ");
-
-        UUID codiceUnivoco;
-
-        try {
-            codiceUnivoco = UUID.fromString(scanner.nextLine().trim());
-        } catch (IllegalArgumentException e) {
-            System.out.println("UUID non valido.");
-            return;
-        }
-
-        System.out.println("\nPer quanto tempo vuoi rinnovare?");
-        System.out.println("1. 1 anno");
-        System.out.println("2. 2 anni");
-        System.out.println("3. 3 anni");
-        System.out.print("Scelta: ");
-
-        int scelta;
-
-        try {
-            scelta = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Input non valido.");
-            return;
-        }
-
-        int anni;
-
-        switch (scelta) {
-            case 1 -> anni = 1;
-            case 2 -> anni = 2;
-            case 3 -> anni = 3;
-            default -> {
-                System.out.println("Scelta non valida.");
-                return;
-            }
-        }
-
-        try {
-
-            Tessera tessera = tesseraDAO.findByUnCode(codiceUnivoco);
-
-            LocalDate vecchiaScadenza = tessera.getDataScadenza();
-
-            LocalDate nuovaScadenza;
-
-            if (vecchiaScadenza.isAfter(LocalDate.now())) {
-                nuovaScadenza = vecchiaScadenza.plusYears(anni);
-            } else {
-                nuovaScadenza = LocalDate.now().plusYears(anni);
-            }
-
-            tesseraDAO.updateTessera(
-                    codiceUnivoco,
-                    tessera.getDataEmissione(),
-                    nuovaScadenza
-            );
-
-            System.out.println("Tessera rinnovata!");
-            System.out.println("Nuova scadenza: " + nuovaScadenza);
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    // Metodo Rinnovo Abbonamento
-    public static void rinnovoAbbonamento(TitoloViaggioDAO titoloViaggioDAO) {
-
-        System.out.println("\n--- RINNOVO ABBONAMENTO ---");
-        System.out.print("Inserisci il Codice Univoco dell'abbonamento: ");
-
-        UUID codiceUnivoco;
-
-        try {
-            codiceUnivoco = UUID.fromString(scanner.nextLine().trim());
-        } catch (IllegalArgumentException e) {
-            System.out.println("UUID non valido.");
-            return;
-        }
-
-        System.out.println("\nSeleziona il tipo di rinnovo:");
-        System.out.println("1. Settimanale");
-        System.out.println("2. Mensile");
-        System.out.println("3. Annuale");
-        System.out.print("Scelta: ");
-
-        int scelta;
-
-        try {
-            scelta = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Input non valido.");
-            return;
-        }
-
-        TipoAbbonamento tipoAbbonamento;
-
-        switch (scelta) {
-            case 1 -> tipoAbbonamento = TipoAbbonamento.SETTIMANALE;
-            case 2 -> tipoAbbonamento = TipoAbbonamento.MENSILE;
-            case 3 -> tipoAbbonamento = TipoAbbonamento.ANNUALE;
-            default -> {
-                System.out.println("Scelta non valida.");
-                return;
-            }
-        }
-
-        try {
-
-            titoloViaggioDAO.updateAbbonamento(codiceUnivoco, tipoAbbonamento, LocalDateTime.now());
-
-            System.out.println("Abbonamento rinnovato con successo!");
-
-        } catch (Exception e) {
-
-            System.out.println(e.getMessage());
-
-        }
-    }
-
-    // Ricerca utente
-    public static void ricercaUtenti(UtenteDAO utenteDAO) {
-        try {
-            System.out.print("Inserisci l'UUID dell'utente da cercare: ");
-            String inserito = scanner.nextLine().trim();
-            UUID id = UUID.fromString(inserito);
-            Utente trovato = utenteDAO.findByID(id);
-            System.out.println(trovato);
-        } catch (UtenteNonTrovatoException ex) {
-            System.out.println("Errore: " + ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            System.out.println("Errore: Formato UUID non valido.");
-        }
-    }
-
-    // Assegna una tratta a un mezzo: l'admin sceglie mezzo e tratta
-    public static void assegnaTrattaMezzo(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
-        try {
-            System.out.print("Targa del mezzo: ");
-            String targa = scanner.nextLine().trim();
-            MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
-
-            // scelgo la tratta da un elenco numerato
-            Tratta tratta = selezionaTratta(trattaDAO);
-            if (tratta == null) {
-                return;
-            }
-
-            LocalDateTime inizio = LocalDateTime.now();
-            LocalDateTime fine = inizio.plusMinutes(tratta.getTempoPercorrenzaStimato());
-
-            Percorrenza percorrenza = percorrenzaDAO.assegnaTrattaAMezzo(tratta, mezzo, inizio, fine);
-            System.out.println("Tratta assegnata al mezzo: " + percorrenza);
-        } catch (IllegalArgumentException ex) {
-            System.out.println("Errore: Formato UUID non valido.");
-        } catch (RuntimeException ex) {
-            System.out.println("Errore: " + ex.getMessage());
-        }
-    }
-
-    // Calcola il tempo medio di percorrenza di una tratta da parte di un mezzo
-    public static void calcolaTempoMedio(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
-        try {
-            System.out.print("Targa del mezzo: ");
-            String targa = scanner.nextLine().trim();
-            MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
-
-            // scelgo la tratta da un elenco numerato
-            Tratta tratta = selezionaTratta(trattaDAO);
-            if (tratta == null) {
-                return;
-            }
-
-            Duration media = percorrenzaDAO.tempoMedioPercorrenza(tratta, mezzo);
-            if (media.isZero()) {
-                System.out.println("Nessuna percorrenza conclusa trovata per questo mezzo su questa tratta.");
-            } else {
-                long minuti = media.toMinutes();
-                long secondi = media.minusMinutes(minuti).getSeconds();
-                System.out.println("Tempo medio di percorrenza: " + minuti + " min " + secondi + " sec.");
-            }
-        } catch (IllegalArgumentException ex) {
-            System.out.println("Errore: Formato UUID non valido.");
-        } catch (RuntimeException ex) {
-            System.out.println("Errore: " + ex.getMessage());
-        }
-    }
-
-    // Storico: quante volte un mezzo ha percorso una tratta e quanto ha impiegato ogni volta
-    public static void storicoPercorrenzeMezzoTratta(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
-        try {
-            System.out.print("Targa del mezzo: ");
-            String targa = scanner.nextLine().trim();
-            MezzoDiTrasporto mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
-
-            // scelgo la tratta da un elenco numerato
-            Tratta tratta = selezionaTratta(trattaDAO);
-            if (tratta == null) {
-                return;
-            }
-
-            List<Duration> tempi = percorrenzaDAO.tempiPercorrenza(tratta, mezzo);
-
-            System.out.println("\nIl mezzo " + targa + " ha percorso questa tratta " + tempi.size() + " volte:");
-            if (tempi.isEmpty()) {
-                System.out.println("(nessuna percorrenza registrata)");
-            }
-            int n = 1;
-            for (Duration t : tempi) {
-                long minuti = t.toMinutes();
-                long secondi = t.minusMinutes(minuti).getSeconds();
-                System.out.println(n + ") " + minuti + " min " + secondi + " sec");
-                n++;
-            }
-        } catch (RuntimeException ex) {
-            System.out.println("Errore: " + ex.getMessage());
-        }
-    }
-
-    // Mostra l'elenco numerato delle tratte e restituisce quella scelta
-    public static Tratta selezionaTratta(TrattaDAO trattaDAO) {
-        List<Tratta> tratte = trattaDAO.findAll();
-
-        if (tratte.isEmpty()) {
-            System.out.println("Nessuna tratta presente.");
-            return null;
-        }
-
-        System.out.println("\nScegli una tratta:");
-        for (int i = 0; i < tratte.size(); i++) {
-            Tratta t = tratte.get(i);
-            System.out.println((i + 1) + ". " + t.getPuntoDiPartenza() + " -> " + t.getCapolinea()
-                    + " (stimato " + t.getTempoPercorrenzaStimato() + " min)");
-        }
-        System.out.print("Numero della tratta: ");
-
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
-            if (scelta < 1 || scelta > tratte.size()) {
-                System.out.println("Numero non valido.");
-                return null;
-            }
-            return tratte.get(scelta - 1);
-        } catch (NumberFormatException ex) {
-            System.out.println("Devi inserire un numero.");
-            return null;
-        }
-    }
-
-    // Mostra l'elenco dei punti vendita
-    public static PuntoDiEmissione selezionaPunto(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
-        List<PuntoDiEmissione> punti = puntoDiEmissioneDAO.findAllPuntiDiEmissione();
-
-        if (punti.isEmpty()) {
-            System.out.println("Nessuna tratta presente: creane prima con l'opzione 5.");
-            return null;
-        }
-
-        System.out.println("\nPunti vendita:");
-        for (int i = 0; i < punti.size(); i++) {
-            PuntoDiEmissione p = punti.get(i);
-            System.out.println((i + 1) + ". " + p.getNome() + " -> " + p.getIndirizzo()
-                    + " " + p.getCitta());
-        }
-        System.out.print("Scegli Punto vendita: ");
-
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
-            if (scelta < 1 || scelta > punti.size()) {
-                System.out.println("Numero non valido.");
-                return null;
-            }
-            return punti.get(scelta - 1);
-        } catch (NumberFormatException ex) {
-            System.out.println("Devi inserire un numero.");
-            return null;
-        }
-    }
-
-    //Storico Manutenzione
-    public static void storicoManutenzione(ManutenzioneDAO dao) {
-        System.out.println("\nInserisci la targa:");
-        String targa = scanner.nextLine();
-
-        List<Manutenzione> lista = dao.storicoManutenzioni(targa);
-
-        if (lista.isEmpty()) {
-            System.out.println("Nessuna manutenzione trovata.");
-            return;
-        }
-
-        System.out.println("\nStorico Manutenzioni:");
-        for (Manutenzione m : lista) {
-            System.out.println("\nInizio: " + m.getDataInizio());
-            System.out.println("Fine: " + m.getDataFine());
-            System.out.println("Motivo: " + m.getMotivo());
-        }
-    }
-
-    //Verifica abbonamento
-
-    public static void verificaAbbonamento(TitoloViaggioDAO titoloDAO) {
-
-        System.out.println("Inserisci il codice della tessera:");
-
-        UUID codice = UUID.fromString(scanner.nextLine());
-
-        boolean valido = titoloDAO.isAbbonamentoValido(codice);
-
-        if (valido) {
-            System.out.println("Abbonamento valido.");
-        } else {
-            System.out.println("Abbonamento scaduto o inesistente.");
-        }
-    }
-
-    // Vidima biglietto
-
-    private static void vidimaBiglietto(TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasporto mezzo) {
-        System.out.println("\n--- VIDIMAZIONE BIGLIETTO ---");
-        System.out.print("Inserisci il codice univoco del biglietto: ");
-
-        try {
-            UUID codiceBiglietto = UUID.fromString(scanner.nextLine().trim());
-
-            // Invochiamo il DAO passando l'UUID e l'oggetto MezzoTrasporto
-            titoloViaggioDAO.vidimaBiglietto(codiceBiglietto, mezzo);
-
-        } catch (IllegalArgumentException e) {
-            System.out.println("Errore: Il formato del codice biglietto non è un UUID valido.");
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-
-    // #region MENU' per cercare titoli di viaggio per periodo o per periodo e punto vendita.
-
+    //region  Menù Conta Titoli Viaggio
     public static void menuCountTitoliViaggio(TitoloViaggioDAO titoloViaggioDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
         while (true) {
             System.out.println("\n SELEZIONA UN'OPZIONE \n");
@@ -875,7 +420,7 @@ public class Application {
                     case 2 -> {
                         PuntoDiEmissione puntoDiEmissione = null;
                         try {
-                            puntoDiEmissione = Application.selezionaPunto(puntoDiEmissioneDAO);
+                            puntoDiEmissione = Service.selezionaPunto(puntoDiEmissioneDAO);
                             if (puntoDiEmissione == null) {
                                 continue;
                             }
@@ -984,7 +529,7 @@ public class Application {
                     case 4 -> {
                         PuntoDiEmissione puntoDiEmissione = null;
                         try {
-                            puntoDiEmissione = Application.selezionaPunto(puntoDiEmissioneDAO);
+                            puntoDiEmissione = Service.selezionaPunto(puntoDiEmissioneDAO);
                             if (puntoDiEmissione == null) {
                                 continue;
                             }
@@ -1047,5 +592,7 @@ public class Application {
             }
         }
     }
-    // #endregion
+//endregion
 }
+
+
