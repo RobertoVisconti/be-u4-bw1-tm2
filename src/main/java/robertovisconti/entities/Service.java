@@ -653,45 +653,17 @@ public class Service {
             return;
         }
 
-        System.out.println("\nPer quanto tempo vuoi rinnovare?");
-        System.out.println("1. 1 anno");
-        System.out.println("2. 2 anni");
-        System.out.println("3. 3 anni");
-        System.out.print("Scelta: ");
-
-        int scelta;
-
-        try {
-            scelta = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Input non valido.");
-            return;
-        }
-
-        int anni;
-
-        switch (scelta) {
-            case 1 -> anni = 1;
-            case 2 -> anni = 2;
-            case 3 -> anni = 3;
-            default -> {
-                System.out.println("Scelta non valida.");
-                return;
-            }
-        }
-
         try {
 
             Tessera tessera = tesseraDAO.findByUnCode(codiceUnivoco);
 
             LocalDate vecchiaScadenza = tessera.getDataScadenza();
-
             LocalDate nuovaScadenza;
-
-            if (vecchiaScadenza.isAfter(LocalDate.now())) {
-                nuovaScadenza = vecchiaScadenza.plusYears(anni);
+            
+            if (vecchiaScadenza != null && vecchiaScadenza.isAfter(LocalDate.now())) {
+                nuovaScadenza = vecchiaScadenza.plusYears(1);
             } else {
-                nuovaScadenza = LocalDate.now().plusYears(anni);
+                nuovaScadenza = LocalDate.now().plusYears(1);
             }
 
             tesseraDAO.updateTessera(
@@ -700,11 +672,11 @@ public class Service {
                     nuovaScadenza
             );
 
-            System.out.println("Tessera rinnovata!");
+            System.out.println("Tessera rinnovata con successo!");
             System.out.println("Nuova scadenza: " + nuovaScadenza);
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Errore: " + e.getMessage());
         }
     }
 //endregion
