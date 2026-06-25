@@ -845,7 +845,7 @@ public class Service {
             System.out.println("\nMezzi di Trasporto:");
             for (int i = 0; i < mezzi.size(); i++) {
                 MezzoDiTrasporto m = mezzi.get(i);
-                System.out.println((i + 1) + ". " + m.getTipoMezzo() + " -> " + m.getId());
+                System.out.println((i + 1) + ". " + m.getTipoMezzo() + " -> Targa: " + m.getTarga());
             }
             System.out.print("Scegli Mezzo di Trasporto: ");
 

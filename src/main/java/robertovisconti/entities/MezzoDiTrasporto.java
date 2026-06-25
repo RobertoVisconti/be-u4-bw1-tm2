@@ -45,6 +45,10 @@ public class MezzoDiTrasporto {
         return id;
     }
 
+    public String getTarga() {
+        return targa;
+    }
+
     public TipoMezzo getTipoMezzo() {
         return tipoMezzo;
     }
