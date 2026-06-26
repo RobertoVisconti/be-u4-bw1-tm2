@@ -1559,15 +1559,5 @@ public class Service {
         System.out.println("Stato del mezzo aggiornato con successo in: " + nuovoStato);
     }
     // endregion
-
-
-//    public Biglietto vendiBiglietto(MezzoDiTrasporto mezzoDiTrasporto) {
-//        if ((this instanceof DistributoreAutomatico && ((DistributoreAutomatico) this).getStato() == StatoDistributoreAutomatico.NON_ATTIVO) || !(this instanceof Rivenditore && ((Rivenditore) this).isAperto())) {
-//            throw new RuntimeException("Punto di Emissione CHIUSO.");
-//        } else {
-//            Biglietto biglietto = new Biglietto(LocalDateTime.now(), this, mezzoDiTrasporto);
-//            System.out.println("Il biglietto " + biglietto + " è stato creato e venduto!");
-//            return biglietto;
-//        }
-//    }
+  
 }
