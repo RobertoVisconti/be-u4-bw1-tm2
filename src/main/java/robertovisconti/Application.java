@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class Application {
     private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
@@ -33,7 +34,7 @@ public class Application {
         ManutenzioneDAO manutenzioneDAO = new ManutenzioneDAO(em, mezzoDiTrasportoDAO);
 
         Service.creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
-        Service.creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
+        Service.creazioneMezzi(mezzoDiTrasportoDAO, genericDAO, manutenzioneDAO);
         Service.creazionePunti(puntoDiEmissioneDAO, genericDAO);
         Service.creazioneTratte(trattaDAO, genericDAO);
         Service.generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
@@ -138,7 +139,7 @@ public class Application {
 
             switch (scelta) {
                 case 1 -> menuCreazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
-                case 2 -> menuCreazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
+                case 2 -> menuCreazioneMezzi(mezzoDiTrasportoDAO, genericDAO, manutenzioneDAO);
                 case 3 -> menuCreazionePunti(puntoDiEmissioneDAO, genericDAO);
                 case 4 -> Service.ricercaUtenti(utenteDAO);
                 case 5 -> menuCreazioneTratte(trattaDAO, genericDAO);
@@ -193,7 +194,7 @@ public class Application {
     // endregion
 
     // region Menu Creazione Mezzi
-    public static void menuCreazioneMezzi(MezzoDiTrasportoDAO mezzoDiTrasportoDAO, GenericDAO genericDAO) {
+    public static void menuCreazioneMezzi(MezzoDiTrasportoDAO mezzoDiTrasportoDAO, GenericDAO genericDAO, ManutenzioneDAO manutenzioneDAO) {
         while (true) {
             System.out.println("\n--- MENU CREAZIONE MEZZI ---");
             System.out.println("1. Genera mezzi in blocco (dati finti)");
@@ -204,7 +205,7 @@ public class Application {
                 int scelta = Integer.parseInt(scanner.nextLine().trim());
                 switch (scelta) {
                     case 1 -> {
-                        Service.creazioneMezzi(mezzoDiTrasportoDAO, genericDAO);
+                        Service.creazioneMezzi(mezzoDiTrasportoDAO, genericDAO, manutenzioneDAO);
                         return;
                     }
                     case 2 -> {

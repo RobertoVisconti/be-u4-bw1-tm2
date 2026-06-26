@@ -66,7 +66,7 @@ public class Service {
     }
 
     // Creazione Mezzi di trasporti
-    public static void creazioneMezzi(MezzoDiTrasportoDAO mezzoDiTrasportoDAO, GenericDAO genericDAO) {
+    public static void creazioneMezzi(MezzoDiTrasportoDAO mezzoDiTrasportoDAO, GenericDAO genericDAO, ManutenzioneDAO manutenzioneDAO) {
         if (!genericDAO.isTableEmpty(MezzoDiTrasporto.class)) {
             return;
         }
@@ -92,6 +92,9 @@ public class Service {
 
             MezzoDiTrasporto mezzo = new MezzoDiTrasporto(tipo, capienza, stato, targa);
             mezzoDiTrasportoDAO.save(mezzo);
+            if (mezzo.getStatoMezzo() == StatoMezzo.IN_MANUTENZIONE) {
+                manutenzioneDAO.saveManutenzione(new Manutenzione(mezzo, "Acquisito già in manutenzione"));
+            }
         }
         System.out.println("Creazione 20 mezzi completata con successo.");
     }
@@ -216,7 +219,7 @@ public class Service {
 
         for (int i = 0; i < 25; i++) {
             PuntoDiEmissione puntoRandom = tuttiIPunti.get(random.nextInt(0, tuttiIPunti.size()));
-            MezzoDiTrasporto mezzoRandom = tuttiIMezzi.get(random.nextInt(0, tuttiIPunti.size()));
+            MezzoDiTrasporto mezzoRandom = tuttiIMezzi.get(random.nextInt(0, tuttiIMezzi.size()));
             Biglietto biglietto = new Biglietto(LocalDateTime.now(), puntoRandom, mezzoRandom);
             titoloViaggioDAO.save(biglietto);
         }

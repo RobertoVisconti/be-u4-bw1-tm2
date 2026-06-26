@@ -1,6 +1,8 @@
 package robertovisconti.dao;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Query;
 
 import java.util.List;
 
@@ -17,5 +19,10 @@ public class GenericDAO {
 
         return result.isEmpty();
     }
+
+//    public <T> void deleteEntity(<T> entity) {
+//        EntityTransaction transaction = em.getTransaction();
+//        Query query = em.createQuery("DELETE e FROM " + entity.class.getSimpleName() + " e WHERE ");
+//    }
 
 }
