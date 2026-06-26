@@ -76,12 +76,13 @@ public class Utente {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", cognome='" + cognome + '\'' +
-                ", idTessera=" + idTessera +
-                ", ruolo=" + ruolo +
-                '}';
+        String BLUE = "\u001B[34m";
+        String RESET = "\u001B[0m";
+
+        return BLUE + "User: " +
+                "\n nome= '" + nome + '\'' +
+                "\n cognome= '" + cognome + '\'' +
+                "\n ruolo= " + ruolo
+                + RESET;
     }
 }

@@ -8,7 +8,6 @@ import robertovisconti.entities.Utente;
 import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
 import robertovisconti.exceptions.UtenteNonTrovatoException;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,10 +38,16 @@ public class UtenteDAO {
     public Utente findByEmail(String email) {
         TypedQuery<Utente> query = em.createQuery("SELECT u FROM Utente u WHERE u.email = :email", Utente.class);
         query.setParameter("email", email);
-        Optional<Utente> utenteOptional = query.getResultStream().findFirst();
-        if (utenteOptional.isPresent()) {
-            System.out.println(utenteOptional + " Utente loggato con successo.");
-            return utenteOptional.get();
+
+        Optional<Utente> userOptional = query.getResultStream().findFirst();
+
+        if (userOptional.isPresent()) {
+
+            Utente utente = userOptional.get();
+
+            System.out.println(utente);
+
+            return utente;
         } else {
             throw new UtenteEmailNonTrovatoException(email);
         }

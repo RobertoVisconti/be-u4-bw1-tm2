@@ -188,7 +188,7 @@ public class Service {
 
         for (int i = 0; i < 15; i++) {
 
-            StatoTratta statoTratta = (i % 10 == 0) ? StatoTratta.LAVORAZIONE_IN_CORSO : StatoTratta.OPERATIVA;
+            StatoTratta statoTratta = (i % 10 == 0) ? StatoTratta.LAVORI_IN_CORSO : StatoTratta.OPERATIVA;
             String partenza = faker.address().city();
             String capolinea = faker.address().city();
             int tempoStimato = random.nextInt(10, 91); // minuti stimati, tra 10 e 90
@@ -209,7 +209,7 @@ public class Service {
 
         StatoTratta stato = random.nextBoolean()
                 ? StatoTratta.OPERATIVA
-                : StatoTratta.LAVORAZIONE_IN_CORSO;
+                : StatoTratta.LAVORI_IN_CORSO;
 
         try {
             trattaDAO.creaTratta(
@@ -576,7 +576,7 @@ public class Service {
                     break;
 
                 case "2":
-                    stato = StatoTratta.LAVORAZIONE_IN_CORSO;
+                    stato = StatoTratta.LAVORI_IN_CORSO;
                     break;
 
                 case "0":
@@ -1535,8 +1535,8 @@ public class Service {
                 continue;
             }
 
-           
-            if (tratta.getStatoTratta() == StatoTratta.LAVORAZIONE_IN_CORSO) {
+
+            if (tratta.getStatoTratta() == StatoTratta.LAVORI_IN_CORSO) {
                 System.out.println("La tratta è IN LAVORAZIONE e non può essere assegnata.");
                 tratta = null;
             }
@@ -1829,5 +1829,67 @@ public class Service {
     }
     // endregion
 
-    
+    // region Popolamento database ciurma
+
+    public static void popoloEasterEgg(UtenteDAO utenteDAO, TesseraDAO tesseraDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, ManutenzioneDAO manutenzioneDAO, TrattaDAO trattaDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
+
+        Utente luffy = new Utente("Monkey D.", "Luffy", "pirateking@sunny.jp", Ruolo.ADMIN);
+        Utente zoro = new Utente("Roronoa", "Zoro", "marimo@sunny.jp", Ruolo.USER);
+        Utente nami = new Utente("Nami", "Mandarini", "money@sunny.jp", Ruolo.USER);
+
+//        utenteDAO.saveUtente(luffy);
+//        utenteDAO.saveUtente(zoro);
+//        utenteDAO.saveUtente(nami);
+
+        UUID codiceLuffy = UUID.randomUUID();
+        Tessera tesseraLuffy = new Tessera(codiceLuffy);
+        tesseraDAO.saveTessera(tesseraLuffy);
+
+//        luffy.setIdTessera(tesseraLuffy);
+
+        MezzoDiTrasporto sunny = new MezzoDiTrasporto(TipoMezzo.BUS, 15, StatoMezzo.IN_SERVIZIO, "SUNNY001");
+        MezzoDiTrasporto polarTang = new MezzoDiTrasporto(TipoMezzo.TRAM, 20, StatoMezzo.IN_SERVIZIO, "LAW_SUB1");
+        MezzoDiTrasporto goingMerry = new MezzoDiTrasporto(TipoMezzo.BUS, 8, StatoMezzo.IN_MANUTENZIONE, "MERRY001");
+//
+//        mezzoDiTrasportoDAO.save(sunny);
+//        mezzoDiTrasportoDAO.save(polarTang);
+//        mezzoDiTrasportoDAO.save(goingMerry);
+
+        Manutenzione riparazioneMerry = new Manutenzione(goingMerry, "Riparazione chiglia distrutta dopo la caduta da Skypiea. Urgente!");
+
+//        manutenzioneDAO.saveManutenzione(riparazioneMerry);
+
+        Tratta rotta1 = new Tratta("Loguetown", "Reverse Mountain", 12, StatoTratta.OPERATIVA);
+        Tratta rotta2 = new Tratta("Water 7", "Enies Lobby", 4, StatoTratta.LAVORI_IN_CORSO);
+        Tratta rottaSkypiea = new Tratta("Jaya", "Skypiea", 2, StatoTratta.OPERATIVA);
+
+//        trattaDAO.save(rotta1);
+//        trattaDAO.save(rotta2);
+//        trattaDAO.save(rottaSkypiea);
+
+        Rivenditore tavernaShackey = new Rivenditore(
+                "Shackey's Rip-off Bar",
+                "Grove 13",
+                "Sabaody Archipelago",
+                "00100",
+                "IT12345678901",
+                true
+        );
+
+        DistributoreAutomatico distributoreLogPose = new DistributoreAutomatico(
+                "Den Den Mushi Ticket",
+                "Molo 1",
+                "Water 7",
+                "00044",
+                "IT99988877761",
+                StatoDistributoreAutomatico.ATTIVO
+        );
+
+
+//        puntoDiEmissioneDAO.savePuntoDiEmissione(tavernaShackey);
+//        puntoDiEmissioneDAO.savePuntoDiEmissione(distributoreLogPose);
+    }
+    // endregion
+
+
 }

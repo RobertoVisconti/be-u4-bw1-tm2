@@ -38,6 +38,7 @@ public class Application {
         Service.creazioneTratte(trattaDAO, genericDAO);
         Service.generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
         Service.creazioneBiglietti(titoloViaggioDAO, genericDAO, puntoDiEmissioneDAO, mezzoDiTrasportoDAO);
+        Service.popoloEasterEgg(utenteDAO, tesseraDAO, mezzoDiTrasportoDAO, manutenzioneDAO, trattaDAO, puntoDiEmissioneDAO);
 
 
         boolean optionMenu = true;
