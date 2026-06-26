@@ -22,7 +22,7 @@ public class Manutenzione {
     @Column(name = "data_inizio", nullable = false)
     private LocalDate dataInizio;
 
-    @Column(name = "data_fine", nullable = false)
+    @Column(name = "data_fine")
     private LocalDate dataFine;
 
     @Column(name = "motivo", nullable = false, length = 200)
