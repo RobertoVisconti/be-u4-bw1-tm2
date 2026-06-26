@@ -27,7 +27,7 @@ public class ManutenzioneDAO {
     }
 
     public Manutenzione getLatestManutenzione(MezzoDiTrasporto mezzo) {
-        TypedQuery<Manutenzione> query = em.createQuery("SELECT m FROM Manutenzione m WHERE m.mezzo = :mezzo ORDER BY m.dataInizio DESC", Manutenzione.class);
+        TypedQuery<Manutenzione> query = em.createQuery("SELECT m FROM Manutenzione m WHERE m.mezzo = :mezzo AND m.dataFine IS NULL ORDER BY m.dataInizio DESC", Manutenzione.class);
         query.setParameter("mezzo", mezzo);
         query.setMaxResults(1);
         return query.getSingleResult();
