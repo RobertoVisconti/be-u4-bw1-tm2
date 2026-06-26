@@ -994,7 +994,7 @@ public class Service {
     public static void aggiornaStatoRivenditore(PuntoDiEmissioneDAO puntoDAO) {
 
         System.out.println("\n--- AGGIORNA STATO RIVENDITORE ---");
-        System.out.print("Inserisci ID  del rivenditore: ");
+        System.out.print("Inserisci ID del rivenditore: ");
 
         UUID id;
 
@@ -1005,27 +1005,29 @@ public class Service {
             return;
         }
 
-        System.out.println("1. Apri rivenditore");
-        System.out.println("2. Chiudi rivenditore");
-        System.out.print("Scelta: ");
-
         boolean stato;
 
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
+        while (true) {
+            System.out.println("1. Apri rivenditore");
+            System.out.println("2. Chiudi rivenditore");
+            System.out.print("Scelta: ");
 
-            switch (scelta) {
-                case 1 -> stato = true;
-                case 2 -> stato = false;
-                default -> {
-                    System.out.println("Scelta non valida.");
-                    return;
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+
+                if (scelta == 1) {
+                    stato = true;
+                    break;
+                } else if (scelta == 2) {
+                    stato = false;
+                    break;
+                } else {
+                    System.out.println("Scelta non valida. Riprova.");
                 }
-            }
 
-        } catch (NumberFormatException e) {
-            System.out.println("Input non valido.");
-            return;
+            } catch (NumberFormatException e) {
+                System.out.println("Input non valido. Inserisci 1 o 2.");
+            }
         }
 
         try {
@@ -1049,27 +1051,29 @@ public class Service {
             return;
         }
 
-        System.out.println("1. Attiva distributore");
-        System.out.println("2. Disattiva distributore");
-        System.out.print("Scelta: ");
-
         StatoDistributoreAutomatico stato;
 
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
+        while (true) {
+            System.out.println("1. Attiva distributore");
+            System.out.println("2. Disattiva distributore");
+            System.out.print("Scelta: ");
 
-            switch (scelta) {
-                case 1 -> stato = StatoDistributoreAutomatico.ATTIVO;
-                case 2 -> stato = StatoDistributoreAutomatico.NON_ATTIVO;
-                default -> {
-                    System.out.println("Scelta non valida.");
-                    return;
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+
+                if (scelta == 1) {
+                    stato = StatoDistributoreAutomatico.ATTIVO;
+                    break;
+                } else if (scelta == 2) {
+                    stato = StatoDistributoreAutomatico.NON_ATTIVO;
+                    break;
+                } else {
+                    System.out.println("Scelta non valida. Riprova.");
                 }
-            }
 
-        } catch (NumberFormatException e) {
-            System.out.println("Input non valido.");
-            return;
+            } catch (NumberFormatException e) {
+                System.out.println("Input non valido. Inserisci 1 o 2.");
+            }
         }
 
         try {
