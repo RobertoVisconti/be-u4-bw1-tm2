@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -419,7 +420,7 @@ public class Service {
     }
 
     public static void creazionePuntoManuale(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
-        System.out.println("\nINSERIMENTO PUNTO DI EMISSIONE");
+        System.out.println("\n--- INSERIMENTO PUNTO DI EMISSIONE ---");
 
         String tipoScelto = "";
         while (!tipoScelto.equals("1") && !tipoScelto.equals("2")) {
@@ -443,11 +444,25 @@ public class Service {
         System.out.print("Città: ");
         String citta = scanner.nextLine().trim();
 
-        System.out.print("CAP: ");
-        String cap = scanner.nextLine().trim();
+        String cap = "";
+        while (true) {
+            System.out.print("CAP (5 cifre): ");
+            cap = scanner.nextLine().trim();
+            if (cap.matches("^\\d{5}$")) {
+                break; // Input valido, esce dal loop
+            }
+            System.out.println("Il CAP deve essere composto da esattamente 5 numeri (es. 00100). Riprova.");
+        }
 
-        System.out.print("Partita IVA: ");
-        String piva = scanner.nextLine().trim();
+        String piva = "";
+        while (true) {
+            System.out.print("Partita IVA (11 cifre): ");
+            piva = scanner.nextLine().trim();
+            if (piva.matches("^\\d{11}$")) {
+                break;
+            }
+            System.out.println("La Partita IVA deve essere composta da esattamente 11 numeri. Riprova.");
+        }
 
         if (tipoScelto.equals("1")) {
             StatoDistributoreAutomatico stato = null;
@@ -512,6 +527,7 @@ public class Service {
 
         System.out.println("\nTratta creata con successo.");
     }
+
     //endregion
 
     //region Metodo Compra biglietto
@@ -758,31 +774,41 @@ public class Service {
 
     //region Metodo Rinnovo Tessera
     public static void rinnovotessera(TesseraDAO tesseraDAO, Utente utente) {
-
         System.out.println("\n--- RINNOVO TESSERA ---");
 
         if (utente.getIdTessera() == null) {
             System.out.println("Non hai una tessera associata al tuo account.");
-            System.out.println("Crea una tessera per procedere.");
+            System.out.println("Crea prima una tessera per procedere.");
             return;
         }
 
         Tessera tessera = utente.getIdTessera();
         UUID codiceUnivoco = tessera.getCodiceUnivoco();
 
-        System.out.println("Tessera trovata!");
-        System.out.println("Codice: " + codiceUnivoco);
-
+        System.out.println("Tessera trovata, codice: " + codiceUnivoco);
 
         try {
-
             LocalDate vecchiaScadenza = tessera.getDataScadenza();
+            LocalDate oggi = LocalDate.now();
             LocalDate nuovaScadenza;
 
-            if (vecchiaScadenza != null && vecchiaScadenza.isAfter(LocalDate.now())) {
+            if (vecchiaScadenza != null && vecchiaScadenza.isAfter(oggi)) {
+
+                long giorniMancanti = ChronoUnit.DAYS.between(oggi, vecchiaScadenza);
+
+                if (giorniMancanti > 30) {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    System.out.println("\nNon puoi rinnovare la tessera adesso.");
+                    System.out.println("Scade il " + vecchiaScadenza.format(formatter) + " (mancano ancora " + giorniMancanti + " giorni).");
+                    System.out.println("Il rinnovo è consentito solo a partire da 30 giorni prima della scadenza.");
+                    return;
+                }
+
+
                 nuovaScadenza = vecchiaScadenza.plusYears(1);
             } else {
-                nuovaScadenza = LocalDate.now().plusYears(1);
+
+                nuovaScadenza = oggi.plusYears(1);
             }
 
             tesseraDAO.updateTessera(
@@ -791,67 +817,98 @@ public class Service {
                     nuovaScadenza
             );
 
-            System.out.println("Tessera rinnovata con successo!");
-            System.out.println("Nuova scadenza: " + nuovaScadenza);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            System.out.println("\nTessera rinnovata con successo.");
+            System.out.println("Nuova scadenza: " + nuovaScadenza.format(formatter));
 
         } catch (Exception e) {
-            System.out.println("Errore: " + e.getMessage());
+            System.out.println("Errore durante il rinnovo: " + e.getMessage());
         }
     }
 //endregion
 
     //region Metodo Rinnovo Abbonamento
     public static void rinnovoAbbonamento(TitoloViaggioDAO titoloViaggioDAO) {
-
         System.out.println("\n--- RINNOVO ABBONAMENTO ---");
-        System.out.print("Inserisci il Codice Univoco dell'abbonamento: ");
 
-        UUID codiceUnivoco;
+        Abbonamento abbonamento = null;
+        UUID codiceUnivoco = null;
 
-        try {
-            codiceUnivoco = UUID.fromString(scanner.nextLine().trim());
-        } catch (IllegalArgumentException e) {
-            System.out.println("UUID non valido.");
-            return;
+        while (abbonamento == null) {
+            System.out.print("Inserisci il Codice Univoco dell'abbonamento (UUID): ");
+            String inputCodice = scanner.nextLine().trim();
+
+            if (inputCodice.isEmpty()) {
+                System.out.println("Il codice non può essere vuoto. Riprova.");
+                continue;
+            }
+
+            try {
+                codiceUnivoco = UUID.fromString(inputCodice);
+
+                abbonamento = titoloViaggioDAO.getUltimoAbbonamento(codiceUnivoco);
+
+                if (abbonamento == null) {
+                    System.out.println("Nessun abbonamento trovato con questo codice. Riprova.");
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("Formato UUID non valido. Riprova.");
+                codiceUnivoco = null;
+            } catch (RuntimeException e) {
+                System.out.println("Errore di database: " + e.getMessage() + ". Riprova.");
+                codiceUnivoco = null;
+            }
         }
 
-        System.out.println("\nSeleziona il tipo di rinnovo:");
-        System.out.println("1. Settimanale");
-        System.out.println("2. Mensile");
-        System.out.println("3. Annuale");
-        System.out.print("Scelta: ");
+        LocalDateTime dataScadenzaAttuale = abbonamento.getDataScadenza();
+        LocalDateTime adesso = LocalDateTime.now();
 
-        int scelta;
+        if (dataScadenzaAttuale != null && dataScadenzaAttuale.isAfter(adesso)) {
+            long giorniMancanti = ChronoUnit.DAYS.between(adesso, dataScadenzaAttuale);
+            TipoAbbonamento tipoAttuale = abbonamento.getTipoAbbonamento();
 
-        try {
-            scelta = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Input non valido.");
-            return;
-        }
+            int giorniLimite = 0;
+            if (tipoAttuale == TipoAbbonamento.SETTIMANALE) {
+                giorniLimite = 3;
+            } else if (tipoAttuale == TipoAbbonamento.MENSILE) {
+                giorniLimite = 7;
+            } else if (tipoAttuale == TipoAbbonamento.ANNUALE) {
+                giorniLimite = 30;
+            }
 
-        TipoAbbonamento tipoAbbonamento;
-
-        switch (scelta) {
-            case 1 -> tipoAbbonamento = TipoAbbonamento.SETTIMANALE;
-            case 2 -> tipoAbbonamento = TipoAbbonamento.MENSILE;
-            case 3 -> tipoAbbonamento = TipoAbbonamento.ANNUALE;
-            default -> {
-                System.out.println("Scelta non valida.");
+            if (giorniMancanti > giorniLimite) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                System.out.println("\nNon puoi ancora rinnovare questo abbonamento.");
+                System.out.println("L'abbonamento attuale è: " + tipoAttuale + " e scade il " + dataScadenzaAttuale.format(formatter) + " (mancano: " + giorniMancanti + " giorni).");
+                System.out.println("Il rinnovo per questa tipologia è consentito solo da " + giorniLimite + " giorni prima della scadenza.");
                 return;
+            }
+        }
+
+        TipoAbbonamento nuovoTipoAbbonamento = null;
+        while (nuovoTipoAbbonamento == null) {
+            System.out.println("\nSeleziona il tipo di rinnovo:");
+            System.out.println("1. Settimanale");
+            System.out.println("2. Mensile");
+            System.out.println("3. Annuale");
+            System.out.print("Scelta: ");
+
+            String scelta = scanner.nextLine().trim();
+            switch (scelta) {
+                case "1" -> nuovoTipoAbbonamento = TipoAbbonamento.SETTIMANALE;
+                case "2" -> nuovoTipoAbbonamento = TipoAbbonamento.MENSILE;
+                case "3" -> nuovoTipoAbbonamento = TipoAbbonamento.ANNUALE;
+                default -> System.out.println("Scelta non valida. Inserisci un numero da 1 a 3.");
             }
         }
 
         try {
 
-            titoloViaggioDAO.updateAbbonamento(codiceUnivoco, tipoAbbonamento, LocalDateTime.now());
+            titoloViaggioDAO.updateAbbonamento(codiceUnivoco, nuovoTipoAbbonamento, adesso);
 
-            System.out.println("Abbonamento rinnovato con successo!");
-
+            System.out.println("\nAbbonamento rinnovato con successo in: " + nuovoTipoAbbonamento);
         } catch (Exception e) {
-
-            System.out.println(e.getMessage());
-
+            System.out.println("Errore durante il salvataggio del rinnovo: " + e.getMessage());
         }
     }
 //endregion
@@ -940,7 +997,7 @@ public class Service {
     public static void aggiornaStatoRivenditore(PuntoDiEmissioneDAO puntoDAO) {
 
         System.out.println("\n--- AGGIORNA STATO RIVENDITORE ---");
-        System.out.print("Inserisci ID  del rivenditore: ");
+        System.out.print("Inserisci ID del rivenditore: ");
 
         UUID id;
 
@@ -951,27 +1008,29 @@ public class Service {
             return;
         }
 
-        System.out.println("1. Apri rivenditore");
-        System.out.println("2. Chiudi rivenditore");
-        System.out.print("Scelta: ");
-
         boolean stato;
 
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
+        while (true) {
+            System.out.println("1. Apri rivenditore");
+            System.out.println("2. Chiudi rivenditore");
+            System.out.print("Scelta: ");
 
-            switch (scelta) {
-                case 1 -> stato = true;
-                case 2 -> stato = false;
-                default -> {
-                    System.out.println("Scelta non valida.");
-                    return;
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+
+                if (scelta == 1) {
+                    stato = true;
+                    break;
+                } else if (scelta == 2) {
+                    stato = false;
+                    break;
+                } else {
+                    System.out.println("Scelta non valida. Riprova.");
                 }
-            }
 
-        } catch (NumberFormatException e) {
-            System.out.println("Input non valido.");
-            return;
+            } catch (NumberFormatException e) {
+                System.out.println("Input non valido. Inserisci 1 o 2.");
+            }
         }
 
         try {
@@ -995,27 +1054,29 @@ public class Service {
             return;
         }
 
-        System.out.println("1. Attiva distributore");
-        System.out.println("2. Disattiva distributore");
-        System.out.print("Scelta: ");
-
         StatoDistributoreAutomatico stato;
 
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
+        while (true) {
+            System.out.println("1. Attiva distributore");
+            System.out.println("2. Disattiva distributore");
+            System.out.print("Scelta: ");
 
-            switch (scelta) {
-                case 1 -> stato = StatoDistributoreAutomatico.ATTIVO;
-                case 2 -> stato = StatoDistributoreAutomatico.NON_ATTIVO;
-                default -> {
-                    System.out.println("Scelta non valida.");
-                    return;
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+
+                if (scelta == 1) {
+                    stato = StatoDistributoreAutomatico.ATTIVO;
+                    break;
+                } else if (scelta == 2) {
+                    stato = StatoDistributoreAutomatico.NON_ATTIVO;
+                    break;
+                } else {
+                    System.out.println("Scelta non valida. Riprova.");
                 }
-            }
 
-        } catch (NumberFormatException e) {
-            System.out.println("Input non valido.");
-            return;
+            } catch (NumberFormatException e) {
+                System.out.println("Input non valido. Inserisci 1 o 2.");
+            }
         }
 
         try {
@@ -1501,15 +1562,5 @@ public class Service {
         System.out.println("Stato del mezzo aggiornato con successo in: " + nuovoStato);
     }
     // endregion
-
-
-//    public Biglietto vendiBiglietto(MezzoDiTrasporto mezzoDiTrasporto) {
-//        if ((this instanceof DistributoreAutomatico && ((DistributoreAutomatico) this).getStato() == StatoDistributoreAutomatico.NON_ATTIVO) || !(this instanceof Rivenditore && ((Rivenditore) this).isAperto())) {
-//            throw new RuntimeException("Punto di Emissione CHIUSO.");
-//        } else {
-//            Biglietto biglietto = new Biglietto(LocalDateTime.now(), this, mezzoDiTrasporto);
-//            System.out.println("Il biglietto " + biglietto + " è stato creato e venduto!");
-//            return biglietto;
-//        }
-//    }
+  
 }
