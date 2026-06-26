@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 import robertovisconti.entities.Manutenzione;
+import robertovisconti.entities.MezzoDiTrasporto;
 import robertovisconti.exceptions.ManutenzioneNonTrovata;
 
 import java.time.LocalDate;
@@ -25,6 +26,13 @@ public class ManutenzioneDAO {
         System.out.println(manutenzione + " Manutenzione registrata con successo.");
     }
 
+    public Manutenzione getLatestManutenzione(MezzoDiTrasporto mezzo) {
+        TypedQuery<Manutenzione> query = em.createQuery("SELECT m FROM Manutenzione m WHERE m.mezzo = :mezzo ORDER BY m.dataInizio DESC", Manutenzione.class);
+        query.setParameter("mezzo", mezzo);
+        query.setMaxResults(1);
+        return query.getSingleResult();
+    }
+
     public List<Manutenzione> findByTargaManutenzione(String targa) {
         String jpql = "SELECT m FROM manutenzione m JOIN m.mezzoTrasporto mezzo WHERE mezzo.targa = :targa";
         TypedQuery<Manutenzione> query = em.createQuery(jpql, Manutenzione.class);
@@ -39,18 +47,12 @@ public class ManutenzioneDAO {
         }
     }
 
-    public void updateManutenzione(String targa, LocalDate dataFine) {
+    public void endManutenzione(Manutenzione manutenzione) {
         EntityTransaction tx = em.getTransaction();
         tx.begin();
-        List<Manutenzione> manutenzioni = findByTargaManutenzione(targa);
-        for (Manutenzione m : manutenzioni) {
-            if (m.getDataFine() == null) {
-                m.setDataFine(dataFine);
-                m.setMotivo(m.getMotivo() + " - Manutenzione effettuata.");
-            }
-        }
+        manutenzione.setDataFine(LocalDate.now());
         tx.commit();
-        System.out.println("Manutenzuioni aggiornate con successo " + manutenzioni);
+        System.out.println("Manutenzione aggiornata con successo");
     }
 
     public void deleteManutenzione(String targa) {
