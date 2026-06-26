@@ -417,7 +417,7 @@ public class Service {
     }
 
     public static void creazionePuntoManuale(PuntoDiEmissioneDAO puntoDiEmissioneDAO) {
-        System.out.println("\nINSERIMENTO PUNTO DI EMISSIONE");
+        System.out.println("\n--- INSERIMENTO PUNTO DI EMISSIONE ---");
 
         String tipoScelto = "";
         while (!tipoScelto.equals("1") && !tipoScelto.equals("2")) {
@@ -441,11 +441,25 @@ public class Service {
         System.out.print("Città: ");
         String citta = scanner.nextLine().trim();
 
-        System.out.print("CAP: ");
-        String cap = scanner.nextLine().trim();
+        String cap = "";
+        while (true) {
+            System.out.print("CAP (5 cifre): ");
+            cap = scanner.nextLine().trim();
+            if (cap.matches("^\\d{5}$")) {
+                break; // Input valido, esce dal loop
+            }
+            System.out.println("Il CAP deve essere composto da esattamente 5 numeri (es. 00100). Riprova.");
+        }
 
-        System.out.print("Partita IVA: ");
-        String piva = scanner.nextLine().trim();
+        String piva = "";
+        while (true) {
+            System.out.print("Partita IVA (11 cifre): ");
+            piva = scanner.nextLine().trim();
+            if (piva.matches("^\\d{11}$")) {
+                break;
+            }
+            System.out.println("La Partita IVA deve essere composta da esattamente 11 numeri. Riprova.");
+        }
 
         if (tipoScelto.equals("1")) {
             StatoDistributoreAutomatico stato = null;
@@ -510,7 +524,7 @@ public class Service {
 
         System.out.println("\nTratta creata con successo.");
     }
-    
+
     //endregion
 
     //region Metodo Compra biglietto
