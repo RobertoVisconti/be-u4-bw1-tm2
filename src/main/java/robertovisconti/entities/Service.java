@@ -1790,8 +1790,7 @@ public class Service {
         }
 
         // Gestione manutenzione prima dell'aggiornamento stato
-        if (nuovoStato == StatoMezzo.IN_SERVIZIO &&
-                mezzo.getStatoMezzo() == StatoMezzo.IN_MANUTENZIONE) {
+        if (nuovoStato == StatoMezzo.IN_SERVIZIO) {
 
             Manutenzione latest = manutenzioneDAO.getLatestManutenzione(mezzo);
 
