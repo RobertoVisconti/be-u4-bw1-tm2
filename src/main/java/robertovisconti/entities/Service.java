@@ -1516,7 +1516,8 @@ public class Service {
 
                 if (mezzo.getStatoMezzo() == StatoMezzo.DISMESSO) {
                     System.out.println("Il mezzo è DISMESSO e non può ricevere tratte.");
-                    return;
+                    mezzo = null;
+                    continue;
                 }
 
             } catch (RuntimeException ex) {
