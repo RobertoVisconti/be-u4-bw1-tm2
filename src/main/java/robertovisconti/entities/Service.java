@@ -1514,8 +1514,9 @@ public class Service {
         MezzoDiTrasporto mezzo = null;
 
         while (mezzo == null) {
-            System.out.print("Inserisci la targa del mezzo: ");
+            System.out.print("Inserisci la targa del mezzo ('0' per uscire): ");
             String targa = scanner.nextLine().trim();
+            if (targa.equals("0")) break;
 
             try {
                 mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
@@ -1528,30 +1529,41 @@ public class Service {
             }
         }
 
+        if (mezzo == null) return;
+
         System.out.println("Mezzo trovato! Stato attuale: " + mezzo.getStatoMezzo());
 
         StatoMezzo nuovoStato = null;
-        while (nuovoStato == null) {
+        boolean ongoing = true;
+        while (ongoing) {
             System.out.println("\nSeleziona il nuovo stato:");
             System.out.println("1. In servizio");
             System.out.println("2. In manutenzione");
+            System.out.println("0. Uscita");
             System.out.print("Scelta: ");
 
             switch (scanner.nextLine().trim()) {
                 case "1" -> nuovoStato = StatoMezzo.IN_SERVIZIO;
                 case "2" -> nuovoStato = StatoMezzo.IN_MANUTENZIONE;
+                case "0" -> ongoing = false;
                 default -> {
                     System.out.println("Scelta non valida.");
                     continue;
                 }
             }
 
+            if (nuovoStato == null) {
+                System.out.println("Operazione annullata.");
+                return;
+            }
+
             if (nuovoStato == mezzo.getStatoMezzo()) {
                 System.out.println("Il mezzo è già " + nuovoStato + ".");
-                nuovoStato = null;
+                ongoing = false;
             } else if (nuovoStato == StatoMezzo.IN_SERVIZIO) {
                 Manutenzione latest = manutenzioneDAO.getLatestManutenzione(mezzo);
                 manutenzioneDAO.endManutenzione(latest);
+                ongoing = false;
             }
         }
 
