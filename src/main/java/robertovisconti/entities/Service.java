@@ -1675,7 +1675,8 @@ public class Service {
 //endregion
 
     //region Cambia Stato Mezzo
-    public static void cambiaStatoMezzo(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+    public static void cambiaStatoMezzo(MezzoDiTrasportoDAO mezzoDiTrasportoDAO,
+                                        ManutenzioneDAO manutenzioneDAO) {
 
         System.out.println("\n--- CAMBIO STATO MEZZO (SERVIZIO / MANUTENZIONE / DISMESSO) ---");
 
@@ -1702,7 +1703,7 @@ public class Service {
             }
         }
 
-
+        // Un mezzo dismesso non può più essere modificato
         if (mezzo.getStatoMezzo() == StatoMezzo.DISMESSO) {
             System.out.println("Il mezzo è stato DISMESSO e non può essere modificato.");
             return;
@@ -1751,12 +1752,43 @@ public class Service {
             }
         }
 
+        // Gestione manutenzione prima dell'aggiornamento stato
+        if (nuovoStato == StatoMezzo.IN_SERVIZIO &&
+                mezzo.getStatoMezzo() == StatoMezzo.IN_MANUTENZIONE) {
+
+            Manutenzione latest = manutenzioneDAO.getLatestManutenzione(mezzo);
+
+            if (latest != null) {
+                manutenzioneDAO.endManutenzione(latest);
+            }
+        }
+
         mezzoDiTrasportoDAO.updateMezzo(
                 mezzo.getTarga(),
                 mezzo.getTipoMezzo(),
                 mezzo.getCapienza(),
                 nuovoStato
         );
+
+        // Apertura nuova manutenzione
+        if (nuovoStato == StatoMezzo.IN_MANUTENZIONE) {
+
+            String motivo;
+
+            do {
+                System.out.print("Inserisci il motivo della manutenzione: ");
+                motivo = scanner.nextLine().trim();
+
+                if (motivo.isEmpty()) {
+                    System.out.println("Inserisci un motivo valido.");
+                }
+
+            } while (motivo.isEmpty());
+
+            manutenzioneDAO.saveManutenzione(
+                    new Manutenzione(mezzo, motivo)
+            );
+        }
 
         System.out.println("Stato del mezzo aggiornato con successo in: " + nuovoStato);
     }
