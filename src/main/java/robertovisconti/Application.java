@@ -80,7 +80,7 @@ public class Application {
                                     trattaDAO,
                                     titoloViaggioDAO,
                                     mezzoDiTrasportoDAO,
-                                    emailScanner);
+                                    emailScanner, utenteDAO);
                             default -> System.out.println("Ruolo non riconosciuto.");
                         }
 
@@ -280,7 +280,7 @@ public class Application {
     // endregion
 
     // region Case Utente
-    public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, Utente utente) {
+    public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, Utente utente, UtenteDAO utenteDAO) {
         boolean userMenu = true;
         while (userMenu) {
             System.out.println("\n MENU PRINCIPALE UTENTE");
@@ -302,7 +302,7 @@ public class Application {
                 case 1 -> {
                     PuntoDiEmissione punto = Service.selezionaPunto(puntoDiEmissioneDAO);
                     if (punto != null) {
-                        casePunto(punto, titoloViaggioDAO, tesseraDAO, utente);
+                        casePunto(punto, titoloViaggioDAO, tesseraDAO, utente, utenteDAO);
                     }
                 }
 
@@ -318,7 +318,7 @@ public class Application {
 //endregion
 
     // region Case Punto Vendita
-    public static void casePunto(PuntoDiEmissione puntoVendita, TitoloViaggioDAO titoloViaggioDAO, TesseraDAO tesseraDAO, Utente utente) {
+    public static void casePunto(PuntoDiEmissione puntoVendita, TitoloViaggioDAO titoloViaggioDAO, TesseraDAO tesseraDAO, Utente utente, UtenteDAO utenteDAO) {
         boolean puntoMenu = true;
         while (puntoMenu) {
             System.out.println("\n MENU PUNTO VENDITA");
@@ -341,8 +341,8 @@ public class Application {
 
             switch (scelta) {
                 case 1 -> Service.compraBiglietto(titoloViaggioDAO, puntoVendita);
-                case 2 -> Service.compraAbbonamento(titoloViaggioDAO, tesseraDAO, puntoVendita, utente);
-                case 3 -> Service.creaTesseraUtente(utente, tesseraDAO);
+                case 2 -> Service.compraAbbonamento(utenteDAO ,titoloViaggioDAO, tesseraDAO, puntoVendita, utente);
+                case 3 -> Service.creaTesseraUtente(utente, tesseraDAO, utenteDAO);
                 case 4 -> Service.rinnovotessera(tesseraDAO, utente);
                 case 5 -> Service.rinnovoAbbonamento(titoloViaggioDAO);
                 case 0 -> {

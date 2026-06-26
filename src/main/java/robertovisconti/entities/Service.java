@@ -625,6 +625,7 @@ public class Service {
 
     //region Metodo Compra Abbonamento
     public static void compraAbbonamento(
+            UtenteDAO utenteDAO,
             TitoloViaggioDAO titoloViaggioDAO,
             TesseraDAO tesseraDAO,
             PuntoDiEmissione puntoVendita,
@@ -721,7 +722,7 @@ public class Service {
                     try {
 
                         tessera = tesseraDAO.creaTessera();
-                        utente.setIdTessera(tessera);
+                        utenteDAO.setIdTessera(utente, tessera);
 
                         System.out.println("Tessera creata con successo!");
                         System.out.println("Codice tessera: " +
