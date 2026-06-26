@@ -1559,5 +1559,5 @@ public class Service {
         System.out.println("Stato del mezzo aggiornato con successo in: " + nuovoStato);
     }
     // endregion
-  
+
 }
