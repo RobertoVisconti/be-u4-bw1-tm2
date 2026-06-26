@@ -110,8 +110,8 @@ public class Application {
         while (adminMenu) {
             System.out.println("\n MENU PRINCIPALE ADMIN\n");
             System.out.println("1. Genera utenti / tessera / non tessera");
-            System.out.println("2. Creazione mezzi di trasporto");
-            System.out.println("3. Creazione punti di emissione");
+            System.out.println("2. Creazione mezzo di trasporto");
+            System.out.println("3. Creazione punto di emissione");
             System.out.println("4. Ricerca utenti");
             System.out.println("5. Creazione tratte");
             System.out.println("6. Genera percorrenze");
@@ -120,8 +120,11 @@ public class Application {
             System.out.println("9. Storico percorrenze mezzo/tratta");
             System.out.println("10. Menù storici titoli di viaggio");
             System.out.println("11. Storico manutenzioni");
-            System.out.println("12. Verifica abbonamento");
-            System.out.println("13. Menù conto biglietti vidimati");
+            System.out.println("12. Cambio Stato Mezzo");
+            System.out.println("13. Verifica abbonamento");
+            System.out.println("14. Menù conto biglietti vidimati");
+            System.out.println("15. Aggiorna stato rivenditore");
+            System.out.println("16. Aggiorna stato distributore automatico");
             System.out.println("0. Logout");
             System.out.print("\nScegli un'opzione: ");
 
@@ -145,9 +148,12 @@ public class Application {
                 case 8 -> Service.calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 9 -> Service.storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 10 -> menuCountTitoliViaggio(titoloViaggioDAO, puntoDiEmissioneDAO);
-                case 11 -> Service.storicoManutenzione(manutenzioneDAO);
-                case 12 -> Service.verificaAbbonamento(titoloViaggioDAO);
-                case 13 -> menuCountBigliettiVidimati(titoloViaggioDAO, mezzoDiTrasportoDAO);
+                case 11 -> Service.storicoManutenzione(manutenzioneDAO, mezzoDiTrasportoDAO);
+                case 12 -> Service.cambiaStatoMezzo(mezzoDiTrasportoDAO);
+                case 13 -> Service.verificaAbbonamento(titoloViaggioDAO);
+                case 14 -> menuCountBigliettiVidimati(titoloViaggioDAO, mezzoDiTrasportoDAO);
+                case 15 -> Service.aggiornaStatoRivenditore(puntoDiEmissioneDAO);
+                case 16 -> Service.aggiornaStatoDistributore(puntoDiEmissioneDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
                     adminMenu = false;
@@ -158,21 +164,31 @@ public class Application {
     }
 //endregion
 
-
     // region Menu Creazione Utenti
     public static void menuCreazioneUtenti(TesseraDAO tesseraDAO, UtenteDAO utenteDAO, GenericDAO genericDAO) {
-        System.out.println("\n1. Genera utenti in blocco (dati finti)");
-        System.out.println("2. Inserisci un utente a mano");
-        System.out.print("Scegli un'opzione: ");
-        try {
-            int scelta = Integer.parseInt(scanner.nextLine().trim());
-            switch (scelta) {
-                case 1 -> Service.creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
-                case 2 -> Service.creazioneUtenteManuale(utenteDAO);
-                default -> System.out.println("Opzione non valida.");
+        while (true) {
+            System.out.println("\n--- MENU CREAZIONE UTENTI ---");
+            System.out.println("1. Genera utenti in blocco (dati finti)");
+            System.out.println("2. Inserisci un utente a mano");
+            System.out.print("Scegli un'opzione: ");
+
+            try {
+                int scelta = Integer.parseInt(scanner.nextLine().trim());
+                switch (scelta) {
+                    case 1 -> {
+                        Service.creazioneUtenti(tesseraDAO, utenteDAO, genericDAO);
+                        return;
+                    }
+                    case 2 -> {
+                        Service.creazioneUtenteManuale(utenteDAO);
+                        return;
+                    }
+                    default -> System.out.println("Opzione non valida. Inserisci 1 o 2.");
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("Errore: Inserire un numero valido.");
             }
-        } catch (NumberFormatException ex) {
-            System.out.println("Errore: Inserire un numero valido.");
+
         }
     }
     // endregion
@@ -264,6 +280,7 @@ public class Application {
     }
 
     // endregion
+
     // region Case Utente
     public static void caseUser(TesseraDAO tesseraDAO, PuntoDiEmissioneDAO puntoDiEmissioneDAO, TrattaDAO trattaDAO, TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, Utente utente) {
         boolean userMenu = true;
@@ -426,11 +443,15 @@ public class Application {
                 while (true) {
                     dataInizio = richiediData("Data di inizio");
                     dataFine = richiediData("Data di fine");
+                    LocalDateTime adesso = LocalDateTime.now();
 
                     if (dataInizio.isAfter(dataFine)) {
                         System.out.println("\n[ERRORE] La data di inizio non può essere successiva alla data di fine. Riprova l'inserimento.");
+                    } else if (dataInizio.isAfter(adesso) || dataFine.isAfter(adesso)) {
+
+                        System.out.println("\n[ERRORE] Non puoi selezionare date future. L'analisi è valida solo fino al momento attuale. Riprova.");
                     } else {
-                        break; // Date cronologicamente corrette, esce dal loop di controllo date
+                        break;
                     }
                 }
             }
@@ -452,6 +473,8 @@ public class Application {
             }
         }
     }
+
+    // endregion
 
     //region  Menù Conta Biglietti Vidimati
     public static void menuCountBigliettiVidimati(TitoloViaggioDAO titoloViaggioDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
@@ -527,6 +550,7 @@ public class Application {
         }
     }
 //endregion
+
 }
 
 

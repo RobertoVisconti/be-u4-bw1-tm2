@@ -109,32 +109,35 @@ public class TitoloViaggioDAO {
         System.out.println("Biglietto aggiornato!");
     }
 
-    public boolean isAbbonamentoValido(UUID codiceTessera) {
-
+    public Abbonamento getUltimoAbbonamento(UUID codiceTessera) {
         TypedQuery<Abbonamento> query = entityManager.createQuery(
-                "SELECT a FROM Abbonamento a WHERE a.tessera.codiceUnivoco = :codice ORDER BY a.dataScadenza DESC",
+                "SELECT a FROM Abbonamento a WHERE a.tessera.id = :codice ORDER BY a.dataScadenza DESC",
                 Abbonamento.class
         );
 
         query.setParameter("codice", codiceTessera);
 
         try {
-            Abbonamento a = query.getSingleResult();
+            List<Abbonamento> risultati = query.getResultList();
 
-            return a.getDataScadenza().isAfter(LocalDateTime.now());
+            if (risultati.isEmpty()) {
+                return null;
+            }
+
+            return risultati.get(0);
 
         } catch (Exception e) {
-            return false;
+            return null;
         }
     }
 
-    public int countBigliettiVidimatiSuMezzo(MezzoDiTrasporto mezzoDiTrasporto){
+    public int countBigliettiVidimatiSuMezzo(MezzoDiTrasporto mezzoDiTrasporto) {
         TypedQuery<Biglietto> query = entityManager.createQuery("SELECT b FROM Biglietto b WHERE b.mezzoDiTrasporto = :mezzoDiTrasporto AND b.dataValidazione IS NOT NULL", Biglietto.class);
         query.setParameter("mezzoDiTrasporto", mezzoDiTrasporto);
         return query.getResultList().size();
     }
 
-    public long countBigliettiVidimatiBetween(LocalDateTime inizio, LocalDateTime fine){
+    public long countBigliettiVidimatiBetween(LocalDateTime inizio, LocalDateTime fine) {
         TypedQuery<Long> query = entityManager.createQuery(
                 "SELECT COUNT(b) FROM Biglietto b WHERE b.dataValidazione IS NOT NULL AND b.dataValidazione BETWEEN :inizio AND :fine", Long.class);
         query.setParameter("inizio", inizio);
