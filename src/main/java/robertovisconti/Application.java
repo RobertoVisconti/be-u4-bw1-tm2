@@ -149,7 +149,7 @@ public class Application {
                 case 9 -> Service.storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
                 case 10 -> menuCountTitoliViaggio(titoloViaggioDAO, puntoDiEmissioneDAO);
                 case 11 -> Service.storicoManutenzione(manutenzioneDAO, mezzoDiTrasportoDAO);
-                case 12 -> Service.cambiaStatoMezzo(mezzoDiTrasportoDAO);
+                case 12 -> Service.cambiaStatoMezzo(mezzoDiTrasportoDAO, manutenzioneDAO);
                 case 13 -> Service.verificaAbbonamento(titoloViaggioDAO);
                 case 14 -> menuCountBigliettiVidimati(titoloViaggioDAO, mezzoDiTrasportoDAO);
                 case 15 -> Service.aggiornaStatoRivenditore(puntoDiEmissioneDAO);

@@ -1508,7 +1508,7 @@ public class Service {
 //endregion
 
     //region Cambia Stato Mezzo
-    public static void cambiaStatoMezzo(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
+    public static void cambiaStatoMezzo(MezzoDiTrasportoDAO mezzoDiTrasportoDAO, ManutenzioneDAO manutenzioneDAO) {
         System.out.println("\n--- CAMBIO STATO MEZZO (SERVIZIO / MANUTENZIONE) ---");
 
         MezzoDiTrasporto mezzo = null;
@@ -1549,6 +1549,9 @@ public class Service {
             if (nuovoStato == mezzo.getStatoMezzo()) {
                 System.out.println("Il mezzo è già " + nuovoStato + ".");
                 nuovoStato = null;
+            } else if (nuovoStato == StatoMezzo.IN_SERVIZIO) {
+                Manutenzione latest = manutenzioneDAO.getLatestManutenzione(mezzo);
+                manutenzioneDAO.endManutenzione(latest);
             }
         }
 
@@ -1558,6 +1561,18 @@ public class Service {
                 mezzo.getCapienza(),
                 nuovoStato
         );
+
+        if (nuovoStato == StatoMezzo.IN_MANUTENZIONE) {
+            String motivo = "";
+            while (true) {
+                System.out.println("Inserisci il motivo della manutenzione");
+                motivo = scanner.nextLine().trim();
+                if (!motivo.isEmpty()) break;
+                else System.out.println("Inserisci un motivo valido.");
+            }
+            manutenzioneDAO.saveManutenzione(new Manutenzione(mezzo, motivo));
+        }
+
 
         System.out.println("Stato del mezzo aggiornato con successo in: " + nuovoStato);
     }
