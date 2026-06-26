@@ -188,7 +188,7 @@ public class Service {
 
         for (int i = 0; i < 15; i++) {
 
-            StatoTratta statoTratta  = (i % 10 == 0) ? StatoTratta.LAVORAZIONE_IN_CORSO : StatoTratta.OPERATIVA;
+            StatoTratta statoTratta = (i % 10 == 0) ? StatoTratta.LAVORAZIONE_IN_CORSO : StatoTratta.OPERATIVA;
             String partenza = faker.address().city();
             String capolinea = faker.address().city();
             int tempoStimato = random.nextInt(10, 91); // minuti stimati, tra 10 e 90
@@ -1757,4 +1757,5 @@ public class Service {
     }
     // endregion
 
+    
 }
