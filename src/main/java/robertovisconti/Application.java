@@ -494,19 +494,33 @@ public class Application {
 
             if (input == 0) break;
 
-
             LocalDateTime dataInizio = null;
             LocalDateTime dataFine = null;
+
             if (input >= 1 && input <= 2) {
                 while (true) {
                     dataInizio = richiediData("Data di inizio");
                     dataFine = richiediData("Data di fine");
 
                     if (dataInizio.isAfter(dataFine)) {
-                        System.out.println("\n[ERRORE] La data di inizio non può essere successiva alla data di fine. Riprova l'inserimento.");
-                    } else {
-                        break;
+                        System.out.println("\nLa data di inizio non può essere successiva alla data di fine. Riprova l'inserimento.");
+                        continue;
                     }
+
+                    LocalDateTime adesso = LocalDateTime.now();
+
+                    if (dataInizio.isAfter(adesso)) {
+                        System.out.println("\nLa data di inizio non può essere nel futuro. Riprova l'inserimento.");
+                        continue;
+                    }
+
+                    if (dataFine.isAfter(adesso)) {
+                        System.out.println("\nLa data di fine inserita è nel futuro.");
+                        System.out.println("La ricerca verrà limitata automaticamente fino a questo preciso istante.");
+                        dataFine = adesso;
+                    }
+
+                    break;
                 }
             }
 
@@ -517,10 +531,14 @@ public class Application {
                             titoloViaggioDAO.countBigliettiVidimatiSuMezzo(mezzo));
                 }
 
-                case 2 -> System.out.println("\nBiglietti vidimati tra " + dataInizio + " e " + dataFine + ": " +
-                        titoloViaggioDAO.countBigliettiVidimatiBetween(dataInizio, dataFine));
+                case 2 -> {
+                    DateTimeFormatter stampaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                    System.out.println("\nBiglietti vidimati tra " + dataInizio.format(stampaFormatter) +
+                            " e " + dataFine.format(stampaFormatter) + ": " +
+                            titoloViaggioDAO.countBigliettiVidimatiBetween(dataInizio, dataFine));
+                }
 
-                default -> System.out.println("Input non valido. Inserisci un numero da 0 a 4.");
+                default -> System.out.println("Input non valido. Inserisci un numero valido.");
             }
         }
     }
