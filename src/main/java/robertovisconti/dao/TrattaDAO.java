@@ -3,6 +3,7 @@ package robertovisconti.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import robertovisconti.entities.Tratta;
+import robertovisconti.enums.StatoTratta;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,8 +26,8 @@ public class TrattaDAO {
     }
 
     // TASK 3a - creo una tratta e la salvo subito
-    public Tratta creaTratta(String puntoDiPartenza, String capolinea, int tempoPercorrenzaStimato) {
-        Tratta tratta = new Tratta(puntoDiPartenza, capolinea, tempoPercorrenzaStimato);
+    public Tratta creaTratta(String puntoDiPartenza, String capolinea, int tempoPercorrenzaStimato, StatoTratta statoTratta) {
+        Tratta tratta = new Tratta(puntoDiPartenza, capolinea, tempoPercorrenzaStimato, statoTratta);
         save(tratta);
         return tratta;
     }

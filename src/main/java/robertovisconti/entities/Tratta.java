@@ -2,6 +2,7 @@ package robertovisconti.entities;
 
 
 import jakarta.persistence.*;
+import robertovisconti.enums.StatoTratta;
 
 import java.util.UUID;
 
@@ -17,14 +18,17 @@ public class Tratta {
     private String capolinea;
     @Column(name = "tempo_percorrenza_stimato", nullable = false)
     private int tempoPercorrenzaStimato;
+    @EnumeratedValue
+    private StatoTratta statoTratta;
 
     public Tratta() {
     }
 
-    public Tratta(String puntoDiPartenza, String capolinea, int tempoPercorrenzaStimato) {
+    public Tratta(String puntoDiPartenza, String capolinea, int tempoPercorrenzaStimato, StatoTratta statoTratta) {
         this.puntoDiPartenza = puntoDiPartenza;
         this.capolinea = capolinea;
         this.tempoPercorrenzaStimato = tempoPercorrenzaStimato;
+        this.statoTratta = statoTratta;
     }
 
     public String getPuntoDiPartenza() {
@@ -43,12 +47,22 @@ public class Tratta {
         this.capolinea = capolinea;
     }
 
+
     public int getTempoPercorrenzaStimato() {
         return tempoPercorrenzaStimato;
     }
 
+
     public void setTempoPercorrenzaStimato(int tempoPercorrenzaStimato) {
         this.tempoPercorrenzaStimato = tempoPercorrenzaStimato;
+    }
+
+    public StatoTratta getStatoTratta() {
+        return statoTratta;
+    }
+
+    public void setStatoTratta(StatoTratta statoTratta) {
+        this.statoTratta = statoTratta;
     }
 
     @Override

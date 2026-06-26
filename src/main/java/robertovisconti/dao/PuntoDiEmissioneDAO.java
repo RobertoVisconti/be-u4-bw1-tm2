@@ -38,39 +38,48 @@ public class PuntoDiEmissioneDAO {
     }
 
     public void updateStatoDistributoreById(UUID id, StatoDistributoreAutomatico stato) {
-        PuntoDiEmissione found = findPuntoDiEmissioneById(id);
-        if (!(found instanceof DistributoreAutomatico)) {
-            throw new PuntoDiEmissioneNonTrovatoException(id);
-        }
+
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
 
-        Query query = em.createQuery("UPDATE DistributoreAutomatico d SET d.stato = :newStato WHERE d.id = :id");
-        query.setParameter("newStato", stato);
-        query.setParameter("id", id);
+        DistributoreAutomatico distributore = em.find(DistributoreAutomatico.class, id);
 
-        query.executeUpdate(); // <-- Questa riga esegue la query nella transazione
+        if (distributore == null) {
+            transaction.rollback();
+            throw new PuntoDiEmissioneNonTrovatoException(id);
+        }
+
+        distributore.setStato(stato);
 
         transaction.commit();
-        System.out.println("Il distributore automatico " + found.getNome() + " è stato aggiornato allo stato " + stato);
+
+        System.out.println(
+                "Il distributore automatico " + distributore.getNome()
+                        + " è stato aggiornato allo stato " + stato
+        );
     }
 
     public void updateStatoRivenditoreById(UUID id, boolean stato) {
-        PuntoDiEmissione found = findPuntoDiEmissioneById(id);
-        if (!(found instanceof Rivenditore)) {
-            throw new PuntoDiEmissioneNonTrovatoException(id);
-        }
+
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
 
-        Query query = em.createQuery("UPDATE Rivenditore r SET r.aperto = :newStato WHERE r.id = :id");
-        query.setParameter("newStato", stato);
-        query.setParameter("id", id);
+        Rivenditore rivenditore = em.find(Rivenditore.class, id);
 
-        query.executeUpdate(); // <-- Questa riga esegue la query nella transazione
+        if (rivenditore == null) {
+            transaction.rollback();
+            throw new PuntoDiEmissioneNonTrovatoException(id);
+        }
+
+        rivenditore.setAperto(stato);
 
         transaction.commit();
-        System.out.println("Il rivenditore " + found.getNome() + " è stato aggiornato allo stato " + (stato ? "'APERTO'" : "'CHIUSO'"));
+
+        System.out.println(
+                "Il rivenditore " + rivenditore.getNome()
+                        + " è stato aggiornato allo stato "
+                        + (stato ? "APERTO" : "CHIUSO")
+        );
     }
 
     public void findByIdAndDelete(UUID id) {
