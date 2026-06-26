@@ -4,6 +4,7 @@ package robertovisconti.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
+import robertovisconti.entities.Tessera;
 import robertovisconti.entities.Utente;
 import robertovisconti.exceptions.UtenteEmailNonTrovatoException;
 import robertovisconti.exceptions.UtenteNonTrovatoException;
@@ -62,5 +63,12 @@ public class UtenteDAO {
         System.out.println(utente + " Rimosso con successo.");
     }
 
+    public void setIdTessera(Utente utente, Tessera tessera) {
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+        utente.setIdTessera(tessera);
+        transaction.commit();
+        System.out.println("Tessera associata con successo!");
+    }
 
 }

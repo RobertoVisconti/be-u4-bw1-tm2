@@ -822,7 +822,7 @@ public class Service {
 
     //region Metodo crea tessera
 
-    public static void creaTesseraUtente(Utente utente, TesseraDAO tesseraDAO) {
+    public static void creaTesseraUtente(Utente utente, TesseraDAO tesseraDAO, UtenteDAO utenteDAO) {
 
         if (utente == null) {
             System.out.println("Errore: utente non valido.");
@@ -838,7 +838,7 @@ public class Service {
         try {
             Tessera nuovaTessera = tesseraDAO.creaTessera();
 
-            utente.setIdTessera(nuovaTessera);
+            utenteDAO.setIdTessera(utente, nuovaTessera);
 
             System.out.println("Tessera creata con successo!");
             System.out.println("Codice tessera: " + nuovaTessera.getCodiceUnivoco());

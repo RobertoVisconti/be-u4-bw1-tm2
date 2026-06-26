@@ -25,6 +25,7 @@ public class TesseraDAO {
         tx.commit();
     }
 
+
     // creo una nuova tessera (con codice univoco generato automaticamente) e la salvo subito
     public Tessera creaTessera() {
         Tessera tessera = new Tessera(UUID.randomUUID());

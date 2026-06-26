@@ -34,6 +34,10 @@ public class Tessera {
         this.codiceUnivoco = codiceUnivoco;  // UUID.randomUUID(); alla creazione tessera
     }
 
+    public void setCodiceUnivoco(UUID codiceUnivoco) {
+        this.codiceUnivoco = codiceUnivoco;
+    }
+
     public UUID getId() {
         return id;
     }
