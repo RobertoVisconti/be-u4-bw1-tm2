@@ -1676,13 +1676,19 @@ public class Service {
 
     //region Cambia Stato Mezzo
     public static void cambiaStatoMezzo(MezzoDiTrasportoDAO mezzoDiTrasportoDAO) {
-        System.out.println("\n--- CAMBIO STATO MEZZO (SERVIZIO / MANUTENZIONE) ---");
+
+        System.out.println("\n--- CAMBIO STATO MEZZO (SERVIZIO / MANUTENZIONE / DISMESSO) ---");
 
         MezzoDiTrasporto mezzo = null;
 
         while (mezzo == null) {
-            System.out.print("Inserisci la targa del mezzo: ");
+
+            System.out.print("Inserisci la targa del mezzo (0 per tornare al menu): ");
             String targa = scanner.nextLine().trim();
+
+            if (targa.equals("0")) {
+                return;
+            }
 
             try {
                 mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
@@ -1690,31 +1696,57 @@ public class Service {
                 if (mezzo == null) {
                     System.out.println("Nessun mezzo trovato con questa targa. Riprova.");
                 }
+
             } catch (Exception e) {
-                System.out.println("Errore nella ricerca: Mezzo non trovato. Riprova.");
+                System.out.println("Errore nella ricerca: mezzo non trovato. Riprova.");
             }
+        }
+
+
+        if (mezzo.getStatoMezzo() == StatoMezzo.DISMESSO) {
+            System.out.println("Il mezzo è stato DISMESSO e non può essere modificato.");
+            return;
         }
 
         System.out.println("Mezzo trovato! Stato attuale: " + mezzo.getStatoMezzo());
 
         StatoMezzo nuovoStato = null;
+
         while (nuovoStato == null) {
+
             System.out.println("\nSeleziona il nuovo stato:");
             System.out.println("1. In servizio");
             System.out.println("2. In manutenzione");
+            System.out.println("3. Dismesso");
+            System.out.println("0. Torna al menu principale");
             System.out.print("Scelta: ");
 
-            switch (scanner.nextLine().trim()) {
-                case "1" -> nuovoStato = StatoMezzo.IN_SERVIZIO;
-                case "2" -> nuovoStato = StatoMezzo.IN_MANUTENZIONE;
-                default -> {
+            String scelta = scanner.nextLine().trim();
+
+            switch (scelta) {
+
+                case "0":
+                    return;
+
+                case "1":
+                    nuovoStato = StatoMezzo.IN_SERVIZIO;
+                    break;
+
+                case "2":
+                    nuovoStato = StatoMezzo.IN_MANUTENZIONE;
+                    break;
+
+                case "3":
+                    nuovoStato = StatoMezzo.DISMESSO;
+                    break;
+
+                default:
                     System.out.println("Scelta non valida.");
                     continue;
-                }
             }
 
             if (nuovoStato == mezzo.getStatoMezzo()) {
-                System.out.println("Il mezzo è già " + nuovoStato + ".");
+                System.out.println("Il mezzo è già in stato " + nuovoStato + ".");
                 nuovoStato = null;
             }
         }
