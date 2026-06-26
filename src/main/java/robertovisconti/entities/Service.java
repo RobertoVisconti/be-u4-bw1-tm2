@@ -1476,13 +1476,24 @@ public class Service {
 //endregion
 
     //region ADMIN: Assegna una tratta a un mezzo
-    public static void assegnaTrattaMezzo(TrattaDAO trattaDAO, MezzoDiTrasportoDAO mezzoDiTrasportoDAO, PercorrenzaDAO percorrenzaDAO) {
+    public static void assegnaTrattaMezzo(
+            TrattaDAO trattaDAO,
+            MezzoDiTrasportoDAO mezzoDiTrasportoDAO,
+            PercorrenzaDAO percorrenzaDAO
+    ) {
+
         System.out.println("\n--- ASSEGNAZIONE TRATTA A MEZZO ---");
 
         MezzoDiTrasporto mezzo = null;
+
         while (mezzo == null) {
-            System.out.print("Targa del mezzo: ");
+
+            System.out.print("Targa del mezzo (0 per tornare al menu): ");
             String targa = scanner.nextLine().trim();
+
+            if (targa.equals("0")) {
+                return;
+            }
 
             if (targa.isEmpty()) {
                 System.out.println("La targa non può essere vuota. Riprova.");
@@ -1491,19 +1502,43 @@ public class Service {
 
             try {
                 mezzo = mezzoDiTrasportoDAO.findByTarga(targa);
+
                 if (mezzo == null) {
                     System.out.println("Nessun mezzo trovato con questa targa. Riprova.");
+                    continue;
                 }
+
+                if (mezzo.getStatoMezzo() == StatoMezzo.IN_MANUTENZIONE) {
+                    System.out.println("Il mezzo è in MANUTENZIONE e non può ricevere tratte.");
+                    mezzo = null;
+                    continue;
+                }
+
+                if (mezzo.getStatoMezzo() == StatoMezzo.DISMESSO) {
+                    System.out.println("Il mezzo è DISMESSO e non può ricevere tratte.");
+                    return;
+                }
+
             } catch (RuntimeException ex) {
-                System.out.println("Errore nella ricerca del mezzo: " + ex.getMessage() + ". Riprova.");
+                System.out.println("Errore nella ricerca del mezzo: " + ex.getMessage());
             }
         }
 
         Tratta tratta = null;
+
         while (tratta == null) {
+
             tratta = selezionaTratta(trattaDAO);
+
             if (tratta == null) {
-                System.out.println("Selezione non valida. Devi scegliere una tratta dall'elenco. Riprova.");
+                System.out.println("Selezione non valida. Devi scegliere una tratta dall'elenco.");
+                continue;
+            }
+
+           
+            if (tratta.getStatoTratta() == StatoTratta.LAVORAZIONE_IN_CORSO) {
+                System.out.println("La tratta è IN LAVORAZIONE e non può essere assegnata.");
+                tratta = null;
             }
         }
 
@@ -1511,12 +1546,12 @@ public class Service {
             LocalDateTime inizio = LocalDateTime.now();
             LocalDateTime fine = inizio.plusMinutes(tratta.getTempoPercorrenzaStimato());
 
-            Percorrenza percorrenza = percorrenzaDAO.assegnaTrattaAMezzo(tratta, mezzo, inizio, fine);
+            Percorrenza percorrenza =
+                    percorrenzaDAO.assegnaTrattaAMezzo(tratta, mezzo, inizio, fine);
+
             System.out.println("\nTratta assegnata al mezzo con successo!");
             System.out.println("Dettagli: " + percorrenza);
 
-        } catch (IllegalArgumentException ex) {
-            System.out.println("Errore: Formato UUID non valido.");
         } catch (RuntimeException ex) {
             System.out.println("Errore durante il salvataggio: " + ex.getMessage());
         }
