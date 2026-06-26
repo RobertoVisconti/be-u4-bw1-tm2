@@ -996,93 +996,182 @@ public class Service {
 
     public static void aggiornaStatoRivenditore(PuntoDiEmissioneDAO puntoDAO) {
 
-        System.out.println("\n--- AGGIORNA STATO RIVENDITORE ---");
-        System.out.print("Inserisci ID del rivenditore: ");
-
-        UUID id;
-
-        try {
-            id = UUID.fromString(scanner.nextLine().trim());
-        } catch (IllegalArgumentException e) {
-            System.out.println("ID non valido.");
-            return;
-        }
-
-        boolean stato;
-
         while (true) {
-            System.out.println("1. Apri rivenditore");
-            System.out.println("2. Chiudi rivenditore");
-            System.out.print("Scelta: ");
+
+            System.out.println("\n--- AGGIORNA STATO RIVENDITORE ---");
+            System.out.println("0. Torna al menu principale");
+            System.out.print("Inserisci ID del rivenditore: ");
+
+            String input = scanner.nextLine().trim();
+
+            if (input.equals("0")) {
+                return;
+            }
+
+            UUID id;
 
             try {
-                int scelta = Integer.parseInt(scanner.nextLine().trim());
-
-                if (scelta == 1) {
-                    stato = true;
-                    break;
-                } else if (scelta == 2) {
-                    stato = false;
-                    break;
-                } else {
-                    System.out.println("Scelta non valida. Riprova.");
-                }
-
-            } catch (NumberFormatException e) {
-                System.out.println("Input non valido. Inserisci 1 o 2.");
+                id = UUID.fromString(input);
+            } catch (IllegalArgumentException e) {
+                System.out.println("ID non valido.");
+                continue;
             }
-        }
 
-        try {
-            puntoDAO.updateStatoRivenditoreById(id, stato);
-        } catch (Exception e) {
-            System.out.println("Errore: " + e.getMessage());
+            PuntoDiEmissione punto;
+
+            try {
+                punto = puntoDAO.findPuntoDiEmissioneById(id);
+            } catch (Exception e) {
+                System.out.println("Nessun punto di emissione trovato con questo ID.");
+                continue;
+            }
+
+            if (!(punto instanceof Rivenditore rivenditore)) {
+                System.out.println("L'ID inserito appartiene ad un distributore automatico.");
+                continue;
+            }
+
+            while (true) {
+
+                System.out.println("\nStato attuale: "
+                        + (rivenditore.isAperto() ? "APERTO" : "CHIUSO"));
+
+                System.out.println("1. Apri rivenditore");
+                System.out.println("2. Chiudi rivenditore");
+                System.out.println("0. Torna al menu principale");
+                System.out.print("Scelta: ");
+
+                String scelta = scanner.nextLine().trim();
+
+                switch (scelta) {
+
+                    case "0":
+                        return;
+
+                    case "1":
+
+                        if (rivenditore.isAperto()) {
+                            System.out.println("Il rivenditore è già aperto.");
+                            continue;
+                        }
+
+                        try {
+                            puntoDAO.updateStatoRivenditoreById(id, true);
+                        } catch (Exception e) {
+                            System.out.println("Errore: " + e.getMessage());
+                        }
+
+                        return;
+
+                    case "2":
+
+                        if (!rivenditore.isAperto()) {
+                            System.out.println("Il rivenditore è già chiuso.");
+                            continue;
+                        }
+
+                        try {
+                            puntoDAO.updateStatoRivenditoreById(id, false);
+                        } catch (Exception e) {
+                            System.out.println("Errore: " + e.getMessage());
+                        }
+
+                        return;
+
+                    default:
+                        System.out.println("Scelta non valida.");
+                }
+            }
         }
     }
 
     public static void aggiornaStatoDistributore(PuntoDiEmissioneDAO puntoDAO) {
 
-        System.out.println("\n--- AGGIORNA STATO DISTRIBUTORE ---");
-        System.out.print("Inserisci ID del distributore: ");
-
-        UUID id;
-
-        try {
-            id = UUID.fromString(scanner.nextLine().trim());
-        } catch (IllegalArgumentException e) {
-            System.out.println("ID non valido.");
-            return;
-        }
-
-        StatoDistributoreAutomatico stato;
-
         while (true) {
-            System.out.println("1. Attiva distributore");
-            System.out.println("2. Disattiva distributore");
-            System.out.print("Scelta: ");
+
+            System.out.println("\n--- AGGIORNA STATO DISTRIBUTORE ---");
+            System.out.println("0. Torna al menu principale");
+            System.out.print("Inserisci ID del distributore: ");
+
+            String input = scanner.nextLine().trim();
+
+            if (input.equals("0")) {
+                return;
+            }
+
+            UUID id;
 
             try {
-                int scelta = Integer.parseInt(scanner.nextLine().trim());
-
-                if (scelta == 1) {
-                    stato = StatoDistributoreAutomatico.ATTIVO;
-                    break;
-                } else if (scelta == 2) {
-                    stato = StatoDistributoreAutomatico.NON_ATTIVO;
-                    break;
-                } else {
-                    System.out.println("Scelta non valida. Riprova.");
-                }
-
-            } catch (NumberFormatException e) {
-                System.out.println("Input non valido. Inserisci 1 o 2.");
+                id = UUID.fromString(input);
+            } catch (IllegalArgumentException e) {
+                System.out.println("ID non valido.");
+                continue;
             }
-        }
 
-        try {
-            puntoDAO.updateStatoDistributoreById(id, stato);
-        } catch (Exception e) {
-            System.out.println("Errore: " + e.getMessage());
+            PuntoDiEmissione punto;
+
+            try {
+                punto = puntoDAO.findPuntoDiEmissioneById(id);
+            } catch (Exception e) {
+                System.out.println("Nessun punto di emissione trovato con questo ID.");
+                continue;
+            }
+
+            if (!(punto instanceof DistributoreAutomatico distributore)) {
+                System.out.println("L'ID inserito appartiene ad un rivenditore.");
+                continue;
+            }
+
+            while (true) {
+
+                System.out.println("\nStato attuale: " + distributore.getStato());
+
+                System.out.println("1. Attiva distributore");
+                System.out.println("2. Disattiva distributore");
+                System.out.println("0. Torna al menu principale");
+                System.out.print("Scelta: ");
+
+                String scelta = scanner.nextLine().trim();
+
+                switch (scelta) {
+
+                    case "0":
+                        return;
+
+                    case "1":
+
+                        if (distributore.getStato() == StatoDistributoreAutomatico.ATTIVO) {
+                            System.out.println("Il distributore è già attivo.");
+                            continue;
+                        }
+
+                        try {
+                            puntoDAO.updateStatoDistributoreById(id, StatoDistributoreAutomatico.ATTIVO);
+                        } catch (Exception e) {
+                            System.out.println("Errore: " + e.getMessage());
+                        }
+
+                        return;
+
+                    case "2":
+
+                        if (distributore.getStato() == StatoDistributoreAutomatico.NON_ATTIVO) {
+                            System.out.println("Il distributore è già non attivo.");
+                            continue;
+                        }
+
+                        try {
+                            puntoDAO.updateStatoDistributoreById(id, StatoDistributoreAutomatico.NON_ATTIVO);
+                        } catch (Exception e) {
+                            System.out.println("Errore: " + e.getMessage());
+                        }
+
+                        return;
+
+                    default:
+                        System.out.println("Scelta non valida.");
+                }
+            }
         }
     }
 
