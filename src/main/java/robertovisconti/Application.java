@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
-import java.util.UUID;
 
 public class Application {
     private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
@@ -114,17 +113,16 @@ public class Application {
             System.out.println("3. Creazione punto di emissione");
             System.out.println("4. Ricerca utenti");
             System.out.println("5. Creazione tratte");
-            System.out.println("6. Genera percorrenze");
-            System.out.println("7. Assegna tratta a un mezzo");
-            System.out.println("8. Calcola tempo medio percorrenza");
-            System.out.println("9. Storico percorrenze mezzo/tratta");
-            System.out.println("10. Menù storici titoli di viaggio");
-            System.out.println("11. Storico manutenzioni");
-            System.out.println("12. Cambio Stato Mezzo");
-            System.out.println("13. Verifica abbonamento");
-            System.out.println("14. Menù conto biglietti vidimati");
-            System.out.println("15. Aggiorna stato rivenditore");
-            System.out.println("16. Aggiorna stato distributore automatico");
+            System.out.println("6. Assegna tratta a un mezzo");
+            System.out.println("7. Calcola tempo medio percorrenza");
+            System.out.println("8. Storico percorrenze mezzo/tratta");
+            System.out.println("9. Menù storici titoli di viaggio");
+            System.out.println("10. Storico manutenzioni");
+            System.out.println("11. Cambio Stato Mezzo");
+            System.out.println("12. Verifica abbonamento");
+            System.out.println("13. Menù conto biglietti vidimati");
+            System.out.println("14. Aggiorna stato rivenditore");
+            System.out.println("15. Aggiorna stato distributore automatico");
             System.out.println("0. Logout");
             System.out.print("\nScegli un'opzione: ");
 
@@ -143,17 +141,16 @@ public class Application {
                 case 3 -> menuCreazionePunti(puntoDiEmissioneDAO, genericDAO);
                 case 4 -> Service.ricercaUtenti(utenteDAO);
                 case 5 -> menuCreazioneTratte(trattaDAO, genericDAO);
-                case 6 -> Service.generaPercorrenze(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO, genericDAO);
-                case 7 -> Service.assegnaTrattaMezzo(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
-                case 8 -> Service.calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
-                case 9 -> Service.storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
-                case 10 -> menuCountTitoliViaggio(titoloViaggioDAO, puntoDiEmissioneDAO);
-                case 11 -> Service.storicoManutenzione(manutenzioneDAO, mezzoDiTrasportoDAO);
-                case 12 -> Service.cambiaStatoMezzo(mezzoDiTrasportoDAO, manutenzioneDAO);
-                case 13 -> Service.verificaAbbonamento(titoloViaggioDAO);
-                case 14 -> menuCountBigliettiVidimati(titoloViaggioDAO, mezzoDiTrasportoDAO);
-                case 15 -> Service.aggiornaStatoRivenditore(puntoDiEmissioneDAO);
-                case 16 -> Service.aggiornaStatoDistributore(puntoDiEmissioneDAO);
+                case 6 -> Service.assegnaTrattaMezzo(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
+                case 7 -> Service.calcolaTempoMedio(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
+                case 8 -> Service.storicoPercorrenzeMezzoTratta(trattaDAO, mezzoDiTrasportoDAO, percorrenzaDAO);
+                case 9 -> menuCountTitoliViaggio(titoloViaggioDAO, puntoDiEmissioneDAO);
+                case 10 -> Service.storicoManutenzione(manutenzioneDAO, mezzoDiTrasportoDAO);
+                case 11 -> Service.cambiaStatoMezzo(mezzoDiTrasportoDAO, manutenzioneDAO);
+                case 12 -> Service.verificaAbbonamento(titoloViaggioDAO);
+                case 13 -> menuCountBigliettiVidimati(titoloViaggioDAO, mezzoDiTrasportoDAO);
+                case 14 -> Service.aggiornaStatoRivenditore(puntoDiEmissioneDAO);
+                case 15 -> Service.aggiornaStatoDistributore(puntoDiEmissioneDAO);
                 case 0 -> {
                     System.out.println("Logout amministratore effettuato.");
                     adminMenu = false;
