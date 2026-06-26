@@ -1,6 +1,5 @@
 package robertovisconti.dao;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import robertovisconti.entities.Tratta;
@@ -11,9 +10,11 @@ import java.util.UUID;
 public class TrattaDAO {
     public final EntityManager entityManager;
 
-    public TrattaDAO(EntityManager em) {this.entityManager = em;}
+    public TrattaDAO(EntityManager em) {
+        this.entityManager = em;
+    }
 
-    public void save (Tratta newTratta){
+    public void save(Tratta newTratta) {
         EntityTransaction transaction = this.entityManager.getTransaction();
 
         transaction.begin();
@@ -40,7 +41,7 @@ public class TrattaDAO {
         Tratta found = entityManager.find(Tratta.class, id);
 
         if (found == null) {
-            throw new RuntimeException("Mezzo non trovato!");
+            throw new RuntimeException("Tratta non trovata!");
         }
 
         return found;
@@ -90,5 +91,5 @@ public class TrattaDAO {
 
         System.out.println("Tratta eliminata con successo!");
     }
-    
+
 }

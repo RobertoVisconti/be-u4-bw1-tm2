@@ -510,6 +510,7 @@ public class Service {
 
         System.out.println("\nTratta creata con successo.");
     }
+    
     //endregion
 
     //region Metodo Compra biglietto
